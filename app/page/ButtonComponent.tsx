@@ -4,7 +4,7 @@
 import { createClient } from '@supabase/supabase-js';
 import React, { useState } from 'react';
 
-const supabase = createClient('http://127.0.0.1:54321/functions/v1/resend', process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY);
+const supabase = createClient('https://qiekvvwcicienqtinxmo.supabase.co/functions/v1/resend', process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY);
 
 export default function ButtonComponent() {
   const [name, setName] = useState('');
