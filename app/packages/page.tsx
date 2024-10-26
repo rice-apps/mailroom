@@ -5,7 +5,7 @@ import { createClient } from "@/utils/supabase/server";
 import { InfoIcon } from "lucide-react";
 import { redirect } from "next/navigation";
 import { useEffect, useState } from "react";
-import { fetchUser } from "@/api/packages";
+import { fetchPackagesbyUser, fetchUser } from "@/api/packages";
 
 interface User {
     id: string;
@@ -18,18 +18,17 @@ interface User {
     user_type: string;
   }
 
+interface Package {
+
+}
+
 
 export default function Packages() {
 
     const [loading, setLoading] = useState(true)
     const [user, setUser] = useState<User | null>(null)
-//   const {
-//     data: { user },
-//   } = await supabase.auth.getUser();
+    const [packages,setPackages] = useState<Package | null>(null)
 
-//   if (!user) {
-//     return redirect("/sign-in");
-//   }
 
   useEffect(() => {
     console.log('page load')
@@ -39,11 +38,20 @@ export default function Packages() {
         const user = await fetchUser("evanjt06@gmail.com")
 
         setUser(user)
-        setLoading(false)
+        
     }
    
     fetchCurrentUser()
+    const fetchCurrentPackages = async () => {
+      const packages = await fetchPackagesbyUser("evanjt06@gmail.com")
+      console.log(packages)
+      setLoading(false)
+    }
+    fetchCurrentPackages()
   }, [])
+
+  
+  
 
   return (
     <div className="flex-1 w-full flex flex-col gap-12">
