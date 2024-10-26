@@ -9,7 +9,7 @@ import { fetchUser } from "@/api/packages";
 
 export default function Packages() {
 
-    const [loading, setLoading] = useState(false)
+    const [loading, setLoading] = useState(true)
     const [user, setUser] = useState([])
 //   const {
 //     data: { user },
@@ -27,6 +27,7 @@ export default function Packages() {
         const user = await fetchUser("evanjt06@gmail.com")
 
         setUser(user)
+        setLoading(false)
     }
    
     fetchCurrentUser()
@@ -34,9 +35,9 @@ export default function Packages() {
 
   return (
     <div className="flex-1 w-full flex flex-col gap-12">
-        {!loading && 
+        {loading ? "Loading..." :  
       <div>
-        hi {user?.name}
+        hi {user.name}
         </div>
         }
     </div>
