@@ -1,15 +1,38 @@
 const RESEND_API_KEY = Deno.env.get('RESEND_API_KEY')
 
 const handler = async (request: Request): Promise<Response> => {
-  const url = new URL(request.url);
-  const name = url.searchParams.get('name');
-  const trackingId = url.searchParams.get('trackingId');
+  if (request.method === 'OPTIONS') {
+    // Handle CORS preflight request
+    return new Response(null, {
+      status: 204,
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Methods': 'POST, OPTIONS',
+        'Access-Control-Allow-Headers': 'Content-Type, Authorization, x-client-info, apikey',
+      },
+    });
+  }
 
+  let requestData;
+  try {
+    requestData = await request.json();
+  } catch (error) {
+    return new Response(JSON.stringify({ error: 'Invalid JSON input' }), {
+      status: 400,
+      headers: {
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': '*',
+      },
+    });
+  }
+
+  const { name, trackingId } = requestData;
   if (!name || !trackingId) {
     return new Response(JSON.stringify({ error: 'Missing name or trackingId' }), {
       status: 400,
       headers: {
         'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': '*',
       },
     });
   }
@@ -34,6 +57,7 @@ const handler = async (request: Request): Promise<Response> => {
     status: 200,
     headers: {
       'Content-Type': 'application/json',
+      'Access-Control-Allow-Origin': '*',
     },
   });
 }
