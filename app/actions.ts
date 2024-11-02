@@ -5,59 +5,19 @@ import { createClient } from "@/utils/supabase/server";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 
-export const signUpAction = async (formData: FormData) => {
-  const email = formData.get("email")?.toString();
-  const password = formData.get("password")?.toString();
-  const supabase = createClient();
-  const origin = headers().get("origin");
-
-  if (!email || !password) {
-    return { error: "Email and password are required" };
-  }
-
-  const { error } = await supabase.auth.signUp({
-    email,
-    password,
-    options: {
-      emailRedirectTo: `${origin}/auth/callback`,
-    },
-  });
-
-  if (error) {
-    console.error(error.code + " " + error.message);
-    return encodedRedirect("error", "/sign-up", error.message);
-  } else {
-    return encodedRedirect(
-      "success",
-      "/sign-up",
-      "Thanks for signing up! Please check your email for a verification link.",
-    );
-  }
-};
-
 export const signInAction = async (formData: FormData) => {
   const supabase = createClient();
-  console.log('hi')
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider: 'google',
     options: {
       queryParams: {
-        access_type: 'offline',
         prompt: 'consent',
       },
-      redirectTo: 'http://localhost:3000/auth/callback'
+      redirectTo: 'http://localhost:3000/auth/callback' // TODO: dynamically choose between dev and prod base URL
     },
   })
-
+  
   redirect(data.url ?? "")
-  // console.log(data)
-
-  // if (error) {
-  //   console.log("error on login")
-  //   return encodedRedirect("error", "/sign-in", error.message);
-  // }
-
-  // return redirect("/protected");
 };
 
 export const forgotPasswordAction = async (formData: FormData) => {
