@@ -1,5 +1,6 @@
 import FetchDataSteps from "@/components/tutorial/fetch-data-steps";
 import { createClient } from "@/utils/supabase/server";
+import { encodedRedirect } from "@/utils/utils";
 import { InfoIcon } from "lucide-react";
 import { redirect } from "next/navigation";
 
@@ -12,6 +13,12 @@ export default async function ProtectedPage() {
 
   if (!user) {
     return redirect("/sign-in");
+  }
+
+  // Kick out non-Rice gmail accounts
+  if (!user.email?.endsWith("@rice.edu")) {
+    supabase.auth.signOut();
+    return encodedRedirect("error", "/sign-in", "Please sign in with your Rice email!");
   }
 
   return (
