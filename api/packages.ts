@@ -5,7 +5,6 @@ import { create } from "domain"
 
 export async function fetchUser(email: string): Promise<any | null> {
   const supabase = createClient()
-  console.log(email)
 
   try {
     const { data, error } = await supabase
@@ -19,8 +18,6 @@ export async function fetchUser(email: string): Promise<any | null> {
       console.error('Error fetching user:', error)
       return null
     }
-    //console.log(data)
-    //console.log("success")
     return data
   } catch (error) {
     console.error('Unexpected error:', error)
@@ -28,21 +25,21 @@ export async function fetchUser(email: string): Promise<any | null> {
   }
 }
 
-export async function fetchPackagesbyUser(email:string): Promise<any | null> {
+export async function fetchPackagesbyUser(user_id:string): Promise<any | null> {
   const supabase = createClient()
+
+  console.log(34, user_id)
 
   try {
     const { data,error} = await supabase
       .from('packages')
       .select()
-      .eq('email',email) //TODO: change to filter by uuid
-      .eq('claimed',false)
+      .eq('user_id',user_id) 
+      .eq('claimed', false)
     if (error) {
-      console.error("error fetching packages")
+      console.error(error)
       return null
     }
-
-    console.log("hello from here")
     
     return data
   } catch (error) {
@@ -63,7 +60,6 @@ export async function claimPackage(id:string): Promise<boolean | undefined> {
       console.error(`error claiming package with id ${id}`)
       return false
     }
-    console.log("success???")
     return true
   } catch (error) {
       console.error(`error claiming package with id ${id}`)
