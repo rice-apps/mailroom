@@ -7,6 +7,9 @@ import { Card } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import { createClient } from '@supabase/supabase-js';
+
+const supabase = createClient("https://qiekvvwcicienqtinxmo.supabase.co/functions/v1/resend", process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY);
 
 const collegeCoordinator = {
   name: "John Doe",
@@ -15,16 +18,31 @@ const collegeCoordinator = {
   college: "Baker"
 }
 
+// 
+// if you want to test it yourself, just add your netid below in the students array
+// 
 const students = [
   { id: 1, name: "Alice Johnson", netid: "aj122", email: "alice@rice.edu", packages: 2 },
   { id: 2, name: "Bob Smith", netid: "bs992", email: "bob@rice.edu", packages: 1 },
   { id: 3, name: "Charlie Brown", netid: "cb921", email: "charlie@rice.edu", packages: 3 },
   { id: 4, name: "Diana Ross", netid: "dr011", email: "diana@rice.edu", packages: 0 },
-  { id: 5, name: "Ethan Hunt", netid: "eh21", email: "ethan@rice.edu", packages: 1 },
+  { id: 5, name: "Evan Tu", netid: "et62", email: "ethan@rice.edu", packages: 1 },
 ]
 
 export default function Component() {
   const totalPackages = students.reduce((sum, student) => sum + student.packages, 0)
+
+  const handleClick = async (netID: string, trackingId: string) => {
+    const { data, error } = await supabase.functions.invoke('resend', {
+      body: { netID, trackingId }
+    });
+
+    if (error) {
+      console.error('Error invoking function:', error);
+    } else {
+      console.log('Function response data:', data);
+    }
+  };
 
   return (
     <div className="flex h-screen bg-white">
@@ -103,6 +121,9 @@ export default function Component() {
                         size="sm"
                         disabled={student.packages === 0}
                         className="bg-white border-[#00205B] text-[#00205B] hover:bg-[#00205B] hover:text-white"
+                        onClick={() => {
+                            handleClick(student.netid, "Your package has arrived!")
+                        }}
                       >
                         Remind
                       </Button>
