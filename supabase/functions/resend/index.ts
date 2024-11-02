@@ -26,9 +26,9 @@ const handler = async (request: Request): Promise<Response> => {
     });
   }
 
-  const { name, trackingId } = requestData;
-  if (!name || !trackingId) {
-    return new Response(JSON.stringify({ error: 'Missing name or trackingId' }), {
+  const { netID, trackingId } = requestData;
+  if (!netID || !trackingId) {
+    return new Response(JSON.stringify({ error: 'Missing netID or trackingId' }), {
       status: 400,
       headers: {
         'Content-Type': 'application/json',
@@ -44,8 +44,8 @@ const handler = async (request: Request): Promise<Response> => {
       Authorization: `Bearer ${RESEND_API_KEY}`,
     },
     body: JSON.stringify({
-      from: 'onboarding@resend.dev',
-      to: 'delivered@resend.dev',
+      from: 'mailroom@riceapps.org',
+      to: netID+'@rice.edu',
       subject: 'Package Delivered',
       html: 
       
