@@ -77,7 +77,7 @@ const PackageInfoForm: React.FC = () => {
 
   return (
     <div>
-      <h2>Package Information</h2>
+      <h1 style={{ fontWeight: 'bold' }}>Package Information</h1>
       <form onSubmit={handleSubmit}>
         <label>
           Recipient Name:
