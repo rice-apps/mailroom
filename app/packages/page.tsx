@@ -5,7 +5,7 @@ import { createClient } from "@/utils/supabase/server";
 import { InfoIcon } from "lucide-react";
 import { redirect } from "next/navigation";
 import { useEffect, useState } from "react";
-import { fetchPackagesbyUser, fetchUser } from "@/api/packages";
+// import { fetchPackagesbyUser, fetchUser } from "@/api/packages";
 
 interface User {
     id: string;
@@ -30,25 +30,25 @@ export default function Packages() {
     const [packages,setPackages] = useState<Package | null>(null)
 
 
-  useEffect(() => {
-    console.log('page load')
+  // useEffect(() => {
+  //   console.log('page load')
 
-    const fetchCurrentUser = async () => {
-        console.log('in function call')
-        const user = await fetchUser("evanjt06@gmail.com")
+  //   const fetchCurrentUser = async () => {
+  //       console.log('in function call')
+  //       const user = await fetchUser("evanjt06@gmail.com")
 
-        setUser(user)
+  //       setUser(user)
         
-    }
+  //   }
    
-    fetchCurrentUser()
-    const fetchCurrentPackages = async () => {
-      const packages = await fetchPackagesbyUser("evanjt06@gmail.com")
-      console.log(packages)
-      setLoading(false)
-    }
-    fetchCurrentPackages()
-  }, [])
+  //   fetchCurrentUser()
+  //   const fetchCurrentPackages = async () => {
+  //     const packages = await fetchPackagesbyUser("evanjt06@gmail.com")
+  //     console.log(packages)
+  //     setLoading(false)
+  //   }
+  //   fetchCurrentPackages()
+  // }, [])
 
   
   
