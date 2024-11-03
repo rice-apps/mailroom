@@ -95,12 +95,12 @@ export default function ScanCheckin() {
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="space-y-2">
             <div className="flex items-center space-x-2">
-            <Label
-              htmlFor="tracking-number"
-              className="text-sm font-medium text-gray-700 dark:text-gray-300"
-            >
-              Tracking Number
-            </Label>
+              <Label
+                htmlFor="tracking-number"
+                className="text-sm font-medium text-gray-700 dark:text-gray-300"
+              >
+                Tracking Number
+              </Label>
               <button type="button" className="relative group">
                 <span className="w-4 h-4 bg-black text-gray-300 dark:text-gray-200 rounded-full flex items-center justify-center text-xs">
                   ?
@@ -164,19 +164,21 @@ export default function ScanCheckin() {
                 />
                 <ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400 dark:text-gray-500" />
               </div>
-              {showDropdown && filteredRecipients.length > 0 && (
-                <ul className="absolute z-10 w-full mt-1 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md shadow-lg max-h-60 overflow-auto">
-                  {filteredRecipients.map((recipient, index) => (
-                    <li
-                      key={index}
-                      className="px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer"
-                      onClick={() => handleRecipientSelect(recipient)}
-                    >
-                      {recipient}
-                    </li>
-                  ))}
-                </ul>
-              )}
+              {showDropdown &&
+                recipientName.length >= 3 &&
+                filteredRecipients.length > 0 && (
+                  <ul className="absolute z-10 w-full mt-1 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md shadow-lg max-h-60 overflow-auto">
+                    {filteredRecipients.map((recipient, index) => (
+                      <li
+                        key={index}
+                        className="px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer"
+                        onClick={() => handleRecipientSelect(recipient)}
+                      >
+                        {recipient}
+                      </li>
+                    ))}
+                  </ul>
+                )}
             </div>
           </div>
           <Button
