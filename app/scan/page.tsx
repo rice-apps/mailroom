@@ -74,7 +74,7 @@ export default function ScanCheckin() {
           Check in Package
         </h1>
         <div className="mb-6 relative">
-          <div className="relative w-64 h-64 mx-auto bg-white dark:bg-gray-700 rounded-lg shadow-inner flex items-center justify-center overflow-hidden">
+          <div className="relative w-64 h-64 mx-auto bg-white dark:bg-gray-700 rounded-3xl shadow-inner flex items-center justify-center overflow-hidden">
             <Package className="w-32 h-32 text-gray-400 dark:text-gray-500 absolute" />
             <div
               className={`absolute inset-0 flex items-center justify-center transition-opacity duration-1000 ${
