@@ -8,7 +8,7 @@ import { Package, ScanLine, Barcode, Edit2, ChevronDown } from "lucide-react";
 
 const recipients = ["Ovik Das", "Aditya Viswanathan"];
 
-export default function Component() {
+export default function ScanCheckin() {
   const [trackingNumber, setTrackingNumber] = useState("");
   const [recipientName, setRecipientName] = useState("");
   const [isScanning, setIsScanning] = useState(true);
@@ -81,7 +81,9 @@ export default function Component() {
                 isScanning ? "opacity-100" : "opacity-0"
               }`}
             >
-              <ScanLine className="w-64 h-64 text-green-500" />
+              <ScanLine
+                className={`w-64 h-64 text-green-500 ${isScanning ? "animate-pulse" : ""}`}
+              />
             </div>
           </div>
           <p className="text-center mt-4 text-sm text-gray-600 dark:text-gray-400">
@@ -92,12 +94,23 @@ export default function Component() {
         </div>
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="space-y-2">
+            <div className="flex items-center space-x-2">
             <Label
               htmlFor="tracking-number"
               className="text-sm font-medium text-gray-700 dark:text-gray-300"
             >
               Tracking Number
             </Label>
+              <button type="button" className="relative group">
+                <span className="w-4 h-4 bg-black text-gray-300 dark:text-gray-200 rounded-full flex items-center justify-center text-xs">
+                  ?
+                </span>
+                <div className="absolute bottom-full mb-2 hidden group-hover:block w-48 p-2 bg-gray-700 text-white text-xs rounded-md shadow-lg">
+                  Scan the tracking number using the scanner or enable manual
+                  input to enter it manually.
+                </div>
+              </button>
+            </div>
             <div className="relative">
               <Input
                 id="tracking-number"
@@ -114,7 +127,7 @@ export default function Component() {
                 placeholder={
                   isManualInput
                     ? "Enter tracking number"
-                    : "Tracking number will appear here"
+                    : "Scan in tracking number with scanner"
                 }
                 readOnly={!isManualInput}
               />
@@ -169,9 +182,13 @@ export default function Component() {
           <Button
             type="submit"
             className="w-full bg-black text-white hover:bg-gray-800 dark:bg-white dark:text-black dark:hover:bg-gray-200"
-            disabled={!trackingNumber || !recipientName}
+            disabled={
+              !trackingNumber ||
+              !recipientName ||
+              !recipients.includes(recipientName)
+            }
           >
-            Submit Package
+            Check-in Package
           </Button>
         </form>
       </div>
