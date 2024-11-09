@@ -20,7 +20,6 @@ Deno.serve(async (req) => {
 
   const url = new URL(req.url);
   const trackingID = url.searchParams.get('trackingID');
-  const netID = url.searchParams.get('netID');
   
   // console.log(trackingID)
 

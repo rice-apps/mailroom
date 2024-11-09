@@ -290,7 +290,7 @@ const handler = async (request: Request): Promise<Response> => {
                             </div>
                             <div> 
                             
-                            <a href="https://qiekvvwcicienqtinxmo.supabase.co/functions/v1/claim-package?trackingID=${trackingId}&netID=${netID}" 
+                            <a href="https://qiekvvwcicienqtinxmo.supabase.co/functions/v1/claim-package?trackingID=${trackingId}" 
                               style="display: inline-block; padding: 10px 20px; background-color: #a27a52; color: #ffffff; text-decoration: none; border-radius: 4px; font-weight: bold; margin: 10px 0;">
                                 Claim Package
                             </a>
