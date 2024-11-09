@@ -1,0 +1,1 @@
+//student page base code
