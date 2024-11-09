@@ -24,21 +24,37 @@ import React, { useState } from 'react';
 
 const supabase = createClient();
 
+/** 
+
+id	
+
+date_added	
+
+package_identifier	
+
+claimed----
+
+date_claimed----
+
+extra_information	
+
+user_id */
+
 interface PackageInfo {
   id?: string;
-  recipient_name?: string;
-  email?: string;
+  // recipient_name?: string;
+  // email?: string;
   date_added?: string;
   package_identifier?: string;
   claimed: boolean;
-  date_claimed: string;
+  date_claimed?: string;
   extra_information?: string;
+  user_id?: string;
 }
 
 const PackageInfoForm: React.FC = () => {
   const [formData, setFormData] = useState<PackageInfo>({
     claimed: false,
-    date_claimed: 'unclaimed',
   });
   const [confirmationMessage, setConfirmationMessage] = useState<string | null>(null);
 
@@ -50,6 +66,8 @@ const PackageInfoForm: React.FC = () => {
     }));
   };
 
+
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const { error } = await supabase
@@ -57,12 +75,13 @@ const PackageInfoForm: React.FC = () => {
       .insert([
         {
           claimed: formData.claimed,
-          claimed_date: formData.date_claimed,
-          recipient_name: formData.recipient_name,
-          email: formData.email,
+          date_claimed: formData.date_claimed,
+          // recipient_name: formData.recipient_name,
+          // email: formData.email,
           date_added: formData.date_added,
           package_identifier: formData.package_identifier,
           extra_information: formData.extra_information,
+          user_id: "a7d79e13-bdb3-4d8b-af8f-1f346eb3e1b0",
         },
       ]);
 
@@ -79,7 +98,7 @@ const PackageInfoForm: React.FC = () => {
     <div>
       <h1 style={{ fontWeight: 'bold' }}>Package Information</h1>
       <form onSubmit={handleSubmit}>
-        <label>
+        {/* <label>
           Recipient Name:
           <input
             type="text"
@@ -99,9 +118,9 @@ const PackageInfoForm: React.FC = () => {
             onChange={handleChange}
           />
         </label>
-        <br />
+        <br /> */}
 
-        <label>
+        {/* <label>
           Date Added:
           <input
             type="date"
@@ -110,7 +129,7 @@ const PackageInfoForm: React.FC = () => {
             onChange={handleChange}
           />
         </label>
-        <br />
+        <br /> */}
 
         <label>
           Package Identifier:
