@@ -3,18 +3,15 @@ import FetchDataSteps from "@/components/tutorial/fetch-data-steps";
 import { createClient } from "@/utils/supabase/server";
 import { InfoIcon } from "lucide-react";
 import { redirect } from "next/navigation";
-import { getEmail } from "@/app/actions";
 
 export default async function ProtectedPage() {
   const supabase = createClient();
-
-  const user_email = getEmail();
   
   //check if user is college coord
   const { data } = await supabase
   .from('users')
   .select('user_type')
-  .eq('email', user_email)  
+  .eq('email', (await supabase.auth.getUser()).data.user?.email)  
   .single();  
 
   if (data === null || data.user_type !== 'coordinator') {
