@@ -7,42 +7,107 @@ import { Card } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { createClient } from '@supabase/supabase-js';
+import { createClient } from '@supabase/supabase-js'
+import { useEffect, useState } from 'react'
+import { ToastAction } from "@/components/ui/toast"
+import { useToast } from "../hooks/use-toast"
 
-const supabase = createClient("https://qiekvvwcicienqtinxmo.supabase.co/functions/v1/resend", process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY);
+// Assuming these functions are defined in the specified path
+import { fetchStudentsGivenCollege } from "../../api/admin"
 
-const collegeCoordinator = {
-  name: "John Doe",
-  email: "john.doe@rice.edu",
-  netID: "jd123",
-  college: "Baker"
-}
+const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY)
 
-// 
-// if you want to test it yourself, just add your netid below in the students array
-// 
-const students = [
-  { id: 1, name: "Alice Johnson", netid: "aj122", email: "alice@rice.edu", packages: 2 },
-  { id: 2, name: "Bob Smith", netid: "bs992", email: "bob@rice.edu", packages: 1 },
-  { id: 3, name: "Charlie Brown", netid: "cb921", email: "charlie@rice.edu", packages: 3 },
-  { id: 4, name: "Diana Ross", netid: "dr011", email: "diana@rice.edu", packages: 0 },
-  { id: 5, name: "Evan Tu", netid: "et62", email: "ethan@rice.edu", packages: 1 },
+const collegeContacts = [
+  { collegeName: "Lovett", name: "Sharon O'Leary", email: "sko1@rice.edu" },
+  { collegeName: "Baker", name: "Kristen Luu", email: "kl161@rice.edu" },
+  { collegeName: "Will Rice", name: "Amanda Garza", email: "ag276@rice.edu" },
+  { collegeName: "Hanszen", name: "Joyce Bald", email: "joyce@rice.edu" },
+  { collegeName: "Wiess", name: "Jenny Toups", email: "jt87@rice.edu" },
+  { collegeName: "Jones", name: "Kellie Sager", email: "ks235@rice.edu" },
+  { collegeName: "Brown", name: "Christy Cousins", email: "cc233@rice.edu" },
+  { collegeName: "Sid", name: "Lisa Galloy", email: "lgalloy@rice.edu" },
+  { collegeName: "Martel", name: "Bonnie Stroman", email: "brs3126@rice.edu" },
+  { collegeName: "McMurtry", name: "Jackie Carrizales", email: "jjc3@rice.edu" },
+  { collegeName: "Duncan", name: "Wendy Olivares", email: "wo5@rice.edu" }
 ]
 
+interface CollegeContact {
+  name: string
+  email: string
+  collegeName: string
+}
+
+interface Package {
+  claimed: boolean
+  date_added: string
+  date_claimed: string
+  extra_information: string
+  id: string
+  package_identifier: string
+  user_id: string
+}
+
+interface Student {
+  id: number
+  name: string
+  netid: string
+  email: string
+  packages: Package[]
+}
+
+const currentCollegeCoordEmail = "jt87@rice.edu"
+
 export default function Component() {
-  const totalPackages = students.reduce((sum, student) => sum + student.packages, 0)
+  const [coord, setCoord] = useState<CollegeContact | null>(null)
+  const [students, setStudents] = useState<Student[] | null>(null)
+  const [loading, setLoading] = useState(false)
+  const [filter, setFilter] = useState("all")
+  const [searchTerm, setSearchTerm] = useState("")
+
+  const { toast } = useToast()
 
   const handleClick = async (netID: string, trackingId: string) => {
-    const { data, error } = await supabase.functions.invoke('resend', {
-      body: { netID, trackingId }
-    });
+    try {
+      const { data, error } = await supabase.functions.invoke('resend', {
+        body: { netID, trackingId }
+      })
 
-    if (error) {
-      console.error('Error invoking function:', error);
-    } else {
-      console.log('Function response data:', data);
+      if (error) throw error
+
+      toast({
+        title: "Successfully sent a reminder to the student",
+      })
+
+    } catch (error) {
+      console.error('Error invoking function:', error)
     }
-  };
+  }
+
+  useEffect(() => {
+    const currentCoord = collegeContacts.find(contact => contact.email === currentCollegeCoordEmail)
+    if (currentCoord) {
+      setCoord(currentCoord)
+      setLoading(true)
+      fetchStudentsGivenCollege(currentCoord.collegeName)
+        .then(result => {
+          setStudents(result)
+          setLoading(false)
+        })
+        .catch(error => {
+          console.error("Error fetching students:", error)
+          setLoading(false)
+        })
+    }
+  }, [])
+
+  const filteredStudents = students?.filter(student => {
+    const matchesFilter = filter === "all" || 
+      (filter === "unclaimed" && student.packages.some(pkg => !pkg.claimed)) ||
+      (filter === "claimed" && student.packages.every(pkg => pkg.claimed))
+    const matchesSearch = student.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      student.email.toLowerCase().includes(searchTerm.toLowerCase())
+    return matchesFilter && matchesSearch
+  })
 
   return (
     <div className="flex h-screen bg-white">
@@ -53,18 +118,18 @@ export default function Component() {
         </div>
         <div className="mt-4 px-4 space-y-2">
           <div className="text-sm font-medium text-gray-600">College Coordinator</div>
-          <div className="text-[#00205B] font-semibold">{collegeCoordinator.name}</div>
-          <div className="text-sm text-gray-600">{collegeCoordinator.email}</div>
-          <div className="text-sm text-gray-600">Net ID: {collegeCoordinator.netID}</div>
+          <div className="text-[#00205B] font-semibold">{coord?.name}</div>
+          <div className="text-sm text-gray-600">{coord?.email}</div>
+          <div className="text-sm text-gray-600">Net ID: {coord?.email.split("@")[0]}</div>
           <div className="text-sm font-medium text-[#00205B] mt-4">Assigned College</div>
-          <div className="text-lg font-bold text-[#00205B]">{collegeCoordinator.college}</div>
+          <div className="text-lg font-bold text-[#00205B]">{coord?.collegeName}</div>
         </div>
       </div>
 
       <div className="flex flex-1 flex-col overflow-hidden">
         <header className="flex h-16 items-center justify-between border-b border-gray-200 bg-white px-6">
           <div className="flex items-center gap-4">
-            <h1 className="text-2xl font-semibold text-[#00205B]">{collegeCoordinator.college} College</h1>
+            <h1 className="text-2xl font-semibold text-[#00205B]">{coord?.collegeName} College</h1>
           </div>
           <div className="flex items-center gap-4 bg-white">
             <Button className="hover:bg-white" variant="ghost" size="icon">
@@ -76,7 +141,7 @@ export default function Component() {
         <main className="flex-1 overflow-auto p-6">
           <div className="mb-6 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
             <div className="flex w-full flex-col gap-4 md:w-auto md:flex-row">
-              <Select defaultValue="all">
+              <Select value={filter} onValueChange={setFilter}>
                 <SelectTrigger className="w-full md:w-[180px] bg-white text-black">
                   <SelectValue placeholder="Filter by status" />
                 </SelectTrigger>
@@ -88,7 +153,12 @@ export default function Component() {
               </Select>
               <div className="relative">
                 <Search className="absolute left-2 top-1/2 h-4 w-4 -translate-y-1/2 transform text-gray-400" />
-                <Input placeholder="Search students..." className="pl-8 bg-white text-black" />
+                <Input 
+                  placeholder="Search students..." 
+                  className="pl-8 bg-white text-black" 
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                />
               </div>
             </div>
           </div>
@@ -105,25 +175,27 @@ export default function Component() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {students.map((student) => (
+                {loading ? (
+                  <TableRow>
+                    <TableCell colSpan={5} className="text-center">Loading...</TableCell>
+                  </TableRow>
+                ) : filteredStudents?.map((student) => (
                   <TableRow key={student.id} className="text-black">
                     <TableCell className="font-medium">{student.name}</TableCell>
                     <TableCell>{student.email}</TableCell>
-                    <TableCell>{student.netid}</TableCell>
+                    <TableCell>{student.email.split("@")[0]}</TableCell>
                     <TableCell>
-                      <Badge variant={student.packages > 0 ? "default" : "secondary"} className="bg-[#00205B] text-white hover:bg-black">
-                        {student.packages}
+                      <Badge variant={student.packages.length > 0 ? "default" : "secondary"} className="bg-[#00205B] text-white hover:bg-black">
+                        {student.packages.length}
                       </Badge>
                     </TableCell>
                     <TableCell>
                       <Button
                         variant="outline"
                         size="sm"
-                        disabled={student.packages === 0}
+                        disabled={student.packages.length === 0}
                         className="bg-white border-[#00205B] text-[#00205B] hover:bg-[#00205B] hover:text-white"
-                        onClick={() => {
-                            handleClick(student.netid, "Your package has arrived!")
-                        }}
+                        onClick={() => handleClick(student.email.split("@")[0], "Your package has arrived!")}
                       >
                         Remind
                       </Button>

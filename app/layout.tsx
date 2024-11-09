@@ -3,6 +3,7 @@ import { ThemeProvider } from "next-themes";
 import { ThemeSwitcher } from "@/components/theme-switcher";
 import Link from "next/link";
 import "./globals.css";
+import { Toaster } from "@/components/ui/toaster"
 
 export const metadata = {
   title: "Next.js and Supabase Starter Kit",
@@ -26,7 +27,7 @@ export default function RootLayout({
 
 
               {children}
-
+              <Toaster />
 
         </ThemeProvider>
       </body>
