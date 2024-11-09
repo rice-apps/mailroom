@@ -1,4 +1,7 @@
+import { EnvVarWarning } from "@/components/env-var-warning";
+import HeaderAuth from "@/components/header-auth";
 import FetchDataSteps from "@/components/tutorial/fetch-data-steps";
+import { hasEnvVars } from "@/utils/supabase/check-env-vars";
 import { createClient } from "@/utils/supabase/server";
 import { encodedRedirect } from "@/utils/utils";
 import { InfoIcon } from "lucide-react";
@@ -28,6 +31,7 @@ export default async function ProtectedPage() {
           <InfoIcon size="16" strokeWidth={2} />
           This is a protected page that you can only see as an authenticated
           user
+          {!hasEnvVars ? <EnvVarWarning /> : <HeaderAuth />}
         </div>
       </div>
       <div className="flex flex-col gap-2 items-start">
