@@ -6,6 +6,11 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Package, ScanLine, Barcode, Edit2, ChevronDown } from "lucide-react";
 
+
+import { createClient } from '@/utils/supabase/client';
+
+const supabase = createClient();
+
 declare global {
   interface Navigator {
     serial: any;
@@ -115,15 +120,15 @@ export default function ScanCheckin() {
   }, []);
 
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    if (trackingNumber && recipientName) {
-      console.log("Package submitted:", { trackingNumber, recipientName });
-      setTrackingNumber("");
-      setRecipientName("");
-      setIsManualInput(false);
-    }
-  };
+  // const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  //   e.preventDefault();
+  //   if (trackingNumber && recipientName) {
+  //     console.log("Package submitted:", { trackingNumber, recipientName });
+  //     setTrackingNumber("");
+  //     setRecipientName("");
+  //     setIsManualInput(false);
+  //   }
+  // };
 
   const toggleManualInput = () => {
     setIsManualInput(!isManualInput);
@@ -140,6 +145,63 @@ export default function ScanCheckin() {
     setRecipientName(recipient);
     setShowDropdown(false);
   };
+
+
+  //code from checkin
+
+  
+  interface PackageInfo {
+    id?: string;
+    // recipient_name?: string;
+    // email?: string;
+    date_added?: string;
+    package_identifier?: string;
+    claimed: boolean;
+    date_claimed?: string;
+    extra_information?: string;
+    user_id?: string;
+  }
+    const [formData, setFormData] = useState<PackageInfo>({
+      claimed: false,
+    });
+    const [confirmationMessage, setConfirmationMessage] = useState<string | null>(null);
+  
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+      const { name, value } = e.target;
+      setFormData((prevData) => ({
+        ...prevData,
+        [name]: value,
+      }));
+      // console.log(formData.package_identifier);
+    };
+
+
+    const handleSubmit = async (e: React.FormEvent) => {
+      e.preventDefault();
+      console.log("handlSubmit")
+      const { error } = await supabase
+        .from('packages')
+        .insert([
+          {
+            claimed: formData.claimed,
+            date_claimed: formData.date_claimed,
+            // recipient_name: formData.recipient_name,
+            // email: formData.email,
+            date_added: formData.date_added,
+            package_identifier: formData.package_identifier,
+            extra_information: formData.extra_information,
+            user_id: "a7d79e13-bdb3-4d8b-af8f-1f346eb3e1b0",
+          },
+        ]);
+  
+      if (error) {
+        console.error("Error inserting package info:", error.message);
+        setConfirmationMessage("Error submitting data. Please try again.");
+      } else {
+        console.log("Package info inserted successfully!");
+        setConfirmationMessage("Package information submitted successfully!");
+      }
+    };
 
   
 
@@ -191,8 +253,9 @@ export default function ScanCheckin() {
               <Input
                 id="tracking-number"
                 type="text"
-                value={trackingNumber}
-                onChange={(e) => setTrackingNumber(e.target.value)}
+                name="package_identifier"
+                value={formData.package_identifier || ''}
+                onChange={handleChange}
                 className={`w-full pl-10 pr-12 ${
                   isManualInput
                     ? "bg-white dark:bg-gray-800"
@@ -261,7 +324,7 @@ export default function ScanCheckin() {
             type="submit"
             className="w-full bg-black text-white hover:bg-gray-800 dark:bg-white dark:text-black dark:hover:bg-gray-200"
             disabled={
-              !trackingNumber ||
+              !formData.package_identifier ||
               !recipientName ||
               !recipients.includes(recipientName)
             }

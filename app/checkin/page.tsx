@@ -75,10 +75,10 @@ const PackageInfoForm: React.FC = () => {
       .insert([
         {
           claimed: formData.claimed,
-          date_claimed: formData.date_claimed,
+          // date_claimed: formData.date_claimed,
           // recipient_name: formData.recipient_name,
           // email: formData.email,
-          date_added: formData.date_added,
+          // date_added: formData.date_added,
           package_identifier: formData.package_identifier,
           extra_information: formData.extra_information,
           user_id: "a7d79e13-bdb3-4d8b-af8f-1f346eb3e1b0",
