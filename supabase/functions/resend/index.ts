@@ -8,7 +8,7 @@ const handler = async (request: Request): Promise<Response> => {
       headers: {
         'Access-Control-Allow-Origin': '*',
         'Access-Control-Allow-Methods': 'POST, OPTIONS',
-        'Access-Control-Allow-Headers': 'Content-Type, Authorization, x-client-info, apikey',
+        'Access-Control-Allow-Headers': 'Content-Type, Authorization, x-client-info, apikey, accept-profile',
       },
     });
   }
@@ -317,17 +317,6 @@ const handler = async (request: Request): Promise<Response> => {
               <tr>
               <td>
                 <table width="100%" border="0" cellpadding="0" cellspacing="0" role="presentation">
-<<<<<<< Updated upstream
-=======
-                <tr>
-                  <td align="center" valign="top" style="padding-top: 20px; padding-bottom: 20px; vertical-align: top;">
-                  <a href="https://postcards.email/?uid=MjczMjEz&type=footer" target="_blank" style="text-decoration: none; overflow: hidden; border-radius: 2px; display: inline-block;">
-                    <img src="https://cloudfilesdm.com/postcards/promo-footer-dark.jpg" width="198" height="46" alt="Unsubscribe from Emails" style="width: 198px; height: auto; margin: 0 auto; border: 0; outline: 0; line-height: 100%; -ms-interpolation-mode: bicubic; vertical-align: top;">
-                  </a>
-                  <img src="https://api-postcards.designmodo.com/tracking/mail/promo?uid=MjczMjEz" width="1" height="1" alt="" style="display:none; width: 1px; height: 1px;">
-                  </td>
-                </tr>
->>>>>>> Stashed changes
                 </table>
               </td>
               </tr>
