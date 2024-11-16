@@ -6,6 +6,18 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Package, ScanLine, Barcode, Edit2, ChevronDown } from "lucide-react";
 
+declare global {
+  interface Navigator {
+    serial: any;
+  }
+
+  interface SerialPort {
+    open: (options: { baudRate: number }) => Promise<void>;
+    readable: ReadableStream;
+    close: () => Promise<void>;
+  }
+}
+
 const recipients = ["Ovik Das", "Aditya Viswanathan"];
 
 export default function ScanCheckin() {
@@ -16,6 +28,67 @@ export default function ScanCheckin() {
   const [showDropdown, setShowDropdown] = useState(false);
   const [filteredRecipients, setFilteredRecipients] = useState(recipients);
   const dropdownRef = useRef<HTMLDivElement>(null);
+
+  
+  const [port, setPort] = useState<SerialPort | null>(null);
+  const [reader, setReader] = useState<ReadableStreamDefaultReader<string> | null>(null);
+  const [buffer, setBuffer] = useState('');
+
+  const requestPort = async () => {
+    try {
+      const port = await navigator.serial.requestPort({
+        filters: [{ usbVendorId: 0x01a86 }],
+      });
+      await port.open({ baudRate: 9600 });
+      setPort(port);
+
+      const textDecoder = new TextDecoderStream();
+      const readableStreamClosed = port.readable.pipeTo(textDecoder.writable);
+      const reader = textDecoder.readable.getReader();
+      setReader(reader);
+
+      readData(reader);
+    } catch (error) {
+      console.error('Error accessing serial port:', error);
+    }
+  };
+
+  const readData = async (reader) => {
+    try {
+      while (true) {
+        const { value, done } = await reader.read();
+        if (done) {
+          break;
+        }
+        const decodedValue = value;
+        setBuffer((prevBuffer) => {
+          const newBuffer = prevBuffer + decodedValue;
+          const crlfIndex = newBuffer.indexOf('\r');
+          if (crlfIndex !== -1) {
+            const completeLine = newBuffer.slice(0, crlfIndex);
+            setTrackingNumber(completeLine);
+            return newBuffer.slice(crlfIndex + 2); 
+          }
+          return newBuffer;
+        });
+      }
+    } catch (error) {
+      console.error('Error reading from serial port:', error);
+    }
+  };
+
+  const closePort = async () => {
+    if (reader) {
+      await reader.cancel(); 
+      await reader.releaseLock(); 
+      setReader(null);
+    }
+    if (port) {
+      await port.close(); 
+      setPort(null);
+    }
+    setBuffer(''); 
+  };
 
   useEffect(() => {
     setFilteredRecipients(
@@ -40,6 +113,7 @@ export default function ScanCheckin() {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
+
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -66,6 +140,8 @@ export default function ScanCheckin() {
     setRecipientName(recipient);
     setShowDropdown(false);
   };
+
+  
 
   return (
     <div className="min-h-screen bg-white dark:bg-gray-900 p-8">
@@ -192,6 +268,12 @@ export default function ScanCheckin() {
           >
             Check-in Package
           </Button>
+
+          {!port ? (
+          <button onClick={requestPort}>Connect Barcode Scanner</button>
+          ) : (
+            <></>
+          )}
         </form>
       </div>
     </div>
