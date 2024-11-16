@@ -114,6 +114,7 @@ export default function ScanCheckin() {
     };
   }, []);
 
+
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (trackingNumber && recipientName) {
@@ -139,6 +140,8 @@ export default function ScanCheckin() {
     setRecipientName(recipient);
     setShowDropdown(false);
   };
+
+  
 
   return (
     <div className="min-h-screen bg-white dark:bg-gray-900 p-8">
@@ -269,7 +272,7 @@ export default function ScanCheckin() {
           {!port ? (
           <button onClick={requestPort}>Connect Barcode Scanner</button>
           ) : (
-            <button onClick={closePort}>Disconnect</button>
+            <></>
           )}
         </form>
       </div>
