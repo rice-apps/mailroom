@@ -1,5 +1,5 @@
 // import Hero from "@/components/hero";
-import Checkin from "@/app/checkin/checkin";
+import Checkin from "@/app/checkin/page"; //TODO: make checkin page its own component
 import ConnectSupabaseSteps from "@/components/tutorial/connect-supabase-steps";
 import SignUpUserSteps from "@/components/tutorial/sign-up-user-steps";
 import { hasEnvVars } from "@/utils/supabase/check-env-vars";

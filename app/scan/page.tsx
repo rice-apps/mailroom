@@ -1,30 +1,22 @@
 "use client";
-
 import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Package, ScanLine, Barcode, Edit2, ChevronDown } from "lucide-react";
-
-
 import { createClient } from '@/utils/supabase/client';
-
 const supabase = createClient();
-
 declare global {
   interface Navigator {
     serial: any;
   }
-
   interface SerialPort {
     open: (options: { baudRate: number }) => Promise<void>;
     readable: ReadableStream;
     close: () => Promise<void>;
   }
 }
-
 const recipients = ["Ovik Das", "Aditya Viswanathan"];
-
 export default function ScanCheckin() {
   const [trackingNumber, setTrackingNumber] = useState("");
   const [recipientName, setRecipientName] = useState("");
@@ -33,12 +25,31 @@ export default function ScanCheckin() {
   const [showDropdown, setShowDropdown] = useState(false);
   const [filteredRecipients, setFilteredRecipients] = useState(recipients);
   const dropdownRef = useRef<HTMLDivElement>(null);
-
   
   const [port, setPort] = useState<SerialPort | null>(null);
   const [reader, setReader] = useState<ReadableStreamDefaultReader<string> | null>(null);
   const [buffer, setBuffer] = useState('');
-
+  interface PackageInfo {
+    id?: string;
+    date_added?: string;
+    package_identifier?: string;
+    claimed: boolean;
+    date_claimed?: string;
+    extra_information?: string;
+    user_id?: string;
+  }
+  const [formData, setFormData] = useState<PackageInfo>({
+    claimed: false,
+    package_identifier: "",
+  });
+  const [confirmationMessage, setConfirmationMessage] = useState<string | null>(null);
+  const handleTrackingNumberChange = (value: string) => {
+    setTrackingNumber(value);
+    setFormData(prev => ({
+      ...prev,
+      package_identifier: value
+    }));
+  };
   const requestPort = async () => {
     try {
       const port = await navigator.serial.requestPort({
@@ -46,42 +57,37 @@ export default function ScanCheckin() {
       });
       await port.open({ baudRate: 9600 });
       setPort(port);
-
       const textDecoder = new TextDecoderStream();
       const readableStreamClosed = port.readable.pipeTo(textDecoder.writable);
       const reader = textDecoder.readable.getReader();
       setReader(reader);
-
+      
       readData(reader);
     } catch (error) {
       console.error('Error accessing serial port:', error);
     }
   };
-
-  const readData = async (reader) => {
+  const readData = async (reader: ReadableStreamDefaultReader<string>) => {
     try {
       while (true) {
         const { value, done } = await reader.read();
         if (done) {
           break;
         }
-        const decodedValue = value;
-        setBuffer((prevBuffer) => {
-          const newBuffer = prevBuffer + decodedValue;
-          const crlfIndex = newBuffer.indexOf('\r');
-          if (crlfIndex !== -1) {
-            const completeLine = newBuffer.slice(0, crlfIndex);
-            setTrackingNumber(completeLine);
-            return newBuffer.slice(crlfIndex + 2); 
-          }
-          return newBuffer;
-        });
+        const newBuffer = buffer + value;
+        const crlfIndex = newBuffer.indexOf('\r');
+        if (crlfIndex !== -1) {
+          const completeLine = newBuffer.slice(0, crlfIndex);
+          handleTrackingNumberChange(completeLine);
+          setBuffer(newBuffer.slice(crlfIndex + 2));
+        } else {
+          setBuffer(newBuffer);
+        }
       }
     } catch (error) {
       console.error('Error reading from serial port:', error);
     }
   };
-
   const closePort = async () => {
     if (reader) {
       await reader.cancel(); 
@@ -94,7 +100,6 @@ export default function ScanCheckin() {
     }
     setBuffer(''); 
   };
-
   useEffect(() => {
     setFilteredRecipients(
       recipients.filter((recipient) =>
@@ -102,7 +107,6 @@ export default function ScanCheckin() {
       )
     );
   }, [recipientName]);
-
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (
@@ -112,99 +116,60 @@ export default function ScanCheckin() {
         setShowDropdown(false);
       }
     };
-
     document.addEventListener("mousedown", handleClickOutside);
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
-
-
-  // const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-  //   e.preventDefault();
-  //   if (trackingNumber && recipientName) {
-  //     console.log("Package submitted:", { trackingNumber, recipientName });
-  //     setTrackingNumber("");
-  //     setRecipientName("");
-  //     setIsManualInput(false);
-  //   }
-  // };
-
   const toggleManualInput = () => {
     setIsManualInput(!isManualInput);
   };
-
   const handleRecipientInputChange = (
     e: React.ChangeEvent<HTMLInputElement>
   ) => {
     setRecipientName(e.target.value);
     setShowDropdown(true);
   };
-
   const handleRecipientSelect = (recipient: string) => {
     setRecipientName(recipient);
     setShowDropdown(false);
   };
-
-
-  //code from checkin
-
-  
-  interface PackageInfo {
-    id?: string;
-    // recipient_name?: string;
-    // email?: string;
-    date_added?: string;
-    package_identifier?: string;
-    claimed: boolean;
-    date_claimed?: string;
-    extra_information?: string;
-    user_id?: string;
-  }
-    const [formData, setFormData] = useState<PackageInfo>({
-      claimed: false,
-    });
-    const [confirmationMessage, setConfirmationMessage] = useState<string | null>(null);
-  
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-      const { name, value } = e.target;
-      setFormData((prevData) => ({
-        ...prevData,
-        [name]: value,
-      }));
-      // console.log(formData.package_identifier);
-    };
-
-
-    const handleSubmit = async (e: React.FormEvent) => {
-      e.preventDefault();
-      console.log("handlSubmit")
-      const { error } = await supabase
-        .from('packages')
-        .insert([
-          {
-            claimed: formData.claimed,
-            date_claimed: formData.date_claimed,
-            // recipient_name: formData.recipient_name,
-            // email: formData.email,
-            // date_added: formData.date_added,
-            package_identifier: formData.package_identifier,
-            extra_information: formData.extra_information,
-            user_id: "a7d79e13-bdb3-4d8b-af8f-1f346eb3e1b0",
-          },
-        ]);
-  
-      if (error) {
-        console.error("Error inserting package info:", error.message);
-        setConfirmationMessage("Error submitting data. Please try again.");
-      } else {
-        console.log("Package info inserted successfully!");
-        setConfirmationMessage("Package information submitted successfully!");
-      }
-    };
-
-  
-
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
+    setFormData((prevData) => ({
+      ...prevData,
+      [name]: value,
+    }));
+  };
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const { error } = await supabase
+      .from('packages')
+      .insert([
+        {
+          claimed: formData.claimed,
+          date_claimed: formData.date_claimed,
+          package_identifier: formData.package_identifier,
+          extra_information: formData.extra_information,
+          user_id: "a7d79e13-bdb3-4d8b-af8f-1f346eb3e1b0",
+        },
+      ]);
+    if (error) {
+      console.error("Error inserting package info:", error.message);
+      setConfirmationMessage("Error submitting data. Please try again.");
+    } else {
+      console.log("Package info inserted successfully!");
+      setConfirmationMessage("Package information submitted successfully!");
+      // Reset form after successful submission
+      setTrackingNumber("");
+      setRecipientName("");
+      setFormData({
+        claimed: false,
+        package_identifier: "",
+        extra_information: ""
+      });
+    }
+  };
   return (
     <div className="min-h-screen bg-white dark:bg-gray-900 p-8">
       <div className="mx-auto bg-gray-100 dark:bg-gray-800 p-6 rounded-lg shadow-md max-w-2xl">
@@ -225,9 +190,7 @@ export default function ScanCheckin() {
             </div>
           </div>
           <p className="text-center mt-4 text-sm text-gray-600 dark:text-gray-400">
-            {isScanning
-              ? "Ready to scan package"
-              : "Place package under scanner"}
+            {isScanning ? "Ready to scan package" : "Place package under scanner"}
           </p>
         </div>
         <form onSubmit={handleSubmit} className="space-y-6">
@@ -253,9 +216,8 @@ export default function ScanCheckin() {
               <Input
                 id="tracking-number"
                 type="text"
-                name="package_identifier"
-                value={formData.package_identifier || ''}
-                onChange={handleChange}
+                value={trackingNumber}
+                onChange={(e) => handleTrackingNumberChange(e.target.value)}
                 className={`w-full pl-10 pr-12 ${
                   isManualInput
                     ? "bg-white dark:bg-gray-800"
@@ -339,24 +301,31 @@ export default function ScanCheckin() {
               />
             </div>
           </div>
+          {confirmationMessage && (
+            <div className={`text-center p-2 rounded ${
+              confirmationMessage.includes('Error') ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700'
+            }`}>
+              {confirmationMessage}
+            </div>
+          )}
           <Button
             type="submit"
             className="w-full bg-black text-white hover:bg-gray-800 dark:bg-white dark:text-black dark:hover:bg-gray-200"
-            disabled={
-              !formData.package_identifier ||
-              !recipientName ||
-              !recipients.includes(recipientName)
-            }
+            disabled={!formData.package_identifier || !recipientName || !recipients.includes(recipientName)}
           >
             Check-in Package
           </Button>
-
-          {!port ? (
-          <button onClick={requestPort}>Connect Barcode Scanner</button>
-          ) : (
-            <></>
-          )}
         </form>
+        {!port ? (
+          <button 
+            onClick={requestPort}
+            className="mt-4 w-full p-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+          >
+            Connect Barcode Scanner
+          </button>
+        ) : (
+          <></>
+        )}
       </div>
     </div>
   );
