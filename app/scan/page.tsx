@@ -320,6 +320,25 @@ export default function ScanCheckin() {
                 )}
             </div>
           </div>
+          <div className="space-y-2">
+            <Label
+              htmlFor="additional-info"
+              className="text-sm font-medium text-gray-700 dark:text-gray-300"
+            >
+              Additional Info
+            </Label>
+            <div className="relative">
+              <Input
+                id="additional-info"
+                type="text"
+                name="extra_information"
+                value={formData.extra_information || ''}
+                onChange={handleChange}
+                className="w-full pr-10 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300"
+                placeholder="Enter additional information"
+              />
+            </div>
+          </div>
           <Button
             type="submit"
             className="w-full bg-black text-white hover:bg-gray-800 dark:bg-white dark:text-black dark:hover:bg-gray-200"
