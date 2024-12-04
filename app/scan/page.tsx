@@ -151,7 +151,7 @@ export default function ScanCheckin() {
           date_claimed: formData.date_claimed,
           package_identifier: formData.package_identifier,
           extra_information: formData.extra_information,
-          user_id: "a7d79e13-bdb3-4d8b-af8f-1f346eb3e1b0",
+          user_id: "f704c4db-5045-4a4b-857c-c55fcf9087e5", // TODO: get rid of the uuid hardcoding
         },
       ]);
     if (error) {

@@ -15,7 +15,7 @@ import { useToast } from "../hooks/use-toast"
 // Assuming these functions are defined in the specified path
 import { fetchStudentsGivenCollege } from "../../api/admin"
 
-const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY)
+const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL ?? "", process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? "")
 
 const collegeContacts = [
   { collegeName: "Lovett", name: "Sharon O'Leary", email: "sko1@rice.edu" },
