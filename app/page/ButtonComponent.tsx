@@ -6,6 +6,8 @@ import React, { useState } from 'react';
 
 // const supabase = createClient('https://qiekvvwcicienqtinxmo.supabase.co/functions/v1/resend', process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY);
 
+const supabase = createClient("https://qiekvvwcicienqtinxmo.supabase.co/functions/v1/resend", process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? "");
+
 export default function ButtonComponent() {
   const supabase = createClient()
   const [netID, setNetID] = useState('');
