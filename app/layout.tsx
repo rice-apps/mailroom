@@ -1,6 +1,6 @@
 import { GeistSans } from "geist/font/sans";
 import { ThemeProvider } from "next-themes";
-import { ThemeSwitcher } from "@/components/theme-switcher";
+
 import Link from "next/link";
 import "./globals.css";
 import { Toaster } from "@/components/ui/toaster"
@@ -17,7 +17,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className={GeistSans.className} suppressHydrationWarning>
-      <body className="bg-white text-foreground">
+      <body className="bg-black text-foreground">
         <ThemeProvider
           attribute="class"
           defaultTheme="system"

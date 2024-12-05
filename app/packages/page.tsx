@@ -5,6 +5,8 @@ import { Package, User } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Skeleton } from "@/components/ui/skeleton"
+import { fetchUser, fetchPackagesbyUser, claimPackage } from "@/api/packages"
+import { createClient } from "@/utils/supabase/client"
 // import { fetchPackagesbyUser, fetchUser, claimPackage } from "@/api/packages"
 
 interface User {
@@ -34,13 +36,25 @@ export default function StudentDashboard() {
   const [user, setUser] = useState<User | null>(null)
   const [packages, setPackages] = useState<Package[] | null>(null)
   const [error, setError] = useState<string | null>(null)
+  const supabase = createClient()
 
-  const currentStudentEmail = "evanjt06@gmail.com"
+  const [currentStudentEmail, setCurrentStudentEmail] = useState<string | null>(null)
+
+  useEffect(() => {
+    const getUserEmail = async () => {
+      const { data: { user } } = await supabase.auth.getUser()
+      if (user && user.email) {
+        setCurrentStudentEmail(user.email)
+      }
+    }
+
+    getUserEmail()
+  }, [])
 
   useEffect(() => {
     const fetchData = async () => {
       console.log("hi")
-      try {
+      if (currentStudentEmail) {try {
         const user = await fetchUser(currentStudentEmail)
         setUser(user)
         console.log(user)
@@ -51,11 +65,11 @@ export default function StudentDashboard() {
         setError("failed to load data. Please try again later.")
       } finally {
         setLoading(false)
-      }
+      }}
     }
 
     fetchData()
-  }, [])
+  }, [currentStudentEmail])
 
   const handleClaim = async (id: string) => {
     try {
