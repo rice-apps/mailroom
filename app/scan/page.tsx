@@ -16,15 +16,35 @@ declare global {
     close: () => Promise<void>;
   }
 }
-const recipients = ["Ovik Das", "Aditya Viswanathan"];
+
 export default function ScanCheckin() {
   const [trackingNumber, setTrackingNumber] = useState("");
   const [recipientName, setRecipientName] = useState("");
   const [isScanning, setIsScanning] = useState(true);
   const [isManualInput, setIsManualInput] = useState(false);
   const [showDropdown, setShowDropdown] = useState(false);
-  const [filteredRecipients, setFilteredRecipients] = useState(recipients);
+  const [filteredRecipients, setFilteredRecipients] = useState<string[]>([]);
+  const [userMap, setUserMap] = useState<Record<string, string>>()
   const dropdownRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const fetchRecipients = async () => {
+      const { data, error } = await supabase
+        .from('users')
+        .select('id, name');
+      if (error) {
+        console.error('Error fetching recipients:', error.message);
+      } else {
+        console.log(data)
+        const recipientMap = data.reduce((acc: Record<string, string>, user: { id: string, name: string }) => {
+          acc[user.name] = user.id;
+          return acc;
+        }, {});
+        setUserMap(recipientMap)
+        setFilteredRecipients(Object.keys(recipientMap));
+      }
+    };
+    fetchRecipients();
+  }, []);
   
   const [port, setPort] = useState<SerialPort | null>(null);
   const [reader, setReader] = useState<ReadableStreamDefaultReader<string> | null>(null);
@@ -101,13 +121,6 @@ export default function ScanCheckin() {
     setBuffer(''); 
   };
   useEffect(() => {
-    setFilteredRecipients(
-      recipients.filter((recipient) =>
-        recipient.toLowerCase().includes(recipientName.toLowerCase())
-      )
-    );
-  }, [recipientName]);
-  useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (
         dropdownRef.current &&
@@ -146,13 +159,13 @@ export default function ScanCheckin() {
     const { error } = await supabase
       .from('packages')
       .insert([
-        {
-          claimed: formData.claimed,
-          date_claimed: formData.date_claimed,
-          package_identifier: formData.package_identifier,
-          extra_information: formData.extra_information,
-          user_id: "f704c4db-5045-4a4b-857c-c55fcf9087e5", // TODO: get rid of the uuid hardcoding
-        },
+      {
+        claimed: formData.claimed,
+        date_claimed: formData.date_claimed,
+        package_identifier: formData.package_identifier,
+        extra_information: formData.extra_information,
+        user_id: userMap ? userMap[recipientName] : "",
+      },
       ]);
     if (error) {
       console.error("Error inserting package info:", error.message);
@@ -311,7 +324,7 @@ export default function ScanCheckin() {
           <Button
             type="submit"
             className="w-full bg-black text-white hover:bg-gray-800 dark:bg-white dark:text-black dark:hover:bg-gray-200"
-            disabled={!formData.package_identifier || !recipientName || !recipients.includes(recipientName)}
+            disabled={!formData.package_identifier || !recipientName || !filteredRecipients.includes(recipientName)}
           >
             Check-in Package
           </Button>
