@@ -45,7 +45,7 @@ Deno.serve(async (req) => {
   return new Response(null, {
     status: 302, // Use 301 for permanent redirect
     headers: {
-      'Location': 'https://example.com/success', // Replace with your target URL
+      'Location': 'http://localhost:3000/packages', // Replace with your target URL
       'Access-Control-Allow-Origin': '*',
     },
   });

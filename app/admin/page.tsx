@@ -186,7 +186,7 @@ export default function Component() {
                     <TableCell>{student.email.split("@")[0]}</TableCell>
                     <TableCell>
                       <Badge variant={student.packages.length > 0 ? "default" : "secondary"} className="bg-[#00205B] text-white hover:bg-black">
-                        {student.packages.length}
+                        {student.packages.filter((x) => !x.claimed).length}
                       </Badge>
                     </TableCell>
                     <TableCell>
