@@ -1,7 +1,7 @@
 // app/components/ButtonComponent.tsx
 'use client';
 
-import { createClient } from '@supabase/supabase-js';
+import { createClient } from "@/utils/supabase/client";
 import React, { useState } from 'react';
 
 // const supabase = createClient('https://qiekvvwcicienqtinxmo.supabase.co/functions/v1/resend', process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY);
@@ -9,20 +9,35 @@ import React, { useState } from 'react';
 const supabase = createClient("https://qiekvvwcicienqtinxmo.supabase.co/functions/v1/resend", process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? "");
 
 export default function ButtonComponent() {
+  const supabase = createClient()
   const [netID, setNetID] = useState('');
   const [trackingId, setTrackingId] = useState('');
 
-  const handleClick = async () => {
-    const { data, error } = await supabase.functions.invoke('resend', {
-      body: { netID, trackingId }
-    });
+  
 
-    if (error) {
-      console.error('Error invoking function:', error);
-    } else {
-      console.log('Function response data:', data);
+
+  const handleClick = async () => {
+    const subscribeResp = await supabase
+      .from("users")
+      .select("is_subscribed")
+      .eq("email", netID+"@rice.edu")
+      .single()
+
+    
+    
+    if (subscribeResp.data?.is_subscribed){
+      const { data, error } = await supabase.functions.invoke('resend', {
+        body: { netID, trackingId }
+      });
+  
+      if (error) {
+        console.error('Error invoking function:', error);
+      } else {
+        console.log('Function response data:', data);
+      }
+    };
     }
-  };
+    
 
   return (
     <>
