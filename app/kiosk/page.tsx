@@ -2,11 +2,44 @@
 
 import { useRouter } from "next/navigation";
 import { ArrowRight, TruckIcon, PackageOpen } from "lucide-react";
+import { createClient } from '@/utils/supabase/client';
+import { useEffect, useState } from 'react';
+
 
 export default function PackageOptions() {
   const router = useRouter();
+  const supabase = createClient();
+  const [isAuthorized, setIsAuthorized] = useState(false);
 
-  const handleNavigate = (path: string) => {
+ 
+
+  const checkAuthorization = async () => {
+    console.log('Checking authorization...');
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        setIsAuthorized(false);
+        return;
+      }
+      const { data: adminUser } = await supabase
+        .from('users')
+        .select('can_add_and_delete_packages')
+        .eq('email', user.email)
+        .single();
+      console.log(adminUser)
+      setIsAuthorized(adminUser?.can_add_and_delete_packages === true);
+    } catch (error) {
+      console.error('Authorization check failed:', error);
+      setIsAuthorized(false);
+    }
+  };
+
+  useEffect(() => {
+    checkAuthorization();
+  }, []);
+
+
+  const handleNavigate = async (path: string) => {
     router.push(path);
   };
 
@@ -32,6 +65,8 @@ export default function PackageOptions() {
               <ArrowRight className="absolute bottom-4 right-4 w-6 h-6 text-gray-500 dark:text-gray-400 transition-all duration-300 ease-in-out transform translate-x-4 opacity-0 group-hover:translate-x-0 group-hover:opacity-100" />
             </div>
           </button>
+
+          {isAuthorized ? (
           <button
             onClick={() => handleNavigate("/admin")}
             className="relative bg-gray-100 dark:bg-gray-800 rounded-lg shadow-md overflow-hidden transition-all duration-300 ease-in-out hover:shadow-lg"
@@ -47,6 +82,10 @@ export default function PackageOptions() {
               <ArrowRight className="absolute bottom-4 right-4 w-6 h-6 text-gray-500 dark:text-gray-400 transition-all duration-300 ease-in-out transform translate-x-4 opacity-0 group-hover:translate-x-0 group-hover:opacity-100" />
             </div>
           </button>
+          ) :
+          (
+          <></>
+          )}
         </div>
       </div>
     </div>
