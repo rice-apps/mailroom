@@ -37,4 +37,26 @@ export async function fetchStudentsGivenCollege(college: string): Promise<any | 
       console.error('Unexpected error:', error)
       return null
     }
+
+}
+
+export async function updateAdmin(netid: string, is_admin: boolean) {
+  const supabase = createClient()
+  console.log("hello",is_admin)
+  try {
+    const {data,error } = await supabase
+    .from("users")
+    .update({can_add_and_delete_packages: is_admin})
+    .eq('email',netid)
+
+    if (error) {
+      console.error('Error fetching user:', error)
+      return null
+    }
+
+    console.log(data)
+    return data
+  } catch (error){
+    console.error("unexpected error",error)
+  }
 }
