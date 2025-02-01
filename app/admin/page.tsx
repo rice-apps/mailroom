@@ -296,5 +296,6 @@ export default function Component() {
         </main>
       </div>
     </div>
+    </>
   )
 }
