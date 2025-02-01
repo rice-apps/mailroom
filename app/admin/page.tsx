@@ -69,11 +69,12 @@ interface Package {
 }
 
 interface Student {
-  id: number;
-  name: string;
-  netid: string;
-  email: string;
-  packages: Package[];
+  id: number
+  name: string
+  netid: string
+  email: string
+  packages: Package[]
+  numOfValidPackages: number
 }
 
 const currentCollegeCoordEmail = "jt87@rice.edu";
@@ -85,6 +86,7 @@ export default function Component() {
   const [filter, setFilter] = useState("all");
   const [searchTerm, setSearchTerm] = useState("");
   const [showAddModal, setShowAddModal] = useState(false);
+  const [toggle, setToggle] = useState(true)
 
   const { toast } = useToast();
 
@@ -112,9 +114,20 @@ export default function Component() {
       setCoord(currentCoord);
       setLoading(true);
       fetchStudentsGivenCollege(currentCoord.collegeName)
-        .then((result) => {
-          setStudents(result);
-          setLoading(false);
+        .then(result => {
+          setStudents(result)
+          setLoading(false)
+
+          // update number of valid packages based on claim
+          result.map((student: Student) => {
+            student.numOfValidPackages = 0
+            const {packages} = student
+            packages.map(pkg => {
+              if (!pkg.claimed) {
+                student.numOfValidPackages += 1
+              }
+            })
+          })
         })
         .catch((error) => {
           console.error("Error fetching students:", error);
@@ -214,71 +227,75 @@ export default function Component() {
               </div>
             </div>
 
-            <Card>
-              <Table className="bg-white">
-                <TableHeader>
+          <Card>
+            <Table className="bg-white">
+              <TableHeader>
+                <TableRow>
+                  <TableHead className="text-black">Name</TableHead>
+                  <TableHead className="text-black">Rice Email</TableHead>
+                  <TableHead className="text-black">Rice NetID</TableHead>
+                  <TableHead className="text-black"># of Packages To Pick Up</TableHead>
+                  <TableHead className="text-black">Action</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {loading ? (
                   <TableRow>
-                    <TableHead className="text-black">Name</TableHead>
-                    <TableHead className="text-black">Rice Email</TableHead>
-                    <TableHead className="text-black">Rice NetID</TableHead>
-                    <TableHead className="text-black">
-                      # of Packages To Pick Up
-                    </TableHead>
-                    <TableHead className="text-black">Action</TableHead>
+                    <TableCell colSpan={5} className="text-center">Loading...</TableCell>
                   </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {loading ? (
-                    <TableRow>
-                      <TableCell colSpan={5} className="text-center">
-                        Loading...
+                ) : filteredStudents?.map((student) => 
+                  (toggle ? 
+                    <TableRow key={student.id} className="text-black">
+                      <TableCell className="font-medium">{student.name}</TableCell>
+                      <TableCell>{student.email}</TableCell>
+                      <TableCell>{student.email.split("@")[0]}</TableCell>
+                      <TableCell>
+                        <Badge variant={student.numOfValidPackages > 0 ? "default" : "secondary"} className="bg-[#00205B] text-white hover:bg-black">
+                          {student.numOfValidPackages}
+                        </Badge>
+                      </TableCell>
+                      <TableCell>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          disabled={student.numOfValidPackages === 0}
+                          className="bg-white border-[#00205B] text-[#00205B] hover:bg-[#00205B] hover:text-white"
+                          onClick={() => handleClick(student.email.split("@")[0], "Your package has arrived!")}
+                        >
+                          Remind
+                        </Button>
                       </TableCell>
                     </TableRow>
-                  ) : (
-                    filteredStudents?.map((student) => (
-                      <TableRow key={student.id} className="text-black">
-                        <TableCell className="font-medium">
-                          {student.name}
-                        </TableCell>
-                        <TableCell>{student.email}</TableCell>
-                        <TableCell>{student.email.split("@")[0]}</TableCell>
-                        <TableCell>
-                          <Badge
-                            variant={
-                              student.packages.length > 0
-                                ? "default"
-                                : "secondary"
-                            }
-                            className="bg-[#00205B] text-white hover:bg-black"
-                          >
-                            {student.packages.length}
-                          </Badge>
-                        </TableCell>
-                        <TableCell>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            disabled={student.packages.length === 0}
-                            className="bg-white border-[#00205B] text-[#00205B] hover:bg-[#00205B] hover:text-white"
-                            onClick={() =>
-                              handleClick(
-                                student.email.split("@")[0],
-                                "Your package has arrived!"
-                              )
-                            }
-                          >
-                            Remind
-                          </Button>
-                        </TableCell>
-                      </TableRow>
-                    ))
-                  )}
-                </TableBody>
-              </Table>
-            </Card>
-          </main>
-        </div>
+                    : 
+                   (student.numOfValidPackages !== 0 && 
+                   <TableRow key={student.id} className="text-black">
+                      <TableCell className="font-medium">{student.name}</TableCell>
+                      <TableCell>{student.email}</TableCell>
+                      <TableCell>{student.email.split("@")[0]}</TableCell>
+                      <TableCell>
+                        <Badge variant={student.numOfValidPackages > 0 ? "default" : "secondary"} className="bg-[#00205B] text-white hover:bg-black">
+                          {student.numOfValidPackages}
+                        </Badge>
+                      </TableCell>
+                      <TableCell>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          disabled={student.packages.length === 0}
+                          className="bg-white border-[#00205B] text-[#00205B] hover:bg-[#00205B] hover:text-white"
+                          onClick={() => handleClick(student.email.split("@")[0], "Your package has arrived!")}
+                        >
+                          Remind
+                        </Button>
+                      </TableCell>
+                    </TableRow>)
+                ))}
+              </TableBody>
+            </Table>
+          </Card>
+        </main>
       </div>
+    </div>
     </>
-  );
+  )
 }
