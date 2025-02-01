@@ -64,22 +64,15 @@ export default function Component() {
   const checkAuthorization = async () => {
     console.log('Checking authorization...');
     try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) {
-        setIsAuthorized(false);
-        return;
-      }
-      const { data: adminUser } = await supabase
-        .from('users')
-        .select('can_add_and_delete_packages')
-        .eq('email', user.email)
-        .single();
-      setIsAuthorized(adminUser?.can_add_and_delete_packages === true);
+      const response = await fetch('/api/check-auth');
+      const data = await response.json();
+      setIsAuthorized(data.isAuthorized);
     } catch (error) {
       console.error('Authorization check failed:', error);
       setIsAuthorized(false);
     }
   };
+
 
   useEffect(() => {
     checkAuthorization();
