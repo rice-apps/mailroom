@@ -29,7 +29,8 @@ import * as DropdownMenu from "@radix-ui/react-dropdown-menu"
 import * as Dialog from "@radix-ui/react-dialog"
 
 // Assuming these functions are defined in the specified path
-import { fetchStudentsGivenCollege } from "../../api/admin"
+import { fetchStudentsGivenCollege, updateAdmin } from "../../api/admin"
+
 
 // ----------------------------------
 // Supabase + Contacts
@@ -167,10 +168,12 @@ export default function Page() {
         // Your logic to add an admin
         console.log(`Adding admin with netID: ${netID}`)
         toast({ title: `Successfully added ${netID} as admin.` })
+        updateAdmin(netID, true)
       } else {
         // Your logic to remove an admin
         console.log(`Removing admin with netID: ${netID}`)
         toast({ title: `Successfully removed ${netID} as admin.` })
+        updateAdmin(netID, false)
       }
     } catch (err) {
       console.error("Error in handleAdminSubmit", err)

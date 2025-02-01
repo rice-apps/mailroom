@@ -47,7 +47,7 @@ export async function updateAdmin(netid: string, is_admin: boolean) {
     const {data,error } = await supabase
     .from("users")
     .update({can_add_and_delete_packages: is_admin})
-    .eq('email',netid)
+    .eq('email',netid+"@rice.edu")
 
     if (error) {
       console.error('Error fetching user:', error)
