@@ -43,11 +43,11 @@ export default function AddModalComponent({
       input.value = "";
       if (file) {
         setError(null);
-        Papa.parse(file, {
+        Papa.parse<StudentData>(file, {
           header: true,
           complete: (results: Papa.ParseResult<StudentData>) => {
             if (results.errors.length > 0) {
-              setError("Error parsing CSV file");
+              setError("Error parsing CSV file: " + [...(results.errors.map(e => e.message))].join(", \n"));
             } else {
               const parsedData = results.data as StudentData[];
               if (parsedData.length > 0) {
@@ -57,7 +57,7 @@ export default function AddModalComponent({
               }
             }
           },
-          error: (error: Papa.ParseError) => {
+          error: (error: Error) => {
             setError(`Error reading file: ${error.message}`);
           },
         });
@@ -95,7 +95,7 @@ export default function AddModalComponent({
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
       <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-2xl">
-        <h2 className="text-xl font-semibold mb-4">
+        <h2 className="text-xl font-semibold mb-4 text-gray-600">
           Add Students to {college}
         </h2>
         <div className="mb-4 flex space-x-2 items-center">
@@ -126,7 +126,7 @@ export default function AddModalComponent({
             )}
           </Button>
         </div>
-        {error && <p className="text-red-500 mb-4">{error}</p>}
+        {error && <p className="text-red-500 mb-4 whitespace-pre-wrap max-h-32 overflow-y-scroll ">{error}</p>}
         {showManualAdd && (
           <div className="mb-4 flex space-x-2">
             <Input
@@ -161,8 +161,8 @@ export default function AddModalComponent({
               <TableBody>
                 {students.map((student, index) => (
                   <TableRow key={index}>
-                    <TableCell>{student["Full Name"]}</TableCell>
-                    <TableCell>{student["netID"]}</TableCell>
+                    <TableCell className="text-gray-600">{student["Full Name"]}</TableCell>
+                    <TableCell className="text-gray-600">{student["netID"]}</TableCell>
                   </TableRow>
                 ))}
               </TableBody>

@@ -54,7 +54,10 @@ export async function insertUsersGivenCollege(college: string, students: Student
           college,
           user_type: "student",
           email: `${student.netID}@rice.edu`,
-          name: student["Full Name"]
+          name: student["Full Name"],
+          can_add_and_delete_packages: false,
+          can_claim_packages: true,
+          can_administrate_users: false,
         })))
   
       if (error) {
