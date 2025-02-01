@@ -102,6 +102,20 @@ export default function Page() {
   const [netID, setNetID] = useState("")
 
   const { toast } = useToast()
+  //todo: figure out a better way to do dialogs lol
+  function resetDialog():any {
+    
+    if (!isDialogOpen) {
+      document.querySelectorAll<HTMLElement>('*').forEach((el) => {
+        
+        if (window.getComputedStyle(el).pointerEvents === 'none') {
+          console.log(el,"is diabled")
+          el.style.pointerEvents = 'auto';
+        }
+      });
+    }
+    console.log('lolo')
+  }
 
   // Resend (Remind) handler
   const handleClick = async (netID: string, trackingId: string) => {
@@ -183,6 +197,7 @@ export default function Page() {
       })
     } finally {
       setIsDialogOpen(false)
+      setTimeout(()=> (document.body.style.pointerEvents = ""),0)
       setNetID("")
     }
   }
@@ -247,7 +262,10 @@ export default function Page() {
                   <DropdownMenu.Item
                     onClick={() => {
                       setActionType("add")
+
                       setIsDialogOpen(true)
+                      setTimeout(()=> (document.body.style.pointerEvents = ""),0)
+
                     }}
                     className="cursor-pointer rounded-sm px-2 py-1 text-sm text-black hover:bg-gray-100 focus:bg-gray-100 outline-none"
                   >
@@ -258,6 +276,7 @@ export default function Page() {
                     onClick={() => {
                       setActionType("remove")
                       setIsDialogOpen(true)
+                      setTimeout(()=> (document.body.style.pointerEvents = ""),0)
                     }}
                     className="cursor-pointer rounded-sm px-2 py-1 text-sm text-black hover:bg-gray-100 focus:bg-gray-100 outline-none"
                   >
@@ -268,7 +287,7 @@ export default function Page() {
             </DropdownMenu.Root>
 
             {/* ADD/REMOVE ADMIN DIALOG */}
-            <Dialog.Root open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+            <Dialog.Root open={isDialogOpen} onOpenChange={resetDialog()}>
               <Dialog.Portal>
                 <Dialog.Overlay className="fixed inset-0 bg-black/40" />
                 <Dialog.Content
@@ -300,8 +319,11 @@ export default function Page() {
                   <div className="mt-6 flex justify-end gap-2">
                     <Button
                       variant="outline"
-                      onClick={() => 
-                        setIsDialogOpen(false)}
+                      onClick={() =>{
+                        
+                        setIsDialogOpen(false)
+                        setTimeout(()=> (document.body.style.pointerEvents = ""),0)
+                      }}
                     >
                       Cancel
                     </Button>
