@@ -79,6 +79,7 @@ interface Student {
   netid: string
   email: string
   packages: Package[]
+  can_add_and_delete_packages:boolean
   // Add optional isAdmin field (default false if undefined)
   isAdmin?: boolean
 }
@@ -138,26 +139,32 @@ export default function Page() {
   useEffect(() => {
     const currentCoord = collegeContacts.find(
       (contact) => contact.email === currentCollegeCoordEmail
-    )
+    );
+    
     if (currentCoord) {
-      setCoord(currentCoord)
-      setLoading(true)
+      setCoord(currentCoord);
+      setLoading(true);
+      
       fetchStudentsGivenCollege(currentCoord.collegeName)
-        .then((result) => {
-          // If 'result' doesn't have isAdmin, default to false:
-          const updated = result.map((student: Student) => ({
-            ...student,
-            isAdmin: student.isAdmin ?? false, 
-          }))
-          setStudents(updated)
-          setLoading(false)
+        .then(async (result) => {
+          // Use Promise.all to handle all async calls
+          const updated = await Promise.all(result.map(async (student: Student) => {
+            // Fetch admin status for each student asynchronously
+            let isAdmin = student.can_add_and_delete_packages
+            console.log(student.name,student.can_add_and_delete_packages)
+            console.log(`Fetched admin status for ${student.netid}: ${isAdmin}`);
+            return { ...student, isAdmin: isAdmin ?? false };
+          }));
+          
+          setStudents(updated);
+          setLoading(false);
         })
         .catch((error) => {
-          console.error("Error fetching students:", error)
-          setLoading(false)
-        })
+          console.error("Error fetching students:", error);
+          setLoading(false);
+        });
     }
-  }, [])
+  }, []);
 
   // Filter Logic
   const filteredStudents = students?.filter((student) => {
