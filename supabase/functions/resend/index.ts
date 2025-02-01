@@ -8,11 +8,10 @@ const handler = async (request: Request): Promise<Response> => {
       headers: {
         'Access-Control-Allow-Origin': '*',
         'Access-Control-Allow-Methods': 'POST, OPTIONS',
-        'Access-Control-Allow-Headers': 'Content-Type, Authorization, x-client-info, apikey',
+        'Access-Control-Allow-Headers': 'Content-Type, Authorization, x-client-info, apikey, accept-profile',
       },
     });
   }
-
   let requestData;
   try {
     requestData = await request.json();
@@ -36,6 +35,8 @@ const handler = async (request: Request): Promise<Response> => {
       },
     });
   }
+
+  
 
   const res = await fetch('https://api.resend.com/emails', {
     method: 'POST',
@@ -271,7 +272,9 @@ const handler = async (request: Request): Promise<Response> => {
                       <table width="100%" border="0" cellpadding="0" cellspacing="0" role="presentation">
                       <tr>
                         <td align="center" valign="top" style="padding: 0px 0px 20px 0px;">
+                          <a href="#" title="" target="_blank">
                         <img src="https://cloudfilesdm.com/postcards/image-1729971413221.png" width="285" height="285" alt="" style="display: block; outline: 0; line-height: 100%; -ms-interpolation-mode: bicubic; width: 285px; height: auto; max-width: 100%; border: 0;" />
+                         </a>
                         </td>
                       </tr>
                       </table>
@@ -284,8 +287,17 @@ const handler = async (request: Request): Promise<Response> => {
                             <div class="pc-font-alt pc-w620-fontSize-16 pc-w620-lineHeight-163pc" style="line-height: 156%; letter-spacing: -0.2px; font-family: 'Fira Sans', Arial, Helvetica, sans-serif; font-size: 18px; font-weight: 300; font-variant-ligatures: normal; color: #ffffff; text-align: center; text-align-last: center;">
                             <div><span>Pickup your package in the mailroom!</span>
                             </div>
+                            <div> 
+                            
+                            <a href="https://qiekvvwcicienqtinxmo.supabase.co/functions/v1/claim-package?trackingID=${trackingId}" 
+                              style="display: inline-block; padding: 10px 20px; background-color: #a27a52; color: #ffffff; text-decoration: none; border-radius: 4px; font-weight: bold; margin: 10px 0;">
+                                Claim Package
+                            </a>
+
+                            </div>
                             <div><span>Tracking ID: ${trackingId}</span>
                             </div>
+                            <div><p>If you no longer want to receive these notifications, you can <a href="https://qiekvvwcicienqtinxmo.supabase.co/functions/v1/unsubscribe-handler?trackingID=${trackingId}&netID=${netID}">unsubscribe here</a>.</p></div>
                             </div>
                           </td>
                           </tr>
@@ -305,14 +317,6 @@ const handler = async (request: Request): Promise<Response> => {
               <tr>
               <td>
                 <table width="100%" border="0" cellpadding="0" cellspacing="0" role="presentation">
-                <tr>
-                  <td align="center" valign="top" style="padding-top: 20px; padding-bottom: 20px; vertical-align: top;">
-                  <a href="https://postcards.email/?uid=MjczMjEz&type=footer" target="_blank" style="text-decoration: none; overflow: hidden; border-radius: 2px; display: inline-block;">
-                    <img src="https://cloudfilesdm.com/postcards/promo-footer-dark.jpg" width="198" height="46" alt="Made with (o -) postcards" style="width: 198px; height: auto; margin: 0 auto; border: 0; outline: 0; line-height: 100%; -ms-interpolation-mode: bicubic; vertical-align: top;">
-                  </a>
-                  <img src="https://api-postcards.designmodo.com/tracking/mail/promo?uid=MjczMjEz" width="1" height="1" alt="" style="display:none; width: 1px; height: 1px;">
-                  </td>
-                </tr>
                 </table>
               </td>
               </tr>
