@@ -18,19 +18,19 @@ import { fetchStudentsGivenCollege } from "../../api/admin"
 
 const supabase = createClient();
 
-const collegeContacts = [
-  { collegeName: "Lovett", name: "Sharon O'Leary", email: "sko1@rice.edu" },
-  { collegeName: "Baker", name: "Kristen Luu", email: "kl161@rice.edu" },
-  { collegeName: "Will Rice", name: "Amanda Garza", email: "ag276@rice.edu" },
-  { collegeName: "Hanszen", name: "Joyce Bald", email: "joyce@rice.edu" },
-  { collegeName: "Wiess", name: "Jenny Toups", email: "jt87@rice.edu" },
-  { collegeName: "Jones", name: "Kellie Sager", email: "ks235@rice.edu" },
-  { collegeName: "Brown", name: "Christy Cousins", email: "cc233@rice.edu" },
-  { collegeName: "Sid", name: "Lisa Galloy", email: "lgalloy@rice.edu" },
-  { collegeName: "Martel", name: "Bonnie Stroman", email: "brs3126@rice.edu" },
-  { collegeName: "McMurtry", name: "Jackie Carrizales", email: "jjc3@rice.edu" },
-  { collegeName: "Duncan", name: "Wendy Olivares", email: "wo5@rice.edu" }
-]
+// const collegeContacts = [
+//   { collegeName: "Lovett", name: "Sharon O'Leary", email: "sko1@rice.edu" },
+//   { collegeName: "Baker", name: "Kristen Luu", email: "kl161@rice.edu" },
+//   { collegeName: "Will Rice", name: "Amanda Garza", email: "ag276@rice.edu" },
+//   { collegeName: "Hanszen", name: "Joyce Bald", email: "joyce@rice.edu" },
+//   { collegeName: "Wiess", name: "Jenny Toups", email: "jt87@rice.edu" },
+//   { collegeName: "Jones", name: "Kellie Sager", email: "ks235@rice.edu" },
+//   { collegeName: "Brown", name: "Christy Cousins", email: "cc233@rice.edu" },
+//   { collegeName: "Sid", name: "Lisa Galloy", email: "lgalloy@rice.edu" },
+//   { collegeName: "Martel", name: "Bonnie Stroman", email: "brs3126@rice.edu" },
+//   { collegeName: "McMurtry", name: "Jackie Carrizales", email: "jjc3@rice.edu" },
+//   { collegeName: "Duncan", name: "Wendy Olivares", email: "wo5@rice.edu" }
+// ]
 
 interface CollegeContact {
   name: string
@@ -56,7 +56,6 @@ interface Student {
   packages: Package[]
 }
 
-const currentCollegeCoordEmail = "jt87@rice.edu"
 
 export default function Component() {
   const [isAuthorized, setIsAuthorized] = useState(false);
@@ -69,12 +68,15 @@ export default function Component() {
         setIsAuthorized(false);
         return;
       }
+      
       const { data: adminUser } = await supabase
         .from('users')
-        .select('can_add_and_delete_packages')
+        .select('*')
         .eq('email', user.email)
         .single();
       setIsAuthorized(adminUser?.can_add_and_delete_packages === true);
+      console.log(adminUser);
+      setCoord({collegeName:adminUser.college, name:adminUser.name, email:adminUser.email})
     } catch (error) {
       console.error('Authorization check failed:', error);
       setIsAuthorized(false);
@@ -112,7 +114,7 @@ export default function Component() {
   }
 
   useEffect(() => {
-    const currentCoord = collegeContacts.find(contact => contact.email === currentCollegeCoordEmail)
+    const currentCoord = coord;
     if (currentCoord) {
       setCoord(currentCoord)
       setLoading(true)
