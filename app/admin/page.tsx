@@ -28,6 +28,7 @@ import { useToast } from "../hooks/use-toast";
 // Assuming these functions are defined in the specified path
 import { fetchStudentsGivenCollege } from "../../api/admin";
 import AddModalComponent from "./AddModalComponent";
+import ExportModalComponent from "./ExportModalComponent";
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL,
@@ -85,6 +86,7 @@ export default function Component() {
   const [filter, setFilter] = useState("all");
   const [searchTerm, setSearchTerm] = useState("");
   const [showAddModal, setShowAddModal] = useState(false);
+  const [showExportModal, setShowExportModal] = useState(false);
 
   const { toast } = useToast();
 
@@ -142,6 +144,11 @@ export default function Component() {
           college={coord?.collegeName}
           exitModal={() => setShowAddModal(false)}
         />
+      )}
+      {showExportModal && coord && (
+        <ExportModalComponent
+          college={coord?.collegeName}
+          exitModal={() => setShowExportModal(false)}/>
       )}
       <div className="flex h-screen bg-white">
         <div className="hidden w-64 bg-gray-100 lg:block">
@@ -205,12 +212,20 @@ export default function Component() {
                     onChange={(e) => setSearchTerm(e.target.value)}
                   />
                 </div>
-                <Button
-                  className="ml-auto bg-[#00205B] text-white hover:bg-black"
-                  onClick={() => setShowAddModal(true)}
-                >
-                  Add Students
-                </Button>
+                <div className="ml-auto gap-4 flex flex-row">
+                  <Button
+                    className=" text-black bg-white hover:bg-[#00205B] hover:text-white border"
+                    onClick={() => setShowExportModal(true)}
+                  >
+                    Export Claims
+                  </Button>
+                  <Button
+                    className="bg-[#00205B] text-white hover:bg-black"
+                    onClick={() => setShowAddModal(true)}
+                  >
+                    Add Students
+                  </Button>
+                </div>
               </div>
             </div>
 
