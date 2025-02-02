@@ -181,13 +181,58 @@ export default function ExportModalComponent({
             className="mr-2 bg-gray-300 text-black hover:bg-gray-400"
             onClick={() => exitModal()}
           >
-            Cancel
+            Exit
           </Button>
           <Button
             className="bg-[#00205B] text-white hover:bg-black"
-            onClick={exitModal}
+            onClick={() => {
+              const escapeCsvValue = (value: string) => {
+                if (!value) {
+                  return "";
+                }
+
+                if (value.includes(",") || value.includes("\n") || value.includes('"')) {
+                  return `"${value.replace(/"/g, '""')}"`;
+                }
+                return value;
+              };
+
+              const csvContent = [
+                [
+                  "Full Name",
+                  "netID",
+                  "Package Identifier",
+                  "Date Checked In",
+                  "Date Claimed",
+                  "Extra Information",
+                ],
+                ...packages.map((pkg) => [
+                  escapeCsvValue(pkg.user.name),
+                  escapeCsvValue(pkg.user.email),
+                  escapeCsvValue(pkg.package_identifier),
+                  escapeCsvValue(pkg.date_added?.toUTCString() || ""),
+                  escapeCsvValue(pkg.date_claimed?.toUTCString() || ""),
+                  escapeCsvValue(pkg.extra_information),
+                ]),
+              ]
+                .map((e) => e.join(","))
+                .join("\n");
+
+              // me when i do funny user download override 
+              const blob = new Blob([csvContent], {
+                type: "text/csv;charset=utf-8;",
+              });
+              const url = URL.createObjectURL(blob);
+              const link = document.createElement("a");
+              link.setAttribute("href", url);
+              link.setAttribute("download", `packages_${college}.csv`);
+              link.style.visibility = "hidden";
+              document.body.appendChild(link);
+              link.click();
+              document.body.removeChild(link);
+            }}
           >
-            Save
+            Export
           </Button>
         </div>
       </div>
