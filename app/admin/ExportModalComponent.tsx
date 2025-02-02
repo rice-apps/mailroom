@@ -28,6 +28,7 @@ export default function ExportModalComponent({
   const [checkinDateRange, setCheckinDateRange] = useState<DateRange | null>(
     null
   );
+  const [refreshing, setRefreshing] = useState(false);
   const [packages, setPackages] = useState<
     {
       package_identifier: string;
@@ -46,6 +47,7 @@ export default function ExportModalComponent({
   const supabase = createClient();
 
   useEffect(() => {
+    setRefreshing(true);
     // Fetch data from API
     supabase
       .from("packages")
@@ -115,6 +117,7 @@ export default function ExportModalComponent({
               );
             })
         );
+        setRefreshing(false);
       });
   }, [pickupDateRange, checkinDateRange]);
 
@@ -136,7 +139,8 @@ export default function ExportModalComponent({
           </div>
 
           <div>
-            {packages.length > 0 && (
+            {refreshing && <p className="text-center">Loading...</p>}
+            {!refreshing && packages.length > 0 && (
               <div className="mb-4 max-h-96 overflow-y-auto">
                 <Table>
                   <TableHeader>
@@ -174,6 +178,12 @@ export default function ExportModalComponent({
                 </Table>
               </div>
             )}
+            {
+              // No packages found
+              !refreshing && packages.length === 0 && (
+                <p className="text-center">No packages found</p>
+              )
+            }
           </div>
         </div>
         <div className="flex justify-end">
@@ -191,7 +201,11 @@ export default function ExportModalComponent({
                   return "";
                 }
 
-                if (value.includes(",") || value.includes("\n") || value.includes('"')) {
+                if (
+                  value.includes(",") ||
+                  value.includes("\n") ||
+                  value.includes('"')
+                ) {
                   return `"${value.replace(/"/g, '""')}"`;
                 }
                 return value;
@@ -218,7 +232,7 @@ export default function ExportModalComponent({
                 .map((e) => e.join(","))
                 .join("\n");
 
-              // me when i do funny user download override 
+              // me when i do funny user download override
               const blob = new Blob([csvContent], {
                 type: "text/csv;charset=utf-8;",
               });
