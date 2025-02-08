@@ -5,38 +5,35 @@
 // Setup type definitions for built-in Supabase Runtime APIs
 // import "jsr:@supabase/functions-js/edge-runtime.d.ts"
 
-
-
-import { createClient } from 'jsr:@supabase/supabase-js@2'
+import { createClient } from "jsr:@supabase/supabase-js@2";
 
 Deno.serve(async (req) => {
   // const authHeader = req.headers.get('Authorization')!
   const supabaseClient = createClient(
-    Deno.env.get('SUPABASE_URL') ?? '',
-    Deno.env.get('SUPABASE_ANON_KEY') ?? '',
+    Deno.env.get("SUPABASE_URL") ?? "",
+    Deno.env.get("SUPABASE_ANON_KEY") ?? "",
     // { global: { headers: { Authorization: authHeader } } }
-  )
-
+  );
 
   const url = new URL(req.url);
-  const trackingID = url.searchParams.get('trackingID');
-  
+  const trackingID = url.searchParams.get("trackingID");
+
   // console.log(trackingID)
 
   const { data, error } = await supabaseClient
-  .from('packages')
-  .update({ claimed: true })
-  .eq('package_identifier', trackingID)
-  .select()
+    .from("packages")
+    .update({ claimed: true })
+    .eq("package_identifier", trackingID)
+    .select();
 
-  console.log(error)
+  console.log(error);
 
   if (error) {
     return new Response(JSON.stringify({ error: error.message }), {
       status: 500,
       headers: {
-        'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': '*',
+        "Content-Type": "application/json",
+        "Access-Control-Allow-Origin": "*",
       },
     });
   }
@@ -45,11 +42,11 @@ Deno.serve(async (req) => {
   return new Response(null, {
     status: 302, // Use 301 for permanent redirect
     headers: {
-      'Location': 'http://localhost:3000/packages', // Replace with your target URL
-      'Access-Control-Allow-Origin': '*',
+      Location: "http://localhost:3000/packages", // Replace with your target URL
+      "Access-Control-Allow-Origin": "*",
     },
   });
-})
+});
 
 /* To invoke locally:
 
