@@ -29,7 +29,7 @@ import * as DropdownMenu from "@radix-ui/react-dropdown-menu"
 import * as Dialog from "@radix-ui/react-dialog"
 
 // Assuming these functions are defined in the specified path
-import { fetchStudentsGivenCollege, updateAdmin } from "../../api/admin"
+import { fetchStudentsGivenCollege, updateAdmin, userExists } from "../../api/admin"
 
 
 // ----------------------------------
@@ -115,7 +115,6 @@ export default function Page() {
         }
       });
     }
-    console.log('lolo')
   }
 
   // Resend (Remind) handler
@@ -187,14 +186,27 @@ export default function Page() {
     try {
       if (actionType === "add") {
         // Your logic to add an admin
-        console.log(`Adding admin with netID: ${netID}`)
-        toast({ title: `Successfully added ${netID} as admin.` })
-        updateAdmin(netID, true)
+        if(await userExists(netID)){
+          console.log(`Adding admin with netID: ${netID}`)
+          toast({ title: `Successfully added ${netID} as admin.` })
+          updateAdmin(netID, true)
+        }
+        else{
+          console.log(`User with netID: ${netID} could not be found.`)
+          toast({ title: `Failed to add ${netID} as admin.` })
+        }
+        
       } else {
         // Your logic to remove an admin
-        console.log(`Removing admin with netID: ${netID}`)
-        toast({ title: `Successfully removed ${netID} as admin.` })
-        updateAdmin(netID, false)
+        if(await userExists(netID)){
+          console.log(`Removing admin with netID: ${netID}`)
+          toast({ title: `Successfully removed ${netID} as admin.` })
+          updateAdmin(netID, false)
+        }
+        else{
+          console.log(`User with netID: ${netID} could not be found.`)
+          toast({ title: `Failed to remove ${netID} as admin.` })
+        }
       }
     } catch (err) {
       console.error("Error in handleAdminSubmit", err)
