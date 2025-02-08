@@ -27,6 +27,7 @@ import { useToast } from "../hooks/use-toast";
 
 // Assuming these functions are defined in the specified path
 import { fetchStudentsGivenCollege } from "../../api/admin";
+import checkAuth from "../../api/checkAuth"
 import AddModalComponent from "./AddModalComponent";
 
 const supabase = createClient();
@@ -80,9 +81,8 @@ export default function Component() {
   const checkAuthorization = async () => {
     console.log('Checking authorization...');
     try {
-      const response = await fetch('/api/check-auth');
-      const data = await response.json();
-      setIsAuthorized(data.isAuthorized);
+      const response = await checkAuth();
+      setIsAuthorized(response);
     } catch (error) {
       console.error('Authorization check failed:', error);
       setIsAuthorized(false);
@@ -168,7 +168,15 @@ export default function Component() {
         />
       )}
 
-      {isAuthorized ? (
+
+
+      {!isAuthorized ? (
+        <div className="flex flex-1 items-center justify-center bg-white h-screen">
+        <h1 className="text-2xl font-semibold text-black">
+          401 - Unauthorized
+        </h1>
+      </div>
+      ) : (
         <div className="flex h-screen bg-white">
           <div className="hidden w-64 bg-gray-100 lg:block">
             <div className="flex h-16 items-center justify-center border-b border-gray-200">
@@ -346,12 +354,6 @@ export default function Component() {
               </Card>
             </main>
           </div>
-        </div>
-      ) : (
-        <div className="flex flex-1 items-center justify-center bg-white h-screen">
-          <h1 className="text-2xl font-semibold text-black">
-            401 - Unauthorized
-          </h1>
         </div>
       )}
     </>

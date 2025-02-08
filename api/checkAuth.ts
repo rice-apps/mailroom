@@ -1,13 +1,17 @@
-import { NextApiRequest, NextApiResponse } from 'next';
-import { createClient } from '@/utils/supabase/client';
+'use server'
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+import { NextApiRequest, NextApiResponse } from 'next';
+import { createClient } from '@/utils/supabase/server';
+
+export default async function checkAuth(): Promise<any | null> {
   const supabase = createClient();
   
   try {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) {
-      return res.status(401).json({ isAuthorized: false });
+      // return res.status(401).json({ isAuthorized: false });
+      console.log("No User")
+      return null
     }
 
     const { data: adminUser } = await supabase
@@ -17,9 +21,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       .single();
 
     const isAuthorized = adminUser?.can_add_and_delete_packages === true;
-    return res.status(200).json({ isAuthorized });
+    return isAuthorized;
   } catch (error) {
     console.error('Authorization check failed:', error);
-    return res.status(500).json({ isAuthorized: false });
+    return false;
   }
 }

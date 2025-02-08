@@ -5,6 +5,7 @@ import { ArrowRight, TruckIcon, PackageOpen } from "lucide-react";
 import { createClient } from '@/utils/supabase/client';
 import { useEffect, useState } from 'react';
 
+import checkAuth from "../../api/checkAuth"
 
 export default function PackageOptions() {
   const router = useRouter();
@@ -14,9 +15,8 @@ export default function PackageOptions() {
   const checkAuthorization = async () => {
     console.log('Checking authorization...');
     try {
-      const response = await fetch('/api/check-auth');
-      const data = await response.json();
-      setIsAuthorized(data.isAuthorized);
+      const response = await checkAuth();
+      setIsAuthorized(response);
     } catch (error) {
       console.error('Authorization check failed:', error);
       setIsAuthorized(false);
