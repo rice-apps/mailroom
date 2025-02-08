@@ -78,30 +78,13 @@ export default function Component() {
   const [isAuthorized, setIsAuthorized] = useState(false);
 
   const checkAuthorization = async () => {
-    console.log("Checking authorization...");
+    console.log('Checking authorization...');
     try {
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
-      if (!user) {
-        setIsAuthorized(false);
-        return;
-      }
-
-      const { data: adminUser } = await supabase
-        .from("users")
-        .select("*")
-        .eq("email", user.email)
-        .single();
-      setIsAuthorized(adminUser?.can_add_and_delete_packages === true);
-      console.log(adminUser);
-      setCoord({
-        collegeName: adminUser.college,
-        name: adminUser.name,
-        email: adminUser.email,
-      });
+      const response = await fetch('/api/check-auth');
+      const data = await response.json();
+      setIsAuthorized(data.isAuthorized);
     } catch (error) {
-      console.error("Authorization check failed:", error);
+      console.error('Authorization check failed:', error);
       setIsAuthorized(false);
     }
   };
