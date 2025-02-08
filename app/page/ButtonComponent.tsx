@@ -27,7 +27,7 @@ export default function ButtonComponent() {
     
     if (subscribeResp.data?.is_subscribed_email){
       const { data, error } = await supabase.functions.invoke('resend', {
-        body: { netID, trackingId }
+        body: { netID }
       });
   
       if (error) {
@@ -43,8 +43,8 @@ export default function ButtonComponent() {
     <>
     <p>Net ID:</p>
     <input type="text" name="netID" value={netID} onChange={(e) => setNetID(e.target.value)} />
-    <p>Tracking ID:</p>
-    <input type="text" name="tracking-id" value={trackingId} onChange={(e) => setTrackingId(e.target.value)} />
+    {/* <p>Tracking ID:</p>
+    <input type="text" name="tracking-id" value={trackingId} onChange={(e) => setTrackingId(e.target.value)} /> */}
     <br/>
     <button onClick={handleClick}>
       Click Me

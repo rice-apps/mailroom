@@ -29,9 +29,9 @@ const handler = async (request: Request): Promise<Response> => {
     });
   }
 
-  const { netID, trackingId } = requestData;
-  if (!netID || !trackingId) {
-    return new Response(JSON.stringify({ error: 'Missing netID or trackingId' }), {
+  const { netID } = requestData;
+  if (!netID) {
+    return new Response(JSON.stringify({ error: 'Missing netID' }), {
       status: 400,
       headers: {
         'Content-Type': 'application/json',
@@ -43,14 +43,16 @@ const handler = async (request: Request): Promise<Response> => {
   // new code to add the date package was scanned to the email template
   const supabase = createClient();
   
-  const { data: packageData, error: packageError } = await supabase
+  // Fetch all unclaimed packages for this user
+  const { data: packages, error: packageError } = await supabase
     .from('packages')
-    .select('date_added')
-    .eq('package_identifier', trackingId)
-    .single();
+    .select('package_identifier, date_added')
+    .eq('claimed', false)
+    .eq('user_id', netID)
+    .order('date_added', { ascending: false });
 
   if (packageError) {
-    return new Response(JSON.stringify({ error: 'Error fetching package details' }), {
+    return new Response(JSON.stringify({ error: 'Error fetching packages details' }), {
       status: 500,
       headers: {
         'Content-Type': 'application/json',
@@ -58,6 +60,35 @@ const handler = async (request: Request): Promise<Response> => {
       },
     });
   }
+
+  // If no packages found
+  if (!packages || packages.length === 0) {
+    return new Response(JSON.stringify({ message: 'No packages found' }), {
+      status: 200,
+      headers: {
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': '*',
+      },
+    });
+  }
+
+  // Create HTML for package list
+  const packagesHTML = packages.map(pkg => `
+    <tr>
+      <td style="padding: 10px; border-bottom: 1px solid #ddd;">
+        ${pkg.package_identifier}
+      </td>
+      <td style="padding: 10px; border-bottom: 1px solid #ddd;">
+        ${new Date(pkg.date_added).toLocaleString()}
+      </td>
+      <td style="padding: 10px; border-bottom: 1px solid #ddd;">
+        <a href="https://qiekvvwcicienqtinxmo.supabase.co/functions/v1/claim-package?trackingID=${pkg.package_identifier}" 
+           style="display: inline-block; padding: 5px 10px; background-color: #a27a52; color: #ffffff; text-decoration: none; border-radius: 4px;">
+          Claim
+        </a>
+      </td>
+    </tr>
+  `).join('');
 
   const res = await fetch('https://api.resend.com/emails', {
     method: 'POST',
@@ -68,7 +99,7 @@ const handler = async (request: Request): Promise<Response> => {
     body: JSON.stringify({
       from: 'mailroom@riceapps.org',
       to: netID+'@rice.edu',
-      subject: 'Package Delivered',
+      subject: 'Your Package Notifications',
       html: 
       
       `
@@ -250,110 +281,112 @@ const handler = async (request: Request): Promise<Response> => {
           <![endif]-->
       </head>
 
-      <body class="body pc-font-alt" style="width: 100% !important; min-height: 100% !important; margin: 0 !important; padding: 0 !important; line-height: 1.5; color: #2D3A41; mso-line-height-rule: exactly; -webkit-font-smoothing: antialiased; -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; font-variant-ligatures: normal; text-rendering: optimizeLegibility; -moz-osx-font-smoothing: grayscale; background-color: #f4f4f4;" bgcolor="#f4f4f4">
-      <table class="pc-project-body" style="table-layout: fixed; min-width: 600px; background-color: #f4f4f4;" bgcolor="#f4f4f4" width="100%" border="0" cellspacing="0" cellpadding="0" role="presentation">
-        <tr>
-        <td align="center" valign="top">
-          <table class="pc-project-container" align="center" width="600" style="width: 600px; max-width: 600px;" border="0" cellpadding="0" cellspacing="0" role="presentation">
-          <tr>
-            <td style="padding: 20px 0px 20px 0px;" align="left" valign="top">
-            <table border="0" cellpadding="0" cellspacing="0" role="presentation" width="100%" style="width: 100%;">
-              <tr>
-              <td valign="top">
-                <!-- BEGIN MODULE: Header 2 -->
-                <table width="100%" border="0" cellspacing="0" cellpadding="0" role="presentation">
-                <tr>
-                  <td style="padding: 0px 0px 0px 0px;">
-                  <table width="100%" border="0" cellspacing="0" cellpadding="0" role="presentation">
-                    <tr>
-                    <td valign="top" class="pc-w520-padding-30-30-30-30 pc-w620-padding-35-35-35-35" style="padding: 40px 40px 40px 40px; border-radius: 0px; background-color: #1B1B1B;" bgcolor="#1B1B1B">
-                      <table width="100%" border="0" cellpadding="0" cellspacing="0" role="presentation">
-                      <tr>
-                        <td class="pc-w620-spacing-0-0-40-0" align="center" valign="top" style="padding: 0px 0px 60px 0px;">
-                        <img src="https://cloudfilesdm.com/postcards/logo-white.png" width="125" height="25" alt="" style="display: block; outline: 0; line-height: 100%; -ms-interpolation-mode: bicubic; width: 125px; height: auto; max-width: 100%; border: 0;" />
-                        </td>
-                      </tr>
-                      </table>
-                      <table width="100%" border="0" cellpadding="0" cellspacing="0" role="presentation">
-                      <tr>
-                        <td align="center" valign="top" style="padding: 0px 0px 0px 0px;">
-                        <table border="0" cellpadding="0" cellspacing="0" role="presentation" width="100%" style="border-collapse: separate; border-spacing: 0; margin-right: auto; margin-left: auto;">
-                          <tr>
-                          <td valign="top" align="center">
-                            <div class="pc-font-alt pc-w620-fontSize-30 pc-w620-lineHeight-133pc" style="line-height: 100%; letter-spacing: -0.6px; font-family: 'Fira Sans', Arial, Helvetica, sans-serif; font-size: 48px; font-weight: 800; font-variant-ligatures: normal; color: #ffffff; text-align: center; text-align-last: center;">
-                            <div><span>Package Delivered</span>
-                            </div>
-                            </div>
-                          </td>
-                          </tr>
-                        </table>
-                        </td>
-                      </tr>
-                      </table>
-                      <table width="100%" border="0" cellpadding="0" cellspacing="0" role="presentation">
-                      <tr>
-                        <td align="center" valign="top" style="padding: 0px 0px 20px 0px;">
-                          <a href="#" title="" target="_blank">
-                        <img src="https://cloudfilesdm.com/postcards/image-1729971413221.png" width="285" height="285" alt="" style="display: block; outline: 0; line-height: 100%; -ms-interpolation-mode: bicubic; width: 285px; height: auto; max-width: 100%; border: 0;" />
-                         </a>
-                        </td>
-                      </tr>
-                      </table>
-                      <table width="100%" border="0" cellpadding="0" cellspacing="0" role="presentation">
-                      <tr>
-                        <td align="center" valign="top" style="padding: 0px 0px 29px 0px;">
-                        <table border="0" cellpadding="0" cellspacing="0" role="presentation" width="100%" style="border-collapse: separate; border-spacing: 0; margin-right: auto; margin-left: auto;">
-                          <tr>
-                          <td valign="top" align="center">
-                            <div class="pc-font-alt pc-w620-fontSize-16 pc-w620-lineHeight-163pc" style="line-height: 156%; letter-spacing: -0.2px; font-family: 'Fira Sans', Arial, Helvetica, sans-serif; font-size: 18px; font-weight: 300; font-variant-ligatures: normal; color: #ffffff; text-align: center; text-align-last: center;">
-                            <div><span>Pickup your package in the mailroom!</span>
-                            </div>
-                            <div> 
-                            
-                            <a href="https://qiekvvwcicienqtinxmo.supabase.co/functions/v1/claim-package?trackingID=${trackingId}" 
-                              style="display: inline-block; padding: 10px 20px; background-color: #a27a52; color: #ffffff; text-decoration: none; border-radius: 4px; font-weight: bold; margin: 10px 0;">
-                                Claim Package
-                            </a>
 
-                            </div>
-                            <div><span>Tracking ID: ${trackingId}</span>
-                            </div>
-                            <div><span>Delivered: ${new Date(packageData.date_added).toLocaleString()}</span>
-                            </div>
-                            <div><p>If you no longer want to receive these notifications, you can <a href="https://qiekvvwcicienqtinxmo.supabase.co/functions/v1/unsubscribe-handler?trackingID=${trackingId}&netID=${netID}">unsubscribe here</a>.</p></div>
-                            </div>
-                          </td>
-                          </tr>
-                        </table>
+      
+
+
+      <body class="body pc-font-alt" style="width: 100% !important; min-height: 100% !important; margin: 0 !important; padding: 0 !important; line-height: 1.5; color: #2D3A41; mso-line-height-rule: exactly; -webkit-font-smoothing: antialiased; -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; font-variant-ligatures: normal; text-rendering: optimizeLegibility; -moz-osx-font-smoothing: grayscale; background-color: #f4f4f4;" bgcolor="#f4f4f4">
+        <table class="pc-project-body" style="table-layout: fixed; min-width: 600px; background-color: #f4f4f4;" bgcolor="#f4f4f4" width="100%" border="0" cellspacing="0" cellpadding="0" role="presentation">
+          <tr>
+            <td align="center" valign="top">
+              <table class="pc-project-container" align="center" width="600" style="width: 600px; max-width: 600px;" border="0" cellpadding="0" cellspacing="0" role="presentation">
+                <tr>
+                  <td style="padding: 20px 0px 20px 0px;" align="left" valign="top">
+                    <table border="0" cellpadding="0" cellspacing="0" role="presentation" width="100%" style="width: 100%;">
+                      <tr>
+                        <td valign="top">
+                          <table width="100%" border="0" cellspacing="0" cellpadding="0" role="presentation">
+                            <tr>
+                              <td style="padding: 0px 0px 0px 0px;">
+                                <table width="100%" border="0" cellspacing="0" cellpadding="0" role="presentation">
+                                  <tr>
+                                    <td valign="top" class="pc-w520-padding-30-30-30-30 pc-w620-padding-35-35-35-35" style="padding: 40px 40px 40px 40px; border-radius: 0px; background-color: #1B1B1B;" bgcolor="#1B1B1B">
+                                      <!-- Logo -->
+                                      <table width="100%" border="0" cellpadding="0" cellspacing="0" role="presentation">
+                                        <tr>
+                                          <td class="pc-w620-spacing-0-0-40-0" align="center" valign="top" style="padding: 0px 0px 60px 0px;">
+                                            <img src="https://cloudfilesdm.com/postcards/logo-white.png" width="125" height="25" alt="" style="display: block; outline: 0; line-height: 100%; -ms-interpolation-mode: bicubic; width: 125px; height: auto; max-width: 100%; border: 0;" />
+                                          </td>
+                                        </tr>
+                                      </table>
+                                      
+                                      <!-- Title -->
+                                      <table width="100%" border="0" cellpadding="0" cellspacing="0" role="presentation">
+                                        <tr>
+                                          <td align="center" valign="top">
+                                            <div class="pc-font-alt pc-w620-fontSize-30" style="font-family: 'Fira Sans', Arial, Helvetica, sans-serif; font-size: 48px; font-weight: 800; line-height: 100%; letter-spacing: -0.6px; color: #ffffff;">
+                                              Packages Delivered
+                                            </div>
+                                          </td>
+                                        </tr>
+                                      </table>
+
+                                      <!-- Package List -->
+                                      <table width="100%" border="0" cellpadding="0" cellspacing="0" role="presentation" style="margin-top: 30px;">
+                                        <tr>
+                                          <td align="center" valign="top">
+                                            <div class="pc-font-alt pc-w620-fontSize-16" style="font-family: 'Fira Sans', Arial, Helvetica, sans-serif; font-size: 18px; line-height: 156%; color: #ffffff;">
+                                              <div style="margin-bottom: 20px;">Pickup your packages in the mailroom!</div>
+                                              
+                                              <table style="width: 100%; border-collapse: collapse; margin: 20px 0;">
+                                                <tr style="border-bottom: 1px solid #ffffff;">
+                                                  <th style="padding: 12px; text-align: left;">Tracking ID</th>
+                                                  <th style="padding: 12px; text-align: left;">Delivered</th>
+                                                  <th style="padding: 12px; text-align: center;">Action</th>
+                                                </tr>
+                                                ${packages.map(pkg => `
+                                                  <tr style="border-bottom: 1px solid #3d3d3d;">
+                                                    <td style="padding: 12px;">${pkg.package_identifier}</td>
+                                                    <td style="padding: 12px;">${new Date(pkg.date_added).toLocaleString()}</td>
+                                                    <td style="padding: 12px; text-align: center;">
+                                                      <a href="https://qiekvvwcicienqtinxmo.supabase.co/functions/v1/claim-package?trackingID=${pkg.package_identifier}" 
+                                                         style="display: inline-block; padding: 8px 15px; background-color: #a27a52; color: #ffffff; text-decoration: none; border-radius: 4px; font-size: 14px;">
+                                                        Claim
+                                                      </a>
+                                                    </td>
+                                                  </tr>
+                                                `).join('')}
+                                              </table>
+
+                                              <div style="margin-top: 30px;">
+                                                <p>If you no longer want to receive these notifications, you can 
+                                                  <a href="https://qiekvvwcicienqtinxmo.supabase.co/functions/v1/unsubscribe-handler?netID=${netID}" 
+                                                     style="color: #ffffff;">
+                                                    unsubscribe here
+                                                  </a>.
+                                                </p>
+                                              </div>
+                                            </div>
+                                          </td>
+                                        </tr>
+                                      </table>
+                                    </td>
+                                  </tr>
+                                </table>
+                              </td>
+                            </tr>
+                          </table>
                         </td>
                       </tr>
-                      </table>
-                    </td>
-                    </tr>
-                  </table>
+                    </table>
                   </td>
                 </tr>
-                </table>
-                <!-- END MODULE: Header 2 -->
-              </td>
-              </tr>
-              <tr>
-              <td>
-                <table width="100%" border="0" cellpadding="0" cellspacing="0" role="presentation">
-                </table>
-              </td>
-              </tr>
-            </table>
+              </table>
             </td>
           </tr>
-          </table>
-        </td>
-        </tr>
-      </table>
-      <!-- Fix for Gmail on iOS -->
-      <div class="pc-gmail-fix" style="white-space: nowrap; font: 15px courier; line-height: 0;">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
-      </div>
+        </table>
+        <!-- Fix for Gmail on iOS -->
+        <div class="pc-gmail-fix" style="white-space: nowrap; font: 15px courier; line-height: 0;">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;</div>
       </body>
+
+
+           
+           
+           
+
+
+
+
 
       `,
     }),
