@@ -409,8 +409,7 @@ export default function Page() {
                         {/* BADGE: Show if user is admin */}
                         {student.isAdmin && (
                           <Badge
-                            variant="secondary"
-                            className="ml-2 bg-blue-100 text-blue-800"
+                            className="ml-2 bg-blue-100 text-blue-800 border border-blue-200"
                           >
                             Admin
                           </Badge>
