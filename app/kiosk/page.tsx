@@ -16,7 +16,8 @@ export default function PackageOptions() {
     console.log('Checking authorization...');
     try {
       const response = await checkAuth();
-      setIsAuthorized(response);
+
+      setIsAuthorized(response.can_add_and_delete_packages===true);
     } catch (error) {
       console.error('Authorization check failed:', error);
       setIsAuthorized(false);

@@ -30,7 +30,7 @@ export async function fetchStudentsGivenCollege(college: string): Promise<any | 
             data[i]["packages"] = packages.data || [];
       }
 
-      console.log(data)
+      // console.log(data)
   
       return data
     } catch (error) {

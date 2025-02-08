@@ -16,12 +16,11 @@ export default async function checkAuth(): Promise<any | null> {
 
     const { data: adminUser } = await supabase
       .from('users')
-      .select('can_add_and_delete_packages')
+      .select('*')
       .eq('email', user.email)
       .single();
 
-    const isAuthorized = adminUser?.can_add_and_delete_packages === true;
-    return isAuthorized;
+    return adminUser;
   } catch (error) {
     console.error('Authorization check failed:', error);
     return false;
