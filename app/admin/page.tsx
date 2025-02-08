@@ -20,7 +20,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { createClient } from "@supabase/supabase-js";
+import { createClient } from "@/utils/supabase/client";
 import { useEffect, useState } from "react";
 import { ToastAction } from "@/components/ui/toast";
 import { useToast } from "../hooks/use-toast";
@@ -29,10 +29,7 @@ import { useToast } from "../hooks/use-toast";
 import { fetchStudentsGivenCollege } from "../../api/admin";
 import AddModalComponent from "./AddModalComponent";
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL ?? "",
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? ""
-);
+const supabase = createClient();
 
 const collegeContacts = [
   { collegeName: "Lovett", name: "Sharon O'Leary", email: "sko1@rice.edu" },
@@ -161,7 +158,7 @@ export default function Component() {
           setLoading(false);
         });
     }
-  }, []);
+  }, [coord]);
 
   const filteredStudents = students?.filter((student) => {
     const matchesFilter =
@@ -183,7 +180,8 @@ export default function Component() {
           exitModal={() => setShowAddModal(false)}
         />
       )}
-      <div className="flex h-screen bg-white">
+      
+      {isAuthorized ? <div className="flex h-screen bg-white">
         <div className="hidden w-64 bg-gray-100 lg:block">
           <div className="flex h-16 items-center justify-center border-b border-gray-200">
             <Package className="mr-2 h-6 w-6 text-[#00205B]" />
@@ -322,7 +320,9 @@ export default function Component() {
           </Card>
         </main>
       </div>
-    </div>
+    </div> : <div className="flex flex-1 items-center justify-center bg-white h-screen">
+          <h1 className="text-2xl font-semibold text-black">401 - Unauthorized</h1>
+        </div>}
     </>
   )
 }
