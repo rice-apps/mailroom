@@ -47,7 +47,10 @@ export default function AddModalComponent({
           header: true,
           complete: (results: Papa.ParseResult<StudentData>) => {
             if (results.errors.length > 0) {
-              setError("Error parsing CSV file: " + [...(results.errors.map(e => e.message))].join(", \n"));
+              setError(
+                "Error parsing CSV file: " +
+                  [...results.errors.map((e) => e.message)].join(", \n"),
+              );
             } else {
               const parsedData = results.data as StudentData[];
               if (parsedData.length > 0) {
@@ -63,7 +66,7 @@ export default function AddModalComponent({
         });
       }
     },
-    []
+    [],
   );
 
   const handleManualAdd = () => {
@@ -126,7 +129,11 @@ export default function AddModalComponent({
             )}
           </Button>
         </div>
-        {error && <p className="text-red-500 mb-4 whitespace-pre-wrap max-h-32 overflow-y-scroll ">{error}</p>}
+        {error && (
+          <p className="text-red-500 mb-4 whitespace-pre-wrap max-h-32 overflow-y-scroll ">
+            {error}
+          </p>
+        )}
         {showManualAdd && (
           <div className="mb-4 flex space-x-2">
             <Input
@@ -161,8 +168,12 @@ export default function AddModalComponent({
               <TableBody>
                 {students.map((student, index) => (
                   <TableRow key={index}>
-                    <TableCell className="text-gray-600">{student["Full Name"]}</TableCell>
-                    <TableCell className="text-gray-600">{student["netID"]}</TableCell>
+                    <TableCell className="text-gray-600">
+                      {student["Full Name"]}
+                    </TableCell>
+                    <TableCell className="text-gray-600">
+                      {student["netID"]}
+                    </TableCell>
                   </TableRow>
                 ))}
               </TableBody>
