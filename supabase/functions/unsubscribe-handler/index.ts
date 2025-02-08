@@ -15,7 +15,7 @@ const unsubscribeHandler = async (request: Request): Promise<Response> => {
 
     const { data, error } = await supabase
       .from("users")
-      .update({ is_subscribed: false })
+      .update({ is_subscribed_email: false })
       .eq("email", netID+"@rice.edu")
       .select()
 

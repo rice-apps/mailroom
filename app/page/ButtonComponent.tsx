@@ -19,13 +19,13 @@ export default function ButtonComponent() {
   const handleClick = async () => {
     const subscribeResp = await supabase
       .from("users")
-      .select("is_subscribed")
+      .select("is_subscribed_email")
       .eq("email", netID+"@rice.edu")
       .single()
 
     
     
-    if (subscribeResp.data?.is_subscribed){
+    if (subscribeResp.data?.is_subscribed_email){
       const { data, error } = await supabase.functions.invoke('resend', {
         body: { netID, trackingId }
       });
