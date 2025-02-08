@@ -1,3 +1,7 @@
+'use client';
+
+import { createClient } from "@/utils/supabase/client";
+
 const RESEND_API_KEY = Deno.env.get('RESEND_API_KEY')
 
 const handler = async (request: Request): Promise<Response> => {
@@ -36,7 +40,24 @@ const handler = async (request: Request): Promise<Response> => {
     });
   }
 
+  // new code to add the date package was scanned to the email template
+  const supabase = createClient();
   
+  const { data: packageData, error: packageError } = await supabase
+    .from('packages')
+    .select('date_added')
+    .eq('package_identifier', trackingId)
+    .single();
+
+  if (packageError) {
+    return new Response(JSON.stringify({ error: 'Error fetching package details' }), {
+      status: 500,
+      headers: {
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': '*',
+      },
+    });
+  }
 
   const res = await fetch('https://api.resend.com/emails', {
     method: 'POST',
@@ -296,6 +317,8 @@ const handler = async (request: Request): Promise<Response> => {
 
                             </div>
                             <div><span>Tracking ID: ${trackingId}</span>
+                            </div>
+                            <div><span>Delivered: ${new Date(packageData.date_added).toLocaleString()}</span>
                             </div>
                             <div><p>If you no longer want to receive these notifications, you can <a href="https://qiekvvwcicienqtinxmo.supabase.co/functions/v1/unsubscribe-handler?trackingID=${trackingId}&netID=${netID}">unsubscribe here</a>.</p></div>
                             </div>
