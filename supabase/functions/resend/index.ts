@@ -1,10 +1,11 @@
-'use client';
-
-import { createClient } from "@/utils/supabase/client";
+import { createClient } from "npm:@supabase/supabase-js";
 
 const RESEND_API_KEY = Deno.env.get('RESEND_API_KEY')
 
 const handler = async (request: Request): Promise<Response> => {
+  const SUPABASE_URL = Deno.env.get('SUPABASE_URL')
+  const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')
+  const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY ?? "");
   if (request.method === 'OPTIONS') {
     // Handle CORS preflight request
     return new Response(null, {
@@ -41,7 +42,6 @@ const handler = async (request: Request): Promise<Response> => {
   }
 
   // new code to add the date package was scanned to the email template
-  const supabase = createClient();
   
   // Fetch all unclaimed packages for this user
   const { data: packages, error: packageError } = await supabase
@@ -73,7 +73,7 @@ const handler = async (request: Request): Promise<Response> => {
   }
 
   // Create HTML for package list
-  const packagesHTML = packages.map(pkg => `
+  const packagesHTML = packages.map((pkg) => `
     <tr>
       <td style="padding: 10px; border-bottom: 1px solid #ddd;">
         ${pkg.package_identifier}
