@@ -54,6 +54,11 @@ export default function PackageOptions() {
               <ArrowRight className="absolute bottom-4 right-4 w-6 h-6 text-foreground transition-all duration-300 ease-in-out transform translate-x-4 opacity-0 group-hover:translate-x-0 group-hover:opacity-100" />
             </div>
           </button>
+          <button
+            onClick={() => handleNavigate("/settings")}
+            className="absolute top-7 right-10 bg-gray-300 hover:bg-gray-400 rounded-full w-10 h-10 flex shadow-md"
+          >
+          </button>
 
           {isAuthorized ? (
             <div>
@@ -72,12 +77,6 @@ export default function PackageOptions() {
                 <ArrowRight className="absolute bottom-4 right-4 w-6 h-6 text-gray-500 dark:text-gray-400 transition-all duration-300 ease-in-out transform translate-x-4 opacity-0 group-hover:translate-x-0 group-hover:opacity-100" />
               </div>
             </button>
-
-          <button
-            onClick={() => handleNavigate("/settings")}
-            className="absolute top-7 right-10 bg-gray-300 hover:bg-gray-400 rounded-full w-10 h-10 flex shadow-md"
-          >
-          </button>
           </div>
           ) : (
             <></>
