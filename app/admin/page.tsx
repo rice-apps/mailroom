@@ -1,17 +1,17 @@
-"use client"
+"use client";
 
-import { Search, Package, User } from "lucide-react"
-import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
-import { Card } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
+import { Search, Package, User } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select"
+} from "@/components/ui/select";
 import {
   Table,
   TableBody,
@@ -19,26 +19,29 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table"
-import { createClient } from "@supabase/supabase-js"
-import { useEffect, useState } from "react"
-import { ToastAction } from "@/components/ui/toast"
-import { useToast } from "../hooks/use-toast"
+} from "@/components/ui/table";
+import { createClient } from "@supabase/supabase-js";
+import { useEffect, useState } from "react";
+import { ToastAction } from "@/components/ui/toast";
+import { useToast } from "../hooks/use-toast";
 
-import * as DropdownMenu from "@radix-ui/react-dropdown-menu"
-import * as Dialog from "@radix-ui/react-dialog"
+import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
+import * as Dialog from "@radix-ui/react-dialog";
 
 // Assuming these functions are defined in the specified path
-import { fetchStudentsGivenCollege, updateAdmin, userExists } from "../../api/admin"
-
+import {
+  fetchStudentsGivenCollege,
+  updateAdmin,
+  userExists,
+} from "../../api/admin";
 
 // ----------------------------------
 // Supabase + Contacts
 // ----------------------------------
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL ?? "",
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? ""
-)
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? "",
+);
 
 const collegeContacts = [
   { collegeName: "Lovett", name: "Sharon O'Leary", email: "sko1@rice.edu" },
@@ -50,9 +53,13 @@ const collegeContacts = [
   { collegeName: "Brown", name: "Christy Cousins", email: "cc233@rice.edu" },
   { collegeName: "Sid", name: "Lisa Galloy", email: "lgalloy@rice.edu" },
   { collegeName: "Martel", name: "Bonnie Stroman", email: "brs3126@rice.edu" },
-  { collegeName: "McMurtry", name: "Jackie Carrizales", email: "jjc3@rice.edu" },
+  {
+    collegeName: "McMurtry",
+    name: "Jackie Carrizales",
+    email: "jjc3@rice.edu",
+  },
   { collegeName: "Duncan", name: "Wendy Olivares", email: "wo5@rice.edu" },
-]
+];
 
 // ----------------------------------
 // Types/Interfaces
@@ -74,44 +81,42 @@ interface Package {
 }
 
 interface Student {
-  id: number
-  name: string
-  netid: string
-  email: string
-  packages: Package[]
-  can_add_and_delete_packages:boolean
+  id: number;
+  name: string;
+  netid: string;
+  email: string;
+  packages: Package[];
+  can_add_and_delete_packages: boolean;
   // Add optional isAdmin field (default false if undefined)
-  isAdmin?: boolean
+  isAdmin?: boolean;
 }
 
 // The "current" coordinator's email
-const currentCollegeCoordEmail = "jt87@rice.edu"
+const currentCollegeCoordEmail = "jt87@rice.edu";
 
 // ----------------------------------
 // Main Component
 // ----------------------------------
 export default function Page() {
-  const [coord, setCoord] = useState<CollegeContact | null>(null)
-  const [students, setStudents] = useState<Student[] | null>(null)
-  const [loading, setLoading] = useState(false)
-  const [filter, setFilter] = useState("all")
-  const [searchTerm, setSearchTerm] = useState("")
+  const [coord, setCoord] = useState<CollegeContact | null>(null);
+  const [students, setStudents] = useState<Student[] | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [filter, setFilter] = useState("all");
+  const [searchTerm, setSearchTerm] = useState("");
 
   // States for the Admin Dialog
-  const [isDialogOpen, setIsDialogOpen] = useState(false)
-  const [actionType, setActionType] = useState<"add" | "remove">("add")
-  const [netID, setNetID] = useState("")
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [actionType, setActionType] = useState<"add" | "remove">("add");
+  const [netID, setNetID] = useState("");
 
-  const { toast } = useToast()
+  const { toast } = useToast();
   //todo: figure out a better way to do dialogs lol
-  function resetDialog():any {
-    
+  function resetDialog(): any {
     if (!isDialogOpen) {
-      document.querySelectorAll<HTMLElement>('*').forEach((el) => {
-        
-        if (window.getComputedStyle(el).pointerEvents === 'none') {
-          console.log(el,"is diabled")
-          el.style.pointerEvents = 'auto';
+      document.querySelectorAll<HTMLElement>("*").forEach((el) => {
+        if (window.getComputedStyle(el).pointerEvents === "none") {
+          console.log(el, "is diabled");
+          el.style.pointerEvents = "auto";
         }
       });
     }
@@ -122,39 +127,43 @@ export default function Page() {
     try {
       const { data, error } = await supabase.functions.invoke("resend", {
         body: { netID, trackingId },
-      })
+      });
 
       if (error) throw error;
 
       toast({
         title: "Successfully sent a reminder to the student",
-      })
+      });
     } catch (error) {
-      console.error("Error invoking function:", error)
+      console.error("Error invoking function:", error);
     }
   };
 
   // Fetch coordinator & students
   useEffect(() => {
     const currentCoord = collegeContacts.find(
-      (contact) => contact.email === currentCollegeCoordEmail
+      (contact) => contact.email === currentCollegeCoordEmail,
     );
-    
+
     if (currentCoord) {
       setCoord(currentCoord);
       setLoading(true);
-      
+
       fetchStudentsGivenCollege(currentCoord.collegeName)
         .then(async (result) => {
           // Use Promise.all to handle all async calls
-          const updated = await Promise.all(result.map(async (student: Student) => {
-            // Fetch admin status for each student asynchronously
-            let isAdmin = student.can_add_and_delete_packages
-            console.log(student.name,student.can_add_and_delete_packages)
-            console.log(`Fetched admin status for ${student.netid}: ${isAdmin}`);
-            return { ...student, isAdmin: isAdmin ?? false };
-          }));
-          
+          const updated = await Promise.all(
+            result.map(async (student: Student) => {
+              // Fetch admin status for each student asynchronously
+              let isAdmin = student.can_add_and_delete_packages;
+              console.log(student.name, student.can_add_and_delete_packages);
+              console.log(
+                `Fetched admin status for ${student.netid}: ${isAdmin}`,
+              );
+              return { ...student, isAdmin: isAdmin ?? false };
+            }),
+          );
+
           setStudents(updated);
           setLoading(false);
         })
@@ -169,57 +178,55 @@ export default function Page() {
   const filteredStudents = students?.filter((student) => {
     const matchesFilter =
       filter === "all" ||
-      (filter === "unclaimed" && student.packages.some((pkg) => !pkg.claimed)) ||
-      (filter === "claimed" && student.packages.every((pkg) => pkg.claimed))
+      (filter === "unclaimed" &&
+        student.packages.some((pkg) => !pkg.claimed)) ||
+      (filter === "claimed" && student.packages.every((pkg) => pkg.claimed));
 
     const matchesSearch =
       student.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      student.email.toLowerCase().includes(searchTerm.toLowerCase())
+      student.email.toLowerCase().includes(searchTerm.toLowerCase());
 
-    return matchesFilter && matchesSearch
-  })
+    return matchesFilter && matchesSearch;
+  });
 
   // Add/Remove admin
   const handleAdminSubmit = async () => {
-    if (!netID) return
+    if (!netID) return;
 
     try {
       if (actionType === "add") {
         // Your logic to add an admin
-        if(await userExists(netID)){
-          console.log(`Adding admin with netID: ${netID}`)
-          toast({ title: `Successfully added ${netID} as admin.` })
-          updateAdmin(netID, true)
+        if (await userExists(netID)) {
+          console.log(`Adding admin with netID: ${netID}`);
+          toast({ title: `Successfully added ${netID} as admin.` });
+          updateAdmin(netID, true);
+        } else {
+          console.log(`User with netID: ${netID} could not be found.`);
+          toast({ title: `Failed to add ${netID} as admin.` });
         }
-        else{
-          console.log(`User with netID: ${netID} could not be found.`)
-          toast({ title: `Failed to add ${netID} as admin.` })
-        }
-        
       } else {
         // Your logic to remove an admin
-        if(await userExists(netID)){
-          console.log(`Removing admin with netID: ${netID}`)
-          toast({ title: `Successfully removed ${netID} as admin.` })
-          updateAdmin(netID, false)
-        }
-        else{
-          console.log(`User with netID: ${netID} could not be found.`)
-          toast({ title: `Failed to remove ${netID} as admin.` })
+        if (await userExists(netID)) {
+          console.log(`Removing admin with netID: ${netID}`);
+          toast({ title: `Successfully removed ${netID} as admin.` });
+          updateAdmin(netID, false);
+        } else {
+          console.log(`User with netID: ${netID} could not be found.`);
+          toast({ title: `Failed to remove ${netID} as admin.` });
         }
       }
     } catch (err) {
-      console.error("Error in handleAdminSubmit", err)
+      console.error("Error in handleAdminSubmit", err);
       toast({
         title: "Error",
         description: "Something went wrong while updating admins.",
-      })
+      });
     } finally {
-      setIsDialogOpen(false)
-      setTimeout(()=> (document.body.style.pointerEvents = ""),0)
-      setNetID("")
+      setIsDialogOpen(false);
+      setTimeout(() => (document.body.style.pointerEvents = ""), 0);
+      setNetID("");
     }
-  }
+  };
 
   // ----------------------------------
   // Render
@@ -235,7 +242,9 @@ export default function Page() {
           </span>
         </div>
         <div className="mt-4 px-4 space-y-2">
-          <div className="text-sm font-medium text-gray-600">College Coordinator</div>
+          <div className="text-sm font-medium text-gray-600">
+            College Coordinator
+          </div>
           <div className="text-[#00205B] font-semibold">{coord?.name}</div>
           <div className="text-sm text-gray-600">{coord?.email}</div>
           <div className="text-sm text-gray-600">
@@ -244,7 +253,9 @@ export default function Page() {
           <div className="text-sm font-medium text-[#00205B] mt-4">
             Assigned College
           </div>
-          <div className="text-lg font-bold text-[#00205B]">{coord?.collegeName}</div>
+          <div className="text-lg font-bold text-[#00205B]">
+            {coord?.collegeName}
+          </div>
         </div>
       </div>
 
@@ -277,14 +288,15 @@ export default function Page() {
                   className="min-w-[160px] rounded-md border border-gray-200 bg-white p-1 shadow-md"
                   sideOffset={6}
                 >
-
                   <DropdownMenu.Item
                     onClick={() => {
-                      setActionType("add")
+                      setActionType("add");
 
-                      setIsDialogOpen(true)
-                      setTimeout(()=> (document.body.style.pointerEvents = ""),0)
-
+                      setIsDialogOpen(true);
+                      setTimeout(
+                        () => (document.body.style.pointerEvents = ""),
+                        0,
+                      );
                     }}
                     className="cursor-pointer rounded-sm px-2 py-1 text-sm text-black hover:bg-gray-100 focus:bg-gray-100 outline-none"
                   >
@@ -293,9 +305,12 @@ export default function Page() {
 
                   <DropdownMenu.Item
                     onClick={() => {
-                      setActionType("remove")
-                      setIsDialogOpen(true)
-                      setTimeout(()=> (document.body.style.pointerEvents = ""),0)
+                      setActionType("remove");
+                      setIsDialogOpen(true);
+                      setTimeout(
+                        () => (document.body.style.pointerEvents = ""),
+                        0,
+                      );
                     }}
                     className="cursor-pointer rounded-sm px-2 py-1 text-sm text-black hover:bg-gray-100 focus:bg-gray-100 outline-none"
                   >
@@ -338,10 +353,12 @@ export default function Page() {
                   <div className="mt-6 flex justify-end gap-2">
                     <Button
                       variant="outline"
-                      onClick={() =>{
-                        
-                        setIsDialogOpen(false)
-                        setTimeout(()=> (document.body.style.pointerEvents = ""),0)
+                      onClick={() => {
+                        setIsDialogOpen(false);
+                        setTimeout(
+                          () => (document.body.style.pointerEvents = ""),
+                          0,
+                        );
                       }}
                     >
                       Cancel
@@ -408,9 +425,7 @@ export default function Page() {
                         {student.name}
                         {/* BADGE: Show if user is admin */}
                         {student.isAdmin && (
-                          <Badge
-                            className="ml-2 bg-blue-100 text-blue-800 border border-blue-200"
-                          >
+                          <Badge className="ml-2 bg-blue-100 text-blue-800 border border-blue-200">
                             Admin
                           </Badge>
                         )}
@@ -438,7 +453,7 @@ export default function Page() {
                           onClick={() =>
                             handleClick(
                               student.email.split("@")[0],
-                              "Your package has arrived!"
+                              "Your package has arrived!",
                             )
                           }
                         >
@@ -454,6 +469,5 @@ export default function Page() {
         </main>
       </div>
     </div>
-  )
+  );
 }
-
