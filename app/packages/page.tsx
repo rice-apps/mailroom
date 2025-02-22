@@ -43,13 +43,18 @@ export default function StudentDashboard() {
   const [error, setError] = useState<string | null>(null);
   const supabase = createClient();
 
-  const [currentStudentEmail, setCurrentStudentEmail] = useState<string | null>(null);
-  const [notificationsEnabled, setNotificationsEnabled] = useState<boolean>(false);
+  const [currentStudentEmail, setCurrentStudentEmail] = useState<string | null>(
+    null,
+  );
+  const [notificationsEnabled, setNotificationsEnabled] =
+    useState<boolean>(false);
 
   // Get the current user email from Supabase
   useEffect(() => {
     const getUserEmail = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
       if (user && user.email) {
         setCurrentStudentEmail(user.email);
       }
@@ -112,12 +117,16 @@ export default function StudentDashboard() {
     }
   };
 
-  const handleNotificationChange = async (e: React.ChangeEvent<HTMLSelectElement>) => {
+  const handleNotificationChange = async (
+    e: React.ChangeEvent<HTMLSelectElement>,
+  ) => {
     const enableNotifications = e.target.value === "enable";
     setNotificationsEnabled(enableNotifications);
 
     // Get the netID of the logged in user using supabase.auth.getUser()
-    const { data: { user } } = await supabase.auth.getUser();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
     if (!user) {
       console.error("No logged in user found");
       return;
