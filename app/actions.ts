@@ -8,15 +8,15 @@ import { redirect } from "next/navigation";
 export const signInAction = async (formData: FormData) => {
   const supabase = createClient();
   const { data, error } = await supabase.auth.signInWithOAuth({
-    provider: 'google',
+    provider: "google",
     options: {
       queryParams: {
-        prompt: 'consent',
+        prompt: "consent",
       },
-      redirectTo: 'http://localhost:3000/auth/callback' // TODO: dynamically choose between dev and prod base URL
+      redirectTo: "http://localhost:3000/auth/callback", // TODO: dynamically choose between dev and prod base URL
     },
-  })
-  redirect(data.url ?? "")
+  });
+  redirect(data.url ?? "");
 };
 
 export const signOutAction = async () => {

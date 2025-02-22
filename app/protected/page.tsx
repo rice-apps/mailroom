@@ -21,7 +21,11 @@ export default async function ProtectedPage() {
   // Kick out non-Rice gmail accounts
   if (!user.email?.endsWith("@rice.edu")) {
     supabase.auth.signOut();
-    return encodedRedirect("error", "/sign-in", "Please sign in with your Rice email!");
+    return encodedRedirect(
+      "error",
+      "/sign-in",
+      "Please sign in with your Rice email!",
+    );
   }
 
   return (
