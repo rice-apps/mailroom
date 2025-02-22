@@ -27,7 +27,7 @@ import { useToast } from "../hooks/use-toast";
 
 // Assuming these functions are defined in the specified path
 import { fetchStudentsGivenCollege } from "../../api/admin";
-import checkAuth from "../../api/checkAuth"
+import checkAuth from "../../api/checkAuth";
 import AddModalComponent from "./AddModalComponent";
 
 const supabase = createClient();
@@ -79,14 +79,18 @@ export default function Component() {
   const [isAuthorized, setIsAuthorized] = useState(false);
 
   const checkAuthorization = async () => {
-    console.log('Checking authorization...');
+    console.log("Checking authorization...");
     try {
       const response = await checkAuth();
 
       setIsAuthorized(response.can_add_and_delete_packages === true);
-      setCoord({ collegeName: response.college, name: response.name, email: response.email });
+      setCoord({
+        collegeName: response.college,
+        name: response.name,
+        email: response.email,
+      });
     } catch (error) {
-      console.error('Authorization check failed:', error);
+      console.error("Authorization check failed:", error);
       setIsAuthorized(false);
     }
   };
@@ -149,8 +153,6 @@ export default function Component() {
     }
   }, [coord]);
 
-  
-
   const filteredStudents = students?.filter((student) => {
     const matchesFilter =
       filter === "all" ||
@@ -172,14 +174,12 @@ export default function Component() {
         />
       )}
 
-
-
       {!isAuthorized ? (
         <div className="flex flex-1 items-center justify-center bg-white h-screen">
-        <h1 className="text-2xl font-semibold text-black">
-          401 - Unauthorized
-        </h1>
-      </div>
+          <h1 className="text-2xl font-semibold text-black">
+            401 - Unauthorized
+          </h1>
+        </div>
       ) : (
         <div className="flex h-screen bg-white">
           <div className="hidden w-64 bg-gray-100 lg:block">

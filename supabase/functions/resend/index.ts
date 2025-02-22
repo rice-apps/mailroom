@@ -1,14 +1,15 @@
-const RESEND_API_KEY = Deno.env.get('RESEND_API_KEY')
+const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
 
 const handler = async (request: Request): Promise<Response> => {
-  if (request.method === 'OPTIONS') {
+  if (request.method === "OPTIONS") {
     // Handle CORS preflight request
     return new Response(null, {
       status: 204,
       headers: {
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Methods': 'POST, OPTIONS',
-        'Access-Control-Allow-Headers': 'Content-Type, Authorization, x-client-info, apikey, accept-profile',
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Methods": "POST, OPTIONS",
+        "Access-Control-Allow-Headers":
+          "Content-Type, Authorization, x-client-info, apikey, accept-profile",
       },
     });
   }
@@ -16,41 +17,40 @@ const handler = async (request: Request): Promise<Response> => {
   try {
     requestData = await request.json();
   } catch (error) {
-    return new Response(JSON.stringify({ error: 'Invalid JSON input' }), {
+    return new Response(JSON.stringify({ error: "Invalid JSON input" }), {
       status: 400,
       headers: {
-        'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': '*',
+        "Content-Type": "application/json",
+        "Access-Control-Allow-Origin": "*",
       },
     });
   }
 
   const { netID, trackingId } = requestData;
   if (!netID || !trackingId) {
-    return new Response(JSON.stringify({ error: 'Missing netID or trackingId' }), {
-      status: 400,
-      headers: {
-        'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': '*',
+    return new Response(
+      JSON.stringify({ error: "Missing netID or trackingId" }),
+      {
+        status: 400,
+        headers: {
+          "Content-Type": "application/json",
+          "Access-Control-Allow-Origin": "*",
+        },
       },
-    });
+    );
   }
 
-  
-
-  const res = await fetch('https://api.resend.com/emails', {
-    method: 'POST',
+  const res = await fetch("https://api.resend.com/emails", {
+    method: "POST",
     headers: {
-      'Content-Type': 'application/json',
+      "Content-Type": "application/json",
       Authorization: `Bearer ${RESEND_API_KEY}`,
     },
     body: JSON.stringify({
-      from: 'mailroom@riceapps.org',
-      to: netID+'@rice.edu',
-      subject: 'Package Delivered',
-      html: 
-      
-      `
+      from: "mailroom@riceapps.org",
+      to: netID + "@rice.edu",
+      subject: "Package Delivered",
+      html: `
       <head>
       <meta charset="UTF-8" />
       <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
@@ -341,10 +341,10 @@ const handler = async (request: Request): Promise<Response> => {
   return new Response(JSON.stringify(data), {
     status: 200,
     headers: {
-      'Content-Type': 'application/json',
-      'Access-Control-Allow-Origin': '*',
+      "Content-Type": "application/json",
+      "Access-Control-Allow-Origin": "*",
     },
   });
-}
+};
 
 Deno.serve(handler);
