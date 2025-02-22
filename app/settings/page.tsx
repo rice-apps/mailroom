@@ -32,11 +32,11 @@ export default function UserDetails() {
 
 
   return (
-    <div className="min-h-screen bg-white flex justify-center items-center">
+    <div className="min-h-screen bg-accent text-foreground flex justify-center items-center">
       <div className="w-full max-w-xl -mt-20">
           
           {/* -------------- Your Details --------------- */}
-          <Card className="p-6 space-y-5 border-none shadow-none max-w-3xl">
+          <div className="p-6 space-y-5 border-none shadow-none max-w-3xl">
           <h2 className="text-2xl font-medium">Your Details</h2>
           <div className="space-y-5">
             <div className="grid grid-cols-2 w-full">
@@ -79,11 +79,11 @@ export default function UserDetails() {
               </Button>
             </div>
           </div>
-        </Card>
+        </div>
 
 
         {/* -------------- Notification Settings --------------- */}
-        <Card className="p-8 space-y-2 border-none shadow-none w-full">
+        <div className="p-8 space-y-2 border-none shadow-none w-full">
           <h2 className="text-2xl font-medium">Notification Settings</h2>
           <p className="text-sm text-gray-500">What notifications do you want to see?</p>
           <div className="space-y-5">
@@ -108,7 +108,7 @@ export default function UserDetails() {
               Delete Account
             </Button>
           </div>
-        </Card>
+        </div>
       </div>
 
       <button 
