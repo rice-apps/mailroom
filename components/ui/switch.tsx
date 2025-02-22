@@ -27,10 +27,10 @@ const Switch = React.forwardRef<React.ElementRef<typeof SwitchPrimitives.Root>, 
       >
         <SwitchPrimitives.Thumb
           className={clsx(
-            "absolute left-1 top-1 h-2 w-2 rounded-full bg-white transition-all",
+            "absolute left-1 top-1 h-2 w-2 rounded-full transition-all",
             checked
               ? "translate-x-3 bg-white scale-110" 
-              : "bg-blue-900 -translate-y-1/4", 
+              : "bg-blue-900 scale-110 -translate-y-1/4 -translate-x-1/4", 
           )}
         />
       </SwitchPrimitives.Root>
