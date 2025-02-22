@@ -33,44 +33,50 @@ export default function PackageOptions() {
   };
 
   return (
-    <div className="min-h-screen bg-white dark:bg-gray-900 p-8 flex items-center justify-center">
+    <div className="min-h-screen bg-accent p-8 flex items-center justify-center">
       <div className="w-full max-w-4xl">
-        <h1 className="text-3xl font-bold text-center text-black dark:text-white mb-8">
+        <h1 className="text-3xl font-bold text-center text-secondary-foreground mb-8">
           Package Management
         </h1>
         <div className="flex flex-col md:flex-row gap-8 justify-center items-stretch w-full">
           <button
             onClick={() => handleNavigate("/scan")}
-            className="relative bg-gray-100 dark:bg-gray-800 rounded-lg shadow-md overflow-hidden transition-all duration-300 ease-in-out hover:shadow-lg"
+            className="relative bg-gray-100 bg-accent rounded-lg shadow-md overflow-hidden transition-all duration-300 ease-in-out hover:shadow-lg"
           >
             <div className="aspect-square p-8 flex flex-col items-center justify-center group">
-              <TruckIcon className="w-24 h-24 text-gray-500 dark:text-gray-400 mb-4" />
-              <h2 className="text-2xl font-semibold text-black dark:text-white mb-2">
+              <TruckIcon className="w-24 h-24 text-gray-500 text-foreground mb-4" />
+              <h2 className="text-2xl font-semibold text-muted-foreground mb-2">
                 Check In
               </h2>
-              <p className="text-gray-600 dark:text-gray-400 text-center">
+              <p className="text-forground text-center">
                 Scan and register incoming packages
               </p>
-              <ArrowRight className="absolute bottom-4 right-4 w-6 h-6 text-gray-500 dark:text-gray-400 transition-all duration-300 ease-in-out transform translate-x-4 opacity-0 group-hover:translate-x-0 group-hover:opacity-100" />
+              <ArrowRight className="absolute bottom-4 right-4 w-6 h-6 text-foreground transition-all duration-300 ease-in-out transform translate-x-4 opacity-0 group-hover:translate-x-0 group-hover:opacity-100" />
             </div>
           </button>
+          <button
+            onClick={() => handleNavigate("/settings")}
+            className="absolute top-7 right-10 bg-gray-300 hover:bg-gray-400 rounded-full w-10 h-10 flex shadow-md"
+          ></button>
 
           {isAuthorized ? (
-            <button
-              onClick={() => handleNavigate("/admin")}
-              className="relative bg-gray-100 dark:bg-gray-800 rounded-lg shadow-md overflow-hidden transition-all duration-300 ease-in-out hover:shadow-lg"
-            >
-              <div className="aspect-square p-8 flex flex-col items-center justify-center group">
-                <PackageOpen className="w-24 h-24 text-gray-500 dark:text-gray-400 mb-4" />
-                <h2 className="text-2xl font-semibold text-black dark:text-white mb-2">
-                  View Current Packages
-                </h2>
-                <p className="text-gray-600 dark:text-gray-400 text-center">
-                  View your college's packages
-                </p>
-                <ArrowRight className="absolute bottom-4 right-4 w-6 h-6 text-gray-500 dark:text-gray-400 transition-all duration-300 ease-in-out transform translate-x-4 opacity-0 group-hover:translate-x-0 group-hover:opacity-100" />
-              </div>
-            </button>
+            <div>
+              <button
+                onClick={() => handleNavigate("/admin")}
+                className="relative bg-gray-100 text-foreground  rounded-lg shadow-md overflow-hidden transition-all duration-300 ease-in-out hover:shadow-lg"
+              >
+                <div className="aspect-square p-8 flex flex-col items-center justify-center group">
+                  <PackageOpen className="w-24 h-24 text-gray-500 mb-4" />
+                  <h2 className="text-2xl font-semibold text-muted-foreground mb-2">
+                    View Current Packages
+                  </h2>
+                  <p className="text-foreground text-center">
+                    View your college's packages
+                  </p>
+                  <ArrowRight className="absolute bottom-4 right-4 w-6 h-6 text-gray-500 dark:text-gray-400 transition-all duration-300 ease-in-out transform translate-x-4 opacity-0 group-hover:translate-x-0 group-hover:opacity-100" />
+                </div>
+              </button>
+            </div>
           ) : (
             <></>
           )}
