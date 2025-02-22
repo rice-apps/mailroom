@@ -1,5 +1,5 @@
 // ... existing imports ...
-import ButtonComponent from './ButtonComponent';
+import ButtonComponent from "./ButtonComponent";
 
 export default async function page() {
   return (

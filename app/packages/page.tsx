@@ -1,87 +1,99 @@
-"use client"
+"use client";
 
-import { useEffect, useState } from "react"
-import { Package, User } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Skeleton } from "@/components/ui/skeleton"
-import { fetchUser, fetchPackagesbyUser, claimPackage } from "@/api/packages"
-import { createClient } from "@/utils/supabase/client"
+import { useEffect, useState } from "react";
+import { Package, User } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
+import { fetchUser, fetchPackagesbyUser, claimPackage } from "@/api/packages";
+import { createClient } from "@/utils/supabase/client";
 // import { fetchPackagesbyUser, fetchUser, claimPackage } from "@/api/packages"
 
 interface User {
-  id: string
-  email: string
-  name: string
-  account_created: string
-  can_add_and_delete_packages: boolean
-  can_claim_packages: boolean
-  can_administrate_users: boolean
-  user_type: string
-  user_id: string
+  id: string;
+  email: string;
+  name: string;
+  account_created: string;
+  can_add_and_delete_packages: boolean;
+  can_claim_packages: boolean;
+  can_administrate_users: boolean;
+  user_type: string;
+  user_id: string;
 }
 
 interface Package {
-  id: string
-  recipient_name: string
-  package_identifier: string
-  claimed: boolean
-  date_added: string
-  date_claimed: string | null
-  extra_information: string
+  id: string;
+  recipient_name: string;
+  package_identifier: string;
+  claimed: boolean;
+  date_added: string;
+  date_claimed: string | null;
+  extra_information: string;
 }
 
 export default function StudentDashboard() {
-  const [loading, setLoading] = useState(true)
-  const [user, setUser] = useState<User | null>(null)
-  const [packages, setPackages] = useState<Package[] | null>(null)
-  const [error, setError] = useState<string | null>(null)
-  const supabase = createClient()
+  const [loading, setLoading] = useState(true);
+  const [user, setUser] = useState<User | null>(null);
+  const [packages, setPackages] = useState<Package[] | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const supabase = createClient();
 
-  const [currentStudentEmail, setCurrentStudentEmail] = useState<string | null>(null)
+  const [currentStudentEmail, setCurrentStudentEmail] = useState<string | null>(
+    null,
+  );
 
   useEffect(() => {
     const getUserEmail = async () => {
-      const { data: { user } } = await supabase.auth.getUser()
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
       if (user && user.email) {
-        setCurrentStudentEmail(user.email)
+        setCurrentStudentEmail(user.email);
       }
-    }
+    };
 
-    getUserEmail()
-  }, [])
+    getUserEmail();
+  }, []);
 
   useEffect(() => {
     const fetchData = async () => {
-      console.log("hi")
-      if (currentStudentEmail) {try {
-        const user = await fetchUser(currentStudentEmail)
-        setUser(user)
-        console.log(user)
+      console.log("hi");
+      if (currentStudentEmail) {
+        try {
+          const user = await fetchUser(currentStudentEmail);
+          setUser(user);
+          console.log(user);
 
-        const fetchedPackages = await fetchPackagesbyUser(user.id)
-        setPackages(fetchedPackages)
-      } catch (err) {
-        setError("failed to load data. Please try again later.")
-      } finally {
-        setLoading(false)
-      }}
-    }
+          const fetchedPackages = await fetchPackagesbyUser(user.id);
+          setPackages(fetchedPackages);
+        } catch (err) {
+          setError("failed to load data. Please try again later.");
+        } finally {
+          setLoading(false);
+        }
+      }
+    };
 
-    fetchData()
-  }, [currentStudentEmail])
+    fetchData();
+  }, [currentStudentEmail]);
 
   const handleClaim = async (id: string) => {
     try {
-      const success = await claimPackage(id)
+      const success = await claimPackage(id);
       if (success && packages) {
-        const newPackages = packages.filter((pack) => pack.id !== id)
-        setPackages(newPackages)
+        const newPackages = packages.filter((pack) => pack.id !== id);
+        setPackages(newPackages);
       }
     } catch (err) {
-      setError("failed to claim package. please try again.")
+      setError("failed to claim package. please try again.");
     }
-  }
+  };
 
   if (loading) {
     return (
@@ -89,11 +101,11 @@ export default function StudentDashboard() {
         <Skeleton className="h-12 w-[250px]" />
         <Skeleton className="h-[200px] w-full" />
       </div>
-    )
+    );
   }
 
   if (error) {
-    return <div className="p-4 text-red-500">{error}</div>
+    return <div className="p-4 text-red-500">{error}</div>;
   }
 
   return (
@@ -123,7 +135,9 @@ export default function StudentDashboard() {
             <Card key={item.id}>
               <CardHeader>
                 <CardTitle>{item.package_identifier}</CardTitle>
-                <CardDescription>Added on: {new Date(item.date_added).toLocaleDateString()}</CardDescription>
+                <CardDescription>
+                  Added on: {new Date(item.date_added).toLocaleDateString()}
+                </CardDescription>
               </CardHeader>
               <CardContent>
                 <p className="mb-2">{item.extra_information}</p>
@@ -138,10 +152,12 @@ export default function StudentDashboard() {
         <Card>
           <CardContent className="p-8 text-center">
             <p className="text-lg font-semibold">No packages available</p>
-            <p className="text-muted-foreground">You don't have any packages to claim at the moment.</p>
+            <p className="text-muted-foreground">
+              You don't have any packages to claim at the moment.
+            </p>
           </CardContent>
         </Card>
       )}
     </div>
-  )
+  );
 }

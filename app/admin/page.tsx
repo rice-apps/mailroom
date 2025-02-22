@@ -58,19 +58,19 @@ const collegeContacts = [
 // Types/Interfaces
 // ----------------------------------
 interface CollegeContact {
-  name: string
-  email: string
-  collegeName: string
+  name: string;
+  email: string;
+  collegeName: string;
 }
 
 interface Package {
-  claimed: boolean
-  date_added: string
-  date_claimed: string
-  extra_information: string
-  id: string
-  package_identifier: string
-  user_id: string
+  claimed: boolean;
+  date_added: string;
+  date_claimed: string;
+  extra_information: string;
+  id: string;
+  package_identifier: string;
+  user_id: string;
 }
 
 interface Student {
@@ -124,7 +124,7 @@ export default function Page() {
         body: { netID, trackingId },
       })
 
-      if (error) throw error
+      if (error) throw error;
 
       toast({
         title: "Successfully sent a reminder to the student",
@@ -132,7 +132,7 @@ export default function Page() {
     } catch (error) {
       console.error("Error invoking function:", error)
     }
-  }
+  };
 
   // Fetch coordinator & students
   useEffect(() => {
@@ -456,3 +456,4 @@ export default function Page() {
     </div>
   )
 }
+
