@@ -7,8 +7,7 @@ import { Switch } from "@/components/ui/switch";
 import { Card } from "@/components/ui/card";
 import { Mail, MessageCircle } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { ArrowLeft} from "lucide-react";
-
+import { ArrowLeft } from "lucide-react";
 
 export default function UserDetails() {
   const [phoneNumber, setPhoneNumber] = useState("");
@@ -30,33 +29,48 @@ export default function UserDetails() {
     console.log("Account deleted");
   };
 
-
   return (
     <div className="min-h-screen bg-accent text-foreground flex justify-center items-center">
       <div className="w-full max-w-xl -mt-20">
-          
-          {/* -------------- Your Details --------------- */}
-          <div className="p-6 space-y-5 border-none shadow-none max-w-3xl">
+        {/* -------------- Your Details --------------- */}
+        <div className="p-6 space-y-5 border-none shadow-none max-w-3xl">
           <h2 className="text-2xl font-medium">Your Details</h2>
           <div className="space-y-5">
             <div className="grid grid-cols-2 w-full">
-              <span className="mb-1 font-medium text-sm text-gray-500">Name</span>
-              <span className="mb-1 font-medium text-sm text-black" > Eugenia Sung</span>
+              <span className="mb-1 font-medium text-sm text-gray-500">
+                Name
+              </span>
+              <span className="mb-1 font-medium text-sm text-black">
+                {" "}
+                Eugenia Sung
+              </span>
             </div>
             <div className="grid grid-cols-2 w-full">
-              <span className="mb-1 font-medium text-sm text-gray-500">Rice Email</span>
-              <span className="mb-1 font-medium text-sm text-black">eys3@rice.edu</span>
+              <span className="mb-1 font-medium text-sm text-gray-500">
+                Rice Email
+              </span>
+              <span className="mb-1 font-medium text-sm text-black">
+                eys3@rice.edu
+              </span>
             </div>
             <div className="grid grid-cols-2 w-full">
-              <span className="mb-1 font-medium text-sm text-gray-500">NetID</span>
+              <span className="mb-1 font-medium text-sm text-gray-500">
+                NetID
+              </span>
               <span className="mb-1 font-medium text-sm text-black">eys3</span>
             </div>
             <div className="grid grid-cols-2 w-full">
-              <span className="mb-1 font-medium text-sm text-gray-500">Residential College</span>
-              <span className= "mb-1 font-medium text-sm text-black">Martel</span>
+              <span className="mb-1 font-medium text-sm text-gray-500">
+                Residential College
+              </span>
+              <span className="mb-1 font-medium text-sm text-black">
+                Martel
+              </span>
             </div>
             <div className="grid grid-cols-2 w-full">
-              <span className="mb-1 font-medium text-sm text-gray-500">Phone Number</span>
+              <span className="mb-1 font-medium text-sm text-gray-500">
+                Phone Number
+              </span>
               <Input
                 placeholder="Enter Phone Number"
                 className="placeholder:text-gray-350 border-black rounded-full h-9 w-80"
@@ -65,7 +79,9 @@ export default function UserDetails() {
               />
             </div>
             <div className="grid grid-cols-2 w-full">
-              <span className="mb-1 font-medium text-sm text-gray-500">Additional Email</span>
+              <span className="mb-1 font-medium text-sm text-gray-500">
+                Additional Email
+              </span>
               <Input
                 placeholder="Enter Additional Email"
                 className="placeholder:text-gray-350 border-black rounded-full h-9 w-80"
@@ -74,49 +90,67 @@ export default function UserDetails() {
               />
             </div>
             <div className="flex justify-center">
-              <Button className="mt-2 w-50 h-8 bg-blue-900 hover:bg-blue-800 rounded-full mx-auto" onClick={handleSaveChanges}>
+              <Button
+                className="mt-2 w-50 h-8 bg-blue-900 hover:bg-blue-800 rounded-full mx-auto"
+                onClick={handleSaveChanges}
+              >
                 Save Changes
               </Button>
             </div>
           </div>
         </div>
 
-
         {/* -------------- Notification Settings --------------- */}
         <div className="p-8 space-y-2 border-none shadow-none w-full">
           <h2 className="text-2xl font-medium">Notification Settings</h2>
-          <p className="text-sm text-gray-500">What notifications do you want to see?</p>
+          <p className="text-sm text-gray-500">
+            What notifications do you want to see?
+          </p>
           <div className="space-y-5">
             <div className="flex justify-between items-center mt-7">
               <div className="flex items-center space-x-5">
                 <Mail className="w-5 h-5" />
                 <span className="text-sm font-medium text-gray-700">Email</span>
               </div>
-              <Switch checked={emailNotifications} onCheckedChange={setEmailNotifications} />
+              <Switch
+                checked={emailNotifications}
+                onCheckedChange={setEmailNotifications}
+              />
             </div>
 
             <div className="flex justify-between items-center">
               <div className="flex items-center space-x-5">
                 <MessageCircle className="w-5 h-5" />
-                <span className="text-sm font-medium text-gray-700">Text Message</span>
+                <span className="text-sm font-medium text-gray-700">
+                  Text Message
+                </span>
               </div>
-              <Switch checked={textNotifications} onCheckedChange={setTextNotifications} />
+              <Switch
+                checked={textNotifications}
+                onCheckedChange={setTextNotifications}
+              />
             </div>
           </div>
           <div className="flex justify-center">
-            <Button className="mt-2 w-50 h-8 bg-blue-900 text-white hover:bg-blue-800 rounded-full" onClick={handleDeleteAccount}>
+            <Button
+              className="mt-2 w-50 h-8 bg-blue-900 text-white hover:bg-blue-800 rounded-full"
+              onClick={handleDeleteAccount}
+            >
               Delete Account
             </Button>
           </div>
         </div>
       </div>
 
-      <button 
+      <button
         onClick={() => handleNavigate("/kiosk")}
-        className="absolute top-12 left-20">
-        <ArrowLeft className="w-10 h-7 text-gray-800 hover:text-gray-500" strokeWidth ={1.5} />
+        className="absolute top-12 left-20"
+      >
+        <ArrowLeft
+          className="w-10 h-7 text-gray-800 hover:text-gray-500"
+          strokeWidth={1.5}
+        />
       </button>
-      
     </div>
   );
 }
