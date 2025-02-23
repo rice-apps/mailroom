@@ -20,7 +20,7 @@ export function SubmitButton({
       type="submit"
       aria-disabled={pending}
       {...props}
-      className="text-lg py-4 px-8"
+      className="text-primary py-5 px-9 rounded-full border border-primary font-normal tracking-wide bg-background hover:bg-background"
     >
       {pending ? pendingText : children}
     </Button>
