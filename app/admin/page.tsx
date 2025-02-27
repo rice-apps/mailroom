@@ -31,8 +31,8 @@ import AddModalComponent from "./AddModalComponent";
 import ExportModalComponent from "./ExportModalComponent";
 
 const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+  process.env.NEXT_PUBLIC_SUPABASE_URL ?? "",
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? ""
 );
 
 const collegeContacts = [
@@ -148,7 +148,8 @@ export default function Component() {
       {showExportModal && coord && (
         <ExportModalComponent
           college={coord?.collegeName}
-          exitModal={() => setShowExportModal(false)}/>
+          exitModal={() => setShowExportModal(false)}
+        />
       )}
       <div className="flex h-screen bg-white">
         <div className="hidden w-64 bg-gray-100 lg:block">
@@ -266,7 +267,7 @@ export default function Component() {
                             }
                             className="bg-[#00205B] text-white hover:bg-black"
                           >
-                            {student.packages.length}
+                            {student.packages.filter((x) => !x.claimed).length}
                           </Badge>
                         </TableCell>
                         <TableCell>
