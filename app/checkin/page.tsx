@@ -5,7 +5,6 @@
 //    claimed: False, date_claimed: null(?)
 // A mapping of these fields should be built to insert into supabase table packages.
 
-
 // First, we need to request the information from the webpage
 //    Front-end pending on design
 //    Back-end http requests?
@@ -16,11 +15,10 @@
 // Third, maybe display back the entire package information
 //    Pop-up? Ask them to confirm the details? Has a button to return and edit?
 
+"use client"; // Mark as Client Component
 
-"use client";  // Mark as Client Component
-
-import { createClient } from '@/utils/supabase/client';  // Use client-side Supabase
-import React, { useState } from 'react';
+import { createClient } from "@/utils/supabase/client"; // Use client-side Supabase
+import React, { useState } from "react";
 
 const supabase = createClient();
 
@@ -56,9 +54,13 @@ const PackageInfoForm: React.FC = () => {
   const [formData, setFormData] = useState<PackageInfo>({
     claimed: false,
   });
-  const [confirmationMessage, setConfirmationMessage] = useState<string | null>(null);
+  const [confirmationMessage, setConfirmationMessage] = useState<string | null>(
+    null,
+  );
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+  ) => {
     const { name, value } = e.target;
     setFormData((prevData) => ({
       ...prevData,
@@ -66,24 +68,20 @@ const PackageInfoForm: React.FC = () => {
     }));
   };
 
-
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const { error } = await supabase
-      .from('packages')
-      .insert([
-        {
-          claimed: formData.claimed,
-          // date_claimed: formData.date_claimed,
-          // recipient_name: formData.recipient_name,
-          // email: formData.email,
-          // date_added: formData.date_added,
-          package_identifier: formData.package_identifier,
-          extra_information: formData.extra_information,
-          user_id: "a7d79e13-bdb3-4d8b-af8f-1f346eb3e1b0",
-        },
-      ]);
+    const { error } = await supabase.from("packages").insert([
+      {
+        claimed: formData.claimed,
+        // date_claimed: formData.date_claimed,
+        // recipient_name: formData.recipient_name,
+        // email: formData.email,
+        // date_added: formData.date_added,
+        package_identifier: formData.package_identifier,
+        extra_information: formData.extra_information,
+        user_id: "a7d79e13-bdb3-4d8b-af8f-1f346eb3e1b0",
+      },
+    ]);
 
     if (error) {
       console.error("Error inserting package info:", error.message);
@@ -96,7 +94,7 @@ const PackageInfoForm: React.FC = () => {
 
   return (
     <div>
-      <h1 style={{ fontWeight: 'bold' }}>Package Information</h1>
+      <h1 style={{ fontWeight: "bold" }}>Package Information</h1>
       <form onSubmit={handleSubmit}>
         {/* <label>
           Recipient Name:
@@ -136,7 +134,7 @@ const PackageInfoForm: React.FC = () => {
           <input
             type="text"
             name="package_identifier"
-            value={formData.package_identifier || ''}
+            value={formData.package_identifier || ""}
             onChange={handleChange}
           />
         </label>
@@ -146,7 +144,7 @@ const PackageInfoForm: React.FC = () => {
           Extra Information:
           <textarea
             name="extra_information"
-            value={formData.extra_information || ''}
+            value={formData.extra_information || ""}
             onChange={handleChange}
           />
         </label>
@@ -161,11 +159,6 @@ const PackageInfoForm: React.FC = () => {
 };
 
 export default PackageInfoForm;
-
-
-
-
-
 
 // "use client";  // Mark as Client Component
 // // import { createClient } from '@/utils/supabase/server';

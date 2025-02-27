@@ -3,7 +3,7 @@ import { ThemeProvider } from "next-themes";
 
 import Link from "next/link";
 import "./globals.css";
-import { Toaster } from "@/components/ui/toaster"
+import { Toaster } from "@/components/ui/toaster";
 
 export const metadata = {
   title: "Next.js and Supabase Starter Kit",
@@ -17,18 +17,15 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className={GeistSans.className} suppressHydrationWarning>
-      <body className="bg-black text-foreground">
+      <body className="bg-accent text-foreground">
         <ThemeProvider
           attribute="class"
           defaultTheme="system"
           enableSystem
           disableTransitionOnChange
         >
-
-
-              {children}
-              <Toaster />
-
+          {children}
+          <Toaster />
         </ThemeProvider>
       </body>
     </html>
