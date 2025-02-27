@@ -251,19 +251,19 @@ export default function Component() {
                     />
                   </div>
                   <div className="ml-auto gap-4 flex flex-row">
-                  <Button
-                    className="text-black bg-white hover:bg-[#00205B] hover:text-white border"
-                    onClick={() => setShowExportModal(true)}
-                  >
-                    Export Claims
-                  </Button>
-                  <Button
-                    className="bg-[#00205B] text-white hover:bg-black"
-                    onClick={() => setShowAddModal(true)}
-                  >
-                    Add Students
-                  </Button>
-                </div>
+                    <Button
+                      className="text-black bg-white hover:bg-[#00205B] hover:text-white border"
+                      onClick={() => setShowExportModal(true)}
+                    >
+                      Export Claims
+                    </Button>
+                    <Button
+                      className="bg-[#00205B] text-white hover:bg-black"
+                      onClick={() => setShowAddModal(true)}
+                    >
+                      Add Students
+                    </Button>
+                  </div>
                 </div>
               </div>
 

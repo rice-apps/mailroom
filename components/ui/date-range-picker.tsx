@@ -114,7 +114,7 @@ const DateRangePickerDropdown = ({
           "px-4 py-2 text-left border rounded-lg bg-white hover:bg-gray-50",
           "transition-colors duration-200 w-64 flex justify-between items-center",
           "text-gray-700 focus:outline-none",
-          isOpen && "ring-2 ring-blue-500 border-blue-500"
+          isOpen && "ring-2 ring-blue-500 border-blue-500",
         )}
       >
         {startDate && endDate ? (
@@ -152,8 +152,8 @@ const DateRangePickerDropdown = ({
                   setCurrentMonth(
                     new Date(
                       currentMonth.getFullYear(),
-                      currentMonth.getMonth() - 1
-                    )
+                      currentMonth.getMonth() - 1,
+                    ),
                   )
                 }
                 className="p-2 hover:bg-gray-100 rounded"
@@ -169,8 +169,8 @@ const DateRangePickerDropdown = ({
                   setCurrentMonth(
                     new Date(
                       currentMonth.getFullYear(),
-                      currentMonth.getMonth() + 1
-                    )
+                      currentMonth.getMonth() + 1,
+                    ),
                   )
                 }
                 className="p-2 hover:bg-gray-100 rounded"
@@ -208,7 +208,7 @@ const DateRangePickerDropdown = ({
                       isInRange(date) && "bg-blue-200",
                       isStart(date) &&
                         "bg-blue-500 text-white hover:bg-blue-600",
-                      isEnd(date) && "bg-blue-500 text-white hover:bg-blue-600"
+                      isEnd(date) && "bg-blue-500 text-white hover:bg-blue-600",
                     )}
                     disabled={!isCurrentMonth}
                   >

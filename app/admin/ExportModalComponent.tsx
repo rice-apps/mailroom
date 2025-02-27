@@ -23,10 +23,10 @@ export default function ExportModalComponent({
   exitModal: () => void;
 }) {
   const [pickupDateRange, setPickupDateRange] = useState<DateRange | null>(
-    null
+    null,
   );
   const [checkinDateRange, setCheckinDateRange] = useState<DateRange | null>(
-    null
+    null,
   );
   const [refreshing, setRefreshing] = useState(false);
   const [packages, setPackages] = useState<
@@ -63,7 +63,7 @@ export default function ExportModalComponent({
                 name,
                 email,
                 college
-            )`
+            )`,
       )
       .eq("users.college", college)
       .then((data) => {
@@ -115,7 +115,7 @@ export default function ExportModalComponent({
                 pkg.date_claimed >= pickupDateRange!.startDate! &&
                 pkg.date_claimed <= pickupDateRange!.endDate!
               );
-            })
+            }),
         );
         setRefreshing(false);
       });
