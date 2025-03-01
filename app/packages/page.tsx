@@ -13,7 +13,6 @@ import {
 import { Skeleton } from "@/components/ui/skeleton";
 import { fetchUser, fetchPackagesbyUser, claimPackage } from "@/api/packages";
 import { createClient } from "@/utils/supabase/client";
-// import { fetchPackagesbyUser, fetchUser, claimPackage } from "@/api/packages"
 
 interface User {
   id: string;
@@ -47,7 +46,10 @@ export default function StudentDashboard() {
   const [currentStudentEmail, setCurrentStudentEmail] = useState<string | null>(
     null,
   );
+  const [notificationsEnabled, setNotificationsEnabled] =
+    useState<boolean>(false);
 
+  // Get the current user email from Supabase
   useEffect(() => {
     const getUserEmail = async () => {
       const {
@@ -61,19 +63,18 @@ export default function StudentDashboard() {
     getUserEmail();
   }, []);
 
+  // Fetch the user and package data using the email
   useEffect(() => {
     const fetchData = async () => {
-      console.log("hi");
       if (currentStudentEmail) {
         try {
-          const user = await fetchUser(currentStudentEmail);
-          setUser(user);
-          console.log(user);
+          const userData = await fetchUser(currentStudentEmail);
+          setUser(userData);
 
-          const fetchedPackages = await fetchPackagesbyUser(user.id);
+          const fetchedPackages = await fetchPackagesbyUser(userData.id);
           setPackages(fetchedPackages);
         } catch (err) {
-          setError("failed to load data. Please try again later.");
+          setError("Failed to load data. Please try again later.");
         } finally {
           setLoading(false);
         }
@@ -83,6 +84,27 @@ export default function StudentDashboard() {
     fetchData();
   }, [currentStudentEmail]);
 
+  // Once the user is available, fetch their current notifications setting.
+  useEffect(() => {
+    const fetchNotificationSetting = async () => {
+      if (user) {
+        const { data, error } = await supabase
+          .from("users")
+          .select("is_subscribed_email")
+          .eq("email", user.email)
+          .single();
+
+        if (error) {
+          console.error("Error fetching notification settings:", error);
+        } else if (data) {
+          setNotificationsEnabled(data.is_subscribed_email);
+        }
+      }
+    };
+
+    fetchNotificationSetting();
+  }, [user]);
+
   const handleClaim = async (id: string) => {
     try {
       const success = await claimPackage(id);
@@ -91,7 +113,35 @@ export default function StudentDashboard() {
         setPackages(newPackages);
       }
     } catch (err) {
-      setError("failed to claim package. please try again.");
+      setError("Failed to claim package. Please try again.");
+    }
+  };
+
+  const handleNotificationChange = async (
+    e: React.ChangeEvent<HTMLSelectElement>,
+  ) => {
+    const enableNotifications = e.target.value === "enable";
+    setNotificationsEnabled(enableNotifications);
+
+    // Get the netID of the logged in user using supabase.auth.getUser()
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    if (!user) {
+      console.error("No logged in user found");
+      return;
+    }
+    const email = user.email;
+
+    // Update the notifications setting in the Supabase table
+    const { error } = await supabase
+      .from("users")
+      .update({ is_subscribed_email: enableNotifications })
+      .eq("email", email)
+      .select();
+
+    if (error) {
+      console.error("Error updating notifications setting:", error);
     }
   };
 
@@ -128,6 +178,22 @@ export default function StudentDashboard() {
           </div>
         </CardContent>
       </Card>
+
+      {/* Notification Dropdown */}
+      <div className="mb-8">
+        <label htmlFor="notifications" className="mr-2 font-medium">
+          Email Notifications:
+        </label>
+        <select
+          id="notifications"
+          value={notificationsEnabled ? "enable" : "disable"}
+          onChange={handleNotificationChange}
+          className="border rounded p-2"
+        >
+          <option value="enable">Enable</option>
+          <option value="disable">Disable</option>
+        </select>
+      </div>
 
       {packages && packages.length > 0 ? (
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
