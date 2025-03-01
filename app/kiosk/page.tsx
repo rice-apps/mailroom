@@ -70,7 +70,7 @@ export default function PackageOptions() {
             <button
               onClick={() => handleNavigate("/admin")}
               className="relative bg-gray-100 bg-accent rounded-[3rem] border-[2px] border-[#BEBFBF] shadow-md overflow-hidden transition-all duration-300 ease-in-out hover:shadow-lg py-2 px-2"
-              >
+            >
               <div className="aspect-square p-8 flex flex-col items-center justify-center group">
                 <CursorIcon className="w-24 h-24 text-gray-500 mb-8" />
                 <h2 className="text-lg font-semibold text-black mb-2 rounded-3xl border border-black px-4 py-2">
@@ -85,11 +85,11 @@ export default function PackageOptions() {
             <button
               onClick={() => handleNavigate("/settings")}
               className="relative bg-gray-100 bg-accent rounded-[3rem] border-[2px] border-[#BEBFBF] shadow-md overflow-hidden transition-all duration-300 ease-in-out hover:shadow-lg py-2 px-2"
-              >
+            >
               <div className="aspect-square p-8 flex flex-col items-center justify-center group">
                 <AdminIcon className="w-24 h-24 text-gray-500 mb-8" />
                 <h2 className="text-lg font-semibold text-black mb-2 rounded-3xl border border-black px-4 py-2">
-                Manage Admin
+                  Manage Admin
                 </h2>
                 <ArrowRight className="absolute bottom-4 right-4 w-6 h-6 text-gray-500 dark:text-gray-400 transition-all duration-300 ease-in-out transform translate-x-4 opacity-0 group-hover:translate-x-0 group-hover:opacity-100" />
               </div>
