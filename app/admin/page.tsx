@@ -33,7 +33,8 @@ import {
   fetchStudentsGivenCollege,
   updateAdmin,
   userExists,
-} from "../../api/admin";
+} from "@/api/admin";
+import checkAuth from "@/api/checkAuth";
 
 // ----------------------------------
 // Supabase + Contacts
@@ -42,24 +43,6 @@ const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL ?? "",
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? "",
 );
-
-const collegeContacts = [
-  { collegeName: "Lovett", name: "Sharon O'Leary", email: "sko1@rice.edu" },
-  { collegeName: "Baker", name: "Kristen Luu", email: "kl161@rice.edu" },
-  { collegeName: "Will Rice", name: "Amanda Garza", email: "ag276@rice.edu" },
-  { collegeName: "Hanszen", name: "Joyce Bald", email: "joyce@rice.edu" },
-  { collegeName: "Wiess", name: "Jenny Toups", email: "jt87@rice.edu" },
-  { collegeName: "Jones", name: "Kellie Sager", email: "ks235@rice.edu" },
-  { collegeName: "Brown", name: "Christy Cousins", email: "cc233@rice.edu" },
-  { collegeName: "Sid", name: "Lisa Galloy", email: "lgalloy@rice.edu" },
-  { collegeName: "Martel", name: "Bonnie Stroman", email: "brs3126@rice.edu" },
-  {
-    collegeName: "McMurtry",
-    name: "Jackie Carrizales",
-    email: "jjc3@rice.edu",
-  },
-  { collegeName: "Duncan", name: "Wendy Olivares", email: "wo5@rice.edu" },
-];
 
 // ----------------------------------
 // Types/Interfaces
@@ -91,9 +74,6 @@ interface Student {
   isAdmin?: boolean;
 }
 
-// The "current" coordinator's email
-const currentCollegeCoordEmail = "jt87@rice.edu";
-
 // ----------------------------------
 // Main Component
 // ----------------------------------
@@ -103,6 +83,7 @@ export default function Page() {
   const [loading, setLoading] = useState(false);
   const [filter, setFilter] = useState("all");
   const [searchTerm, setSearchTerm] = useState("");
+  const [isAuthorized, setIsAuthorized] = useState(false);
 
   // States for the Admin Dialog
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -141,20 +122,23 @@ export default function Page() {
 
   // Fetch coordinator & students
   useEffect(() => {
-    const currentCoord = collegeContacts.find(
-      (contact) => contact.email === currentCollegeCoordEmail,
-    );
+    const fetchData = async () => {
+      try {
+        const response = await checkAuth();
+        setIsAuthorized(response.can_add_and_delete_packages === true);
 
-    if (currentCoord) {
-      setCoord(currentCoord);
-      setLoading(true);
+        if (response.can_add_and_delete_packages === true) {
+          setCoord({
+            collegeName: response.college,
+            name: response.name,
+            email: response.email,
+          });
 
-      fetchStudentsGivenCollege(currentCoord.collegeName)
-        .then(async (result) => {
-          // Use Promise.all to handle all async calls
+          setLoading(true);
+          const result = await fetchStudentsGivenCollege(response.college);
+
           const updated = await Promise.all(
             result.map(async (student: Student) => {
-              // Fetch admin status for each student asynchronously
               let isAdmin = student.can_add_and_delete_packages;
               console.log(student.name, student.can_add_and_delete_packages);
               console.log(
@@ -165,13 +149,16 @@ export default function Page() {
           );
 
           setStudents(updated);
-          setLoading(false);
-        })
-        .catch((error) => {
-          console.error("Error fetching students:", error);
-          setLoading(false);
-        });
-    }
+        }
+      } catch (error) {
+        console.error("Error fetching data:", error);
+        setIsAuthorized(false);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
   }, []);
 
   // Filter Logic
@@ -231,15 +218,19 @@ export default function Page() {
   // ----------------------------------
   // Render
   // ----------------------------------
-  return (
+  return !isAuthorized ? (
+    <div className="flex flex-1 items-center justify-center bg-white h-screen">
+      <h1 className="text-2xl font-semibold text-black">401 - Unauthorized</h1>
+    </div>
+  ) : (
     <div className="flex h-screen bg-white">
       {/* LEFT SIDEBAR */}
       <div className="hidden w-64 bg-gray-100 lg:block">
         <div className="flex h-16 items-center justify-center border-b border-gray-200">
           <Package className="mr-2 h-6 w-6 text-[#00205B]" />
           <span className="text-lg font-semibold text-[#00205B]">
-            Rice Package Admin
-          </span>
+          Rice Package Admin
+        </span>
         </div>
         <div className="mt-4 px-4 space-y-2">
           <div className="text-sm font-medium text-gray-600">
@@ -248,7 +239,7 @@ export default function Page() {
           <div className="text-[#00205B] font-semibold">{coord?.name}</div>
           <div className="text-sm text-gray-600">{coord?.email}</div>
           <div className="text-sm text-gray-600">
-            Net ID: {coord?.email.split("@")[0]}
+            Net ID: {coord?.email?.split("@")[0]}
           </div>
           <div className="text-sm font-medium text-[#00205B] mt-4">
             Assigned College
@@ -291,7 +282,6 @@ export default function Page() {
                   <DropdownMenu.Item
                     onClick={() => {
                       setActionType("add");
-
                       setIsDialogOpen(true);
                       setTimeout(
                         () => (document.body.style.pointerEvents = ""),
