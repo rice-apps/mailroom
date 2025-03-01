@@ -90,17 +90,6 @@ export default function ExportModalComponent({
               };
             })
             .filter((pkg) => {
-              if (pickupDateRange?.startDate && pickupDateRange?.endDate && pickupDateRange?.startDate.valueOf() == pickupDateRange?.endDate.valueOf()) {
-                pickupDateRange.startDate = new Date(pickupDateRange.startDate.setHours(0, 0, 0, 0));
-                pickupDateRange.endDate = new Date(pickupDateRange.endDate.setHours(23, 59, 59, 999));
-              }
-              if (checkinDateRange?.startDate && checkinDateRange?.endDate && checkinDateRange?.startDate.valueOf() == checkinDateRange?.endDate.valueOf()) {
-                checkinDateRange.startDate = new Date(checkinDateRange.startDate.setHours(0, 0, 0, 0));
-                checkinDateRange.endDate = new Date(checkinDateRange.endDate.setHours(23, 59, 59, 999));
-              }
-
-              console.log("pickupDateRange", checkinDateRange);
-              
               if (!pickupDateRange && !checkinDateRange) {
                 return true;
               }

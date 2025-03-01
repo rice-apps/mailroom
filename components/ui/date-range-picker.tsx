@@ -80,13 +80,13 @@ const DateRangePickerDropdown = ({
 
   const handleDateClick = (date: Date) => {
     if (!startDate || (startDate && endDate)) {
-      setStartDate(date);
+      setStartDate(new Date(date.setHours(0, 0, 0, 0)));
       setEndDate(null);
     } else if (date > startDate) {
-      setEndDate(date);
+      setEndDate(new Date(date.setHours(23, 59, 59, 999)));
     } else {
-      setEndDate(startDate);
-      setStartDate(date);
+      setEndDate(new Date(date.setHours(23, 59, 59, 999)));
+      setStartDate(new Date(date.setHours(0, 0, 0, 0)));
     }
   };
 
