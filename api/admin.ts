@@ -83,7 +83,7 @@ export async function deleteInactiveUsers(emails: Array<string>) {
   try {
     const {data,error} = await supabase
     .from("users")
-    .select()
+    .delete()
     .filter("email","not.in",`(${emails.map((email) => `'${email}'`).join(",")})`)
     .neq("can_add_and_delete_packages",true)
     console.log(data,"HAHHAHAHAHAH")
