@@ -46,7 +46,9 @@ export default function ScanCheckin() {
     };
     fetchRecipients();
   }, []);
-
+  useEffect(()=>{
+    
+  })
   const [port, setPort] = useState<SerialPort | null>(null);
   const [reader, setReader] =
     useState<ReadableStreamDefaultReader<string> | null>(null);
@@ -285,10 +287,11 @@ export default function ScanCheckin() {
                 <ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400 dark:text-gray-500" />
               </div>
               {showDropdown &&
-                recipientName.length >= 3 &&
+                recipientName.length >= 4 &&
                 filteredRecipients.length > 0 && (
                   <ul className="absolute z-10 w-full mt-1 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md shadow-lg max-h-60 overflow-auto">
-                    {filteredRecipients.map((recipient, index) => (
+                    {filteredRecipients.sort().map((recipient, index) => (
+                      
                       <li
                         key={index}
                         className="px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer"
