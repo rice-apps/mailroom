@@ -490,15 +490,21 @@ function PackageTable({
                                 </Badge>
                               </TableCell>
                               <TableCell className="w-[15%]"></TableCell>
-                                <TableCell className="text-gray-500 w-[10%]">
+                              <TableCell className="text-gray-500 w-[10%]">
                                 {`Scanned ${Math.floor(
-                                  (new Date().getTime() - new Date(pkg.date_added).getTime()) /
-                                  (1000 * 60 * 60 * 24)
-                                )} ${Math.floor(
-                                  (new Date().getTime() - new Date(pkg.date_added).getTime()) /
-                                  (1000 * 60 * 60 * 24)
-                                ) === 1 ? 'day' : 'days'} ago`}
-                                </TableCell>
+                                  (new Date().getTime() -
+                                    new Date(pkg.date_added).getTime()) /
+                                    (1000 * 60 * 60 * 24),
+                                )} ${
+                                  Math.floor(
+                                    (new Date().getTime() -
+                                      new Date(pkg.date_added).getTime()) /
+                                      (1000 * 60 * 60 * 24),
+                                  ) === 1
+                                    ? "day"
+                                    : "days"
+                                } ago`}
+                              </TableCell>
                             </TableRow>
                           </>
                         ))}

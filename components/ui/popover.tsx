@@ -12,7 +12,7 @@ const PopoverTrigger = React.forwardRef<
     ref={ref}
     className={cn(
       "inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus:outline-none",
-      className
+      className,
     )}
     {...props}
   />
@@ -32,7 +32,7 @@ const PopoverContent = React.forwardRef<
         "z-50 rounded-lg bg-white p-4 shadow-lg border border-gray-200",
         "focus:outline-none animate-fadeIn",
         "data-[side=top]:animate-slideUp data-[side=bottom]:animate-slideDown",
-        className
+        className,
       )}
       {...props}
     />

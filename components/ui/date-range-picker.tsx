@@ -16,8 +16,12 @@ const DateRangePickerDropdown = ({
   initialDateRange?: DateRange | null;
 }) => {
   const [isOpen, setIsOpen] = useState(false);
-  const [startDate, setStartDate] = useState<Date | null>(initialDateRange?.startDate || null);
-  const [endDate, setEndDate] = useState<Date | null>(initialDateRange?.endDate || null);
+  const [startDate, setStartDate] = useState<Date | null>(
+    initialDateRange?.startDate || null,
+  );
+  const [endDate, setEndDate] = useState<Date | null>(
+    initialDateRange?.endDate || null,
+  );
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const dropdownRef = useRef<HTMLDivElement>(null);
 
