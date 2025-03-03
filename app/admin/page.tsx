@@ -53,6 +53,7 @@ import {
 import DateRangePickerDropdown, {
   DateRange,
 } from "@/components/ui/date-range-picker";
+import { signOutAction } from "../actions";
 
 const supabase = createClient();
 
@@ -277,6 +278,9 @@ export default function Component() {
               <Button
                 variant="ghost"
                 className="flex items-center w-full text-[#00205B] justify-start hover:bg-gray-200 font-semibold"
+                onClick={() => {
+                  signOutAction();
+                }}
               >
                 <LogOut className="w-5 h-5 mr-2" />
                 Sign Out
