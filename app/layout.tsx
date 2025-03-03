@@ -5,10 +5,18 @@ import Link from "next/link";
 import "./globals.css";
 import { Toaster } from "@/components/ui/toaster";
 
+import { Figtree } from "next/font/google";
+
 export const metadata = {
   title: "Next.js and Supabase Starter Kit",
   description: "The fastest way to build apps with Next.js and Supabase",
 };
+
+const figtree = Figtree({
+  subsets: ["latin"],
+});
+
+const figtreeClass = figtree.className;
 
 export default function RootLayout({
   children,
@@ -16,7 +24,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={GeistSans.className} suppressHydrationWarning>
+    <html lang="en" className={figtreeClass} suppressHydrationWarning>
       <body className="bg-accent text-foreground">
         <ThemeProvider
           attribute="class"
