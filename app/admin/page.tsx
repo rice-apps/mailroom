@@ -601,7 +601,7 @@ function PackageTable({
                     <TableCell className="font-medium w-[25%]">
                       {student.name}
                       {student.isAdmin && (
-                        <Badge className="ml-2 bg-blue-100 text-blue-800 border border-blue-200">
+                        <Badge className="ml-2 bg-blue-100 text-blue-800 border border-blue-200 hover:bg-blue-200">
                           Admin
                         </Badge>
                       )}
