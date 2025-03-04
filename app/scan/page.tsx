@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ArrowLeft, Barcode, ChevronDown, Edit2 } from "lucide-react";
 import { createClient } from "@/utils/supabase/client";
+import ScanIcon from "@/components/scan-icon";
 const supabase = createClient();
 
 declare global {
@@ -217,7 +218,7 @@ export default function ScanCheckin() {
           <div className="mx-auto h-64 w-64 rounded-3xl border-2 border-gray-200 flex items-center justify-center">
             <div className="text-center">
               <div className="mb-4 flex justify-center">
-                <Barcode className="h-20 w-20 text-navy-900" />
+                <ScanIcon className="h-[7.5rem] w-[7.5rem]" />
               </div>
               <Button 
                 className="rounded-full bg-white text-navy-900 border border-gray-300 px-6 py-2"
