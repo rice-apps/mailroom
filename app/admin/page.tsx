@@ -40,7 +40,11 @@ import { ToastAction } from "@/components/ui/toast";
 import { useToast } from "../hooks/use-toast";
 
 // Assuming these functions are defined in the specified path
-import { fetchStudentsGivenCollege } from "../../api/admin";
+import {
+  fetchStudentsGivenCollege,
+  updateAdmin,
+  userExists,
+} from "../../api/admin";
 import checkAuth from "../../api/checkAuth";
 import AddModalComponent from "./AddModalComponent";
 import ExportModalComponent from "./ExportModalComponent";
@@ -55,6 +59,14 @@ import DateRangePickerDropdown, {
 } from "@/components/ui/date-range-picker";
 import { signOutAction } from "../actions";
 
+import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
+import * as Dialog from "@radix-ui/react-dialog";
+
+// Assuming these functions are defined in the specified path
+
+// ----------------------------------
+// Supabase + Contacts
+// ----------------------------------
 const supabase = createClient();
 
 const collegeContacts = [
@@ -98,10 +110,45 @@ interface Student {
   email: string;
   packages: Package[];
   numOfValidPackages: number;
+  can_add_and_delete_packages: boolean;
+  isAdmin?: boolean;
 }
+
+// The "current" coordinator's email for the incoming version
+const currentCollegeCoordEmail = "jt87@rice.edu";
 
 export default function Component() {
   const [isAuthorized, setIsAuthorized] = useState(false);
+  const [coord, setCoord] = useState<CollegeContact | null>(null);
+  const [students, setStudents] = useState<Student[] | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [filter, setFilter] = useState("all");
+  const [searchTerm, setSearchTerm] = useState("");
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [showExportModal, setShowExportModal] = useState(false);
+  const [toggle, setToggle] = useState(true);
+  const [deliveryDateRange, setDeliveryDateRange] = useState<DateRange | null>(
+    null,
+  );
+  const [minPackages, setMinPackages] = useState(0);
+
+  // States for the Admin Dialog
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [actionType, setActionType] = useState<"add" | "remove">("add");
+  const [netID, setNetID] = useState("");
+
+  const { toast } = useToast();
+
+  function resetDialog(): any {
+    if (!isDialogOpen) {
+      document.querySelectorAll<HTMLElement>("*").forEach((el) => {
+        if (window.getComputedStyle(el).pointerEvents === "none") {
+          console.log(el, "is diabled");
+          el.style.pointerEvents = "auto";
+        }
+      });
+    }
+  }
 
   const checkAuthorization = async () => {
     console.log("Checking authorization...");
@@ -120,27 +167,6 @@ export default function Component() {
     }
   };
 
-  useEffect(() => {
-    checkAuthorization();
-  }, []);
-
-  const [coord, setCoord] = useState<CollegeContact | null>(null);
-  const [students, setStudents] = useState<Student[] | null>(null);
-  const [loading, setLoading] = useState(false);
-  const [filter, setFilter] = useState("all");
-  const [searchTerm, setSearchTerm] = useState("");
-  const [showAddModal, setShowAddModal] = useState(false);
-  const [showExportModal, setShowExportModal] = useState(false);
-  const [toggle, setToggle] = useState(true);
-
-  const [deliveryDateRange, setDeliveryDateRange] = useState<DateRange | null>(
-    null,
-  );
-
-  const [minPackages, setMinPackages] = useState(0);
-
-  const { toast } = useToast();
-
   const handleClick = async (netID: string, trackingId: string) => {
     try {
       const { data, error } = await supabase.functions.invoke("resend", {
@@ -157,26 +183,80 @@ export default function Component() {
     }
   };
 
+  // Add/Remove admin
+  const handleAdminSubmit = async () => {
+    if (!netID) return;
+
+    try {
+      if (actionType === "add") {
+        // Your logic to add an admin
+        if (await userExists(netID)) {
+          console.log(`Adding admin with netID: ${netID}`);
+          toast({ title: `Successfully added ${netID} as admin.` });
+          updateAdmin(netID, true);
+        } else {
+          console.log(`User with netID: ${netID} could not be found.`);
+          toast({ title: `Failed to add ${netID} as admin.` });
+        }
+      } else {
+        // Your logic to remove an admin
+        if (await userExists(netID)) {
+          console.log(`Removing admin with netID: ${netID}`);
+          toast({ title: `Successfully removed ${netID} as admin.` });
+          updateAdmin(netID, false);
+        } else {
+          console.log(`User with netID: ${netID} could not be found.`);
+          toast({ title: `Failed to remove ${netID} as admin.` });
+        }
+      }
+    } catch (err) {
+      console.error("Error in handleAdminSubmit", err);
+      toast({
+        title: "Error",
+        description: "Something went wrong while updating admins.",
+      });
+    } finally {
+      setIsDialogOpen(false);
+      setTimeout(() => (document.body.style.pointerEvents = ""), 0);
+      setNetID("");
+    }
+  };
+
+  useEffect(() => {
+    checkAuthorization();
+  }, []);
+
   useEffect(() => {
     const currentCoord = coord;
     if (currentCoord) {
       setCoord(currentCoord);
       setLoading(true);
       fetchStudentsGivenCollege(currentCoord.collegeName)
-        .then((result) => {
-          setStudents(result);
-          setLoading(false);
+        .then(async (result) => {
+          // Use Promise.all to handle all async calls
+          const updated = await Promise.all(
+            result.map(async (student: Student) => {
+              // Update number of valid packages based on claim
+              student.numOfValidPackages = 0;
+              const { packages } = student;
+              packages.map((pkg) => {
+                if (!pkg.claimed) {
+                  student.numOfValidPackages += 1;
+                }
+              });
 
-          // update number of valid packages based on claim
-          result.map((student: Student) => {
-            student.numOfValidPackages = 0;
-            const { packages } = student;
-            packages.map((pkg) => {
-              if (!pkg.claimed) {
-                student.numOfValidPackages += 1;
-              }
-            });
-          });
+              // Fetch admin status for each student asynchronously
+              let isAdmin = student.can_add_and_delete_packages;
+              console.log(student.name, student.can_add_and_delete_packages);
+              console.log(
+                `Fetched admin status for ${student.netid}: ${isAdmin}`,
+              );
+              return { ...student, isAdmin: isAdmin ?? false };
+            }),
+          );
+
+          setStudents(updated);
+          setLoading(false);
         })
         .catch((error) => {
           console.error("Error fetching students:", error);
@@ -249,13 +329,44 @@ export default function Component() {
               </span>
             </div>
             <div className="mt-4 space-y-2 pl-[10px]">
-              <Button
-                variant="ghost"
-                className="flex items-center w-full text-[#00205B] justify-start hover:bg-gray-200 font-semibold"
-              >
-                <Pencil className="w-5 h-5 mr-2" />
-                Manage Admin
-              </Button>
+              <DropdownMenu.Root>
+                <DropdownMenu.Trigger asChild>
+                  <Button
+                    variant="ghost"
+                    className="flex items-center w-full text-[#00205B] justify-start hover:bg-gray-200 font-semibold"
+                  >
+                    <Pencil className="w-5 h-5 mr-2" />
+                    Manage Admin
+                  </Button>
+                </DropdownMenu.Trigger>
+                <DropdownMenu.Portal>
+                  <DropdownMenu.Content
+                    className="min-w-[220px] bg-white rounded-md p-1 shadow-md"
+                    align="start"
+                  >
+                    <DropdownMenu.Item
+                      className="flex items-center px-2 py-2 text-sm cursor-pointer hover:bg-gray-100 rounded"
+                      onClick={() => {
+                        setActionType("add");
+                        setIsDialogOpen(true);
+                      }}
+                    >
+                      <Plus className="w-4 h-4 mr-2" />
+                      Add Admin
+                    </DropdownMenu.Item>
+                    <DropdownMenu.Item
+                      className="flex items-center px-2 py-2 text-sm cursor-pointer hover:bg-gray-100 rounded"
+                      onClick={() => {
+                        setActionType("remove");
+                        setIsDialogOpen(true);
+                      }}
+                    >
+                      <X className="w-4 h-4 mr-2" />
+                      Remove Admin
+                    </DropdownMenu.Item>
+                  </DropdownMenu.Content>
+                </DropdownMenu.Portal>
+              </DropdownMenu.Root>
 
               <Button
                 variant="ghost"
@@ -299,6 +410,57 @@ export default function Component() {
                 <Button className="hover:bg-white" variant="ghost" size="icon">
                   <User className="h-5 w-5 text-[#00205B]" />
                 </Button>
+
+                {/* Admin Dialog */}
+                <Dialog.Root open={isDialogOpen} onOpenChange={resetDialog()}>
+                  <Dialog.Portal>
+                    <Dialog.Overlay className="fixed inset-0 bg-black/40" />
+                    <Dialog.Content
+                      className="
+                        fixed
+                        top-1/2 left-1/2
+                        w-[90vw] max-w-sm
+                        -translate-x-1/2 -translate-y-1/2
+                        rounded-lg bg-white p-6
+                        shadow-lg
+                      "
+                    >
+                      <Dialog.Title className="text-lg font-semibold text-black">
+                        {actionType === "add" ? "Add Admin" : "Remove Admin"}
+                      </Dialog.Title>
+                      <Dialog.Description className="text-sm text-gray-500 mt-1">
+                        Please enter the netID of the admin to{" "}
+                        {actionType === "add" ? "add" : "remove"}.
+                      </Dialog.Description>
+
+                      <div className="mt-4">
+                        <Input
+                          placeholder="Enter netID"
+                          value={netID}
+                          onChange={(e) => setNetID(e.target.value)}
+                        />
+                      </div>
+
+                      <div className="mt-6 flex justify-end gap-2">
+                        <Button
+                          variant="outline"
+                          onClick={() => {
+                            setIsDialogOpen(false);
+                            setTimeout(
+                              () => (document.body.style.pointerEvents = ""),
+                              0,
+                            );
+                          }}
+                        >
+                          Cancel
+                        </Button>
+                        <Button onClick={handleAdminSubmit}>
+                          {actionType === "add" ? "Add" : "Remove"}
+                        </Button>
+                      </div>
+                    </Dialog.Content>
+                  </Dialog.Portal>
+                </Dialog.Root>
               </div>
             </header>
 
@@ -438,6 +600,11 @@ function PackageTable({
                     </TableCell>
                     <TableCell className="font-medium w-[25%]">
                       {student.name}
+                      {student.isAdmin && (
+                        <Badge className="ml-2 bg-blue-100 text-blue-800 border border-blue-200">
+                          Admin
+                        </Badge>
+                      )}
                     </TableCell>
                     <TableCell className="w-[25%]">{student.email}</TableCell>
                     <TableCell className="w-[20%]">
