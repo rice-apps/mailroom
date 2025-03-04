@@ -186,6 +186,9 @@ export default function ScanCheckin() {
       setConfirmationMessage("Error submitting data. Please try again.");
     } else {
       setConfirmationMessage("Package information submitted successfully!");
+      setTimeout(() => {
+        setConfirmationMessage(null);
+      }, 3000);
       // Reset form after successful submission
       setTrackingNumber("");
       setRecipientName("");
@@ -221,7 +224,7 @@ export default function ScanCheckin() {
                 <ScanIcon className="h-[7.5rem] w-[7.5rem]" />
               </div>
               <Button 
-                className="rounded-full bg-white text-navy-900 border border-gray-300 px-6 py-2"
+                className="rounded-full bg-white text-navy-900 border border-gray-300 px-6 py-2 hover:bg-gray-100"
                 onClick={requestPort}
                 type="button"
               >
@@ -305,10 +308,10 @@ export default function ScanCheckin() {
 
           {confirmationMessage && (
             <div
-              className={`text-center p-2 rounded ${
-                confirmationMessage.includes("Error")
-                  ? "bg-red-100 text-red-700"
-                  : "bg-green-100 text-green-700"
+              className={`text-center p-3 rounded-md font-medium ${
+              confirmationMessage.includes("Error")
+                ? "bg-red-200 text-red-800 border border-red-300"
+                : "bg-green-200 text-green-800 border border-green-300"
               }`}
             >
               {confirmationMessage}
@@ -318,7 +321,7 @@ export default function ScanCheckin() {
           <div className="pt-4">
             <button
               type="submit"
-              className="inline-flex items-center justify-center whitespace-nowrap text-sm font-medium w-full rounded-lg bg-blue-700 text-white py-2 px-4 h-10"
+              className="inline-flex items-center justify-center whitespace-nowrap text-sm font-medium w-full rounded-lg bg-[#00205B] text-white py-2 px-4 h-10"
               disabled={!trackingNumber || !recipientName || !studentNetID}
               style={{ opacity: (!trackingNumber || !recipientName || !studentNetID) ? '0.6' : '1' }}
             >
