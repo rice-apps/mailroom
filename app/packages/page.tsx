@@ -181,17 +181,17 @@ export default function StudentDashboard() {
 
       {/* Notification Dropdown */}
       <div className="mb-8">
-        <label htmlFor="notifications" className="mr-2 font-medium">
+        <label htmlFor="notifications" className="mr-2 font-medium   ">
           Email Notifications:
         </label>
         <select
           id="notifications"
           value={notificationsEnabled ? "enable" : "disable"}
           onChange={handleNotificationChange}
-          className="border rounded p-2"
+          className="border rounded p-2m bg-background"
         >
-          <option value="enable">Enable</option>
-          <option value="disable">Disable</option>
+          <option value="enable">Enabled</option>
+          <option value="disable">Disabled</option>
         </select>
       </div>
 
