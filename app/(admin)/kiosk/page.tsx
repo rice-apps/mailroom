@@ -5,7 +5,7 @@ import { ArrowRight, TruckIcon, PackageOpen } from "lucide-react";
 import { createClient } from "@/utils/supabase/client";
 import { useEffect, useState } from "react";
 
-import checkAuth from "../../api/checkAuth";
+import checkAuth from "../../../api/checkAuth";
 import ScanIcon from "@/components/scan-icon";
 import AdminIcon from "@/components/admin-icon";
 import CursorIcon from "@/components/cursor-icon";
