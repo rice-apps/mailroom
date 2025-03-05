@@ -673,19 +673,26 @@ function PackageTable({
                               </TableCell>
                               <TableCell className="w-[15%]"></TableCell>
                               <TableCell className="text-gray-500 w-[10%]">
-                                {`Scanned ${Math.floor(
-                                  (new Date().getTime() -
-                                    new Date(pkg.date_added).getTime()) /
-                                    (1000 * 60 * 60 * 24),
-                                )} ${
-                                  Math.floor(
-                                    (new Date().getTime() -
-                                      new Date(pkg.date_added).getTime()) /
-                                      (1000 * 60 * 60 * 24),
-                                  ) === 1
-                                    ? "day"
-                                    : "days"
-                                } ago`}
+                                {(() => {
+                                  const now = new Date().getTime();
+                                  const addedDate = new Date(pkg.date_added).getTime();
+                                  const diffMs = now - addedDate;
+                                  
+                                  const diffSeconds = Math.floor(diffMs / 1000);
+                                  const diffMinutes = Math.floor(diffSeconds / 60);
+                                  const diffHours = Math.floor(diffMinutes / 60);
+                                  const diffDays = Math.floor(diffHours / 24);
+                                  
+                                  if (diffSeconds < 60) {
+                                    return "Scanned just now";
+                                  } else if (diffMinutes < 60) {
+                                    return `Scanned ${diffMinutes} ${diffMinutes === 1 ? "minute" : "minutes"} ago`;
+                                  } else if (diffHours < 24) {
+                                    return `Scanned ${diffHours} ${diffHours === 1 ? "hour" : "hours"} ago`;
+                                  } else {
+                                    return `Scanned ${diffDays} ${diffDays === 1 ? "day" : "days"} ago`;
+                                  }
+                                })()}
                               </TableCell>
                             </TableRow>
                           </>
