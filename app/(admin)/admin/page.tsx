@@ -531,7 +531,12 @@ export default function Component() {
 }
 
 function getPackageCount(filter: string, student: Student) {
-  return ((filter === "unclaimed" || filter === "all") ? student.numDeliveredPackages : 0) + ((filter === "claimed" || filter === "all") ? student.numClaimedPackages : 0);
+  return (
+    (filter === "unclaimed" || filter === "all"
+      ? student.numDeliveredPackages
+      : 0) +
+    (filter === "claimed" || filter === "all" ? student.numClaimedPackages : 0)
+  );
 }
 
 interface PackageTableProps {
@@ -552,7 +557,7 @@ function PackageTable({
   filteredStudents,
   toggle,
   handleClick,
-  currentFilter
+  currentFilter,
 }: PackageTableProps) {
   const [expandedRows, setExpandedRows] = useState<{ [key: number]: boolean }>(
     {},
@@ -665,63 +670,67 @@ function PackageTable({
                           if (currentFilter === "unclaimed" && pkg.claimed) {
                             return null;
                           }
-                          return (<>
-                            <TableRow
-                              key={`${student.id}-package-${index}`}
-                              className="bg-gray-100"
-                            >
-                              <TableCell className="w-[5%]"></TableCell>
-                              <TableCell className="w-[25%]">
-                                {pkg.extra_information ||
-                                  "Package details unavailable"}
-                              </TableCell>
-                              <TableCell className="w-[25%]"></TableCell>
-                              <TableCell className="w-[20%]">
-                                {pkg.claimed ? (
-                                  <Badge className="bg-green-400 text-white px-3 py-1">
-                                    Claimed
-                                  </Badge>
-                                ) : (
-                                  <Badge className="bg-gray-400 text-white px-3 py-1">
-                                    Delivered
-                                  </Badge>
-                                )}
-                              </TableCell>
-                              <TableCell className="w-[15%]"></TableCell>
-                              <TableCell className="text-gray-500 w-[10%]">
-                                {(() => {
-                                  const now = new Date().getTime();
-                                  const addedDate = new Date(
-                                    !pkg.claimed
-                                      ? pkg.date_added
-                                      : pkg.date_claimed,
-                                  ).getTime();
-                                  const diffMs = now - addedDate;
+                          return (
+                            <>
+                              <TableRow
+                                key={`${student.id}-package-${index}`}
+                                className="bg-gray-100"
+                              >
+                                <TableCell className="w-[5%]"></TableCell>
+                                <TableCell className="w-[25%]">
+                                  {pkg.extra_information ||
+                                    "Package details unavailable"}
+                                </TableCell>
+                                <TableCell className="w-[25%]"></TableCell>
+                                <TableCell className="w-[20%]">
+                                  {pkg.claimed ? (
+                                    <Badge className="bg-green-400 text-white px-3 py-1">
+                                      Claimed
+                                    </Badge>
+                                  ) : (
+                                    <Badge className="bg-gray-400 text-white px-3 py-1">
+                                      Delivered
+                                    </Badge>
+                                  )}
+                                </TableCell>
+                                <TableCell className="w-[15%]"></TableCell>
+                                <TableCell className="text-gray-500 w-[10%]">
+                                  {(() => {
+                                    const now = new Date().getTime();
+                                    const addedDate = new Date(
+                                      !pkg.claimed
+                                        ? pkg.date_added
+                                        : pkg.date_claimed,
+                                    ).getTime();
+                                    const diffMs = now - addedDate;
 
-                                  const diffSeconds = Math.floor(diffMs / 1000);
-                                  const diffMinutes = Math.floor(
-                                    diffSeconds / 60,
-                                  );
-                                  const diffHours = Math.floor(
-                                    diffMinutes / 60,
-                                  );
-                                  const diffDays = Math.floor(diffHours / 24);
-                                  const baseAction = pkg.claimed
-                                    ? "Claimed"
-                                    : "Added";
-                                  if (diffSeconds < 60) {
-                                    return `${baseAction} just now`;
-                                  } else if (diffMinutes < 60) {
-                                    return `${baseAction} ${diffMinutes} ${diffMinutes === 1 ? "minute" : "minutes"} ago`;
-                                  } else if (diffHours < 24) {
-                                    return `${baseAction} ${diffHours} ${diffHours === 1 ? "hour" : "hours"} ago`;
-                                  } else {
-                                    return `${baseAction} ${diffDays} ${diffDays === 1 ? "day" : "days"} ago`;
-                                  }
-                                })()}
-                              </TableCell>
-                            </TableRow>
-                          </>);
+                                    const diffSeconds = Math.floor(
+                                      diffMs / 1000,
+                                    );
+                                    const diffMinutes = Math.floor(
+                                      diffSeconds / 60,
+                                    );
+                                    const diffHours = Math.floor(
+                                      diffMinutes / 60,
+                                    );
+                                    const diffDays = Math.floor(diffHours / 24);
+                                    const baseAction = pkg.claimed
+                                      ? "Claimed"
+                                      : "Added";
+                                    if (diffSeconds < 60) {
+                                      return `${baseAction} just now`;
+                                    } else if (diffMinutes < 60) {
+                                      return `${baseAction} ${diffMinutes} ${diffMinutes === 1 ? "minute" : "minutes"} ago`;
+                                    } else if (diffHours < 24) {
+                                      return `${baseAction} ${diffHours} ${diffHours === 1 ? "hour" : "hours"} ago`;
+                                    } else {
+                                      return `${baseAction} ${diffDays} ${diffDays === 1 ? "day" : "days"} ago`;
+                                    }
+                                  })()}
+                                </TableCell>
+                              </TableRow>
+                            </>
+                          );
                         })}
                       </>
                     )}
