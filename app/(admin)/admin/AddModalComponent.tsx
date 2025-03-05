@@ -190,7 +190,7 @@ export default function AddModalComponent({
           <Button
             className="bg-[#00205B] text-white hover:bg-black"
             onClick={() => {
-              insertUsersGivenCollege("Wiess", students).then((data) => {
+              insertUsersGivenCollege(college, students).then((data) => {
                 exitModal();
               });
             }}
