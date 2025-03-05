@@ -26,10 +26,10 @@ const handler = async (request: Request): Promise<Response> => {
     });
   }
 
-  const { netID, trackingId } = requestData;
-  if (!netID || !trackingId) {
+  const { netID, trackingId, redirectUrl } = requestData;
+  if (!netID || !trackingId || !redirectUrl) {
     return new Response(
-      JSON.stringify({ error: "Missing netID or trackingId" }),
+      JSON.stringify({ error: "Missing netID, trackingId, or redirectUrl" }),
       {
         status: 400,
         headers: {
@@ -289,7 +289,7 @@ const handler = async (request: Request): Promise<Response> => {
                             </div>
                             <div> 
                             
-                            <a href="https://qiekvvwcicienqtinxmo.supabase.co/functions/v1/claim-package?trackingID=${trackingId}" 
+                            <a href="https://qiekvvwcicienqtinxmo.supabase.co/functions/v1/claim-package?trackingID=${trackingId}&redirectUrl=${redirectUrl}" 
                               style="display: inline-block; padding: 10px 20px; background-color: #a27a52; color: #ffffff; text-decoration: none; border-radius: 4px; font-weight: bold; margin: 10px 0;">
                                 Claim Package
                             </a>
