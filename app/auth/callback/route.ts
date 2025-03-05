@@ -14,13 +14,15 @@ export async function GET(request: Request) {
       origin,
     )
   ) {
-    throw new Error("Invalid host");
+    throw new Error(
+      `Invalid host ${origin} in ${process.env.NEXT_PUBLIC_ALLOWED_HOSTS}`,
+    );
   }
 
   const protocol = request.headers.get("x-forwarded-proto") || "http";
 
   const baseUrl = `${protocol}://${origin}`;
-  
+
   const redirectTo = requestUrl.searchParams.get("redirect_to")?.toString();
 
   if (code) {
