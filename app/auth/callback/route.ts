@@ -7,7 +7,7 @@ export async function GET(request: Request) {
   // https://supabase.com/docs/guides/auth/server-side/nextjs
   const requestUrl = new URL(request.url);
   const code = requestUrl.searchParams.get("code");
-
+  console.log("headers", JSON.stringify(request.headers));
   const host = request.headers.get("host") || requestUrl.host;
   if (
     !(JSON.parse(process.env.NEXT_PUBLIC_ALLOWED_HOSTS || "[]") ?? []).includes(
