@@ -30,7 +30,7 @@ export const signInAction = async (formData: FormData) => {
       redirectTo: baseUrl + "/auth/callback",
     },
   });
-  console.log(baseUrl, data);
+
   redirect(data.url ?? "");
 };
 
