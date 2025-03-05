@@ -37,15 +37,15 @@ import { createClient } from "@/utils/supabase/client";
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import { ToastAction } from "@/components/ui/toast";
-import { useToast } from "../hooks/use-toast";
+import { useToast } from "../../hooks/use-toast";
 
 // Assuming these functions are defined in the specified path
 import {
   fetchStudentsGivenCollege,
   updateAdmin,
   userExists,
-} from "../../api/admin";
-import checkAuth from "../../api/checkAuth";
+} from "../../../api/admin";
+import checkAuth from "../../../api/checkAuth";
 import AddModalComponent from "./AddModalComponent";
 import ExportModalComponent from "./ExportModalComponent";
 import React from "react";
@@ -57,7 +57,7 @@ import {
 import DateRangePickerDropdown, {
   DateRange,
 } from "@/components/ui/date-range-picker";
-import { signOutAction } from "../actions";
+import { signOutAction } from "../../actions";
 
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 import * as Dialog from "@radix-ui/react-dialog";
@@ -118,7 +118,6 @@ interface Student {
 const currentCollegeCoordEmail = "jt87@rice.edu";
 
 export default function Component() {
-  const [isAuthorized, setIsAuthorized] = useState(false);
   const [coord, setCoord] = useState<CollegeContact | null>(null);
   const [students, setStudents] = useState<Student[] | null>(null);
   const [loading, setLoading] = useState(false);
@@ -150,32 +149,30 @@ export default function Component() {
     }
   }
 
-  const checkAuthorization = async () => {
-    console.log("Checking authorization...");
+  const fetchCoord = async () => {
+    console.log("Fetching coordinator...");
     try {
       const response = await checkAuth();
-
-      setIsAuthorized(response.can_add_and_delete_packages === true);
       setCoord({
         collegeName: response.college,
         name: response.name,
         email: response.email,
       });
     } catch (error) {
-      console.error("Authorization check failed:", error);
-      setIsAuthorized(false);
+      console.error("Coordinator fetching failed:", error);
     }
   };
 
   const handleClick = async (
     netID: string,
     trackingId: string,
+    redirectUrl: string,
     event: React.MouseEvent<HTMLButtonElement, MouseEvent>,
   ) => {
     event.stopPropagation();
     try {
       const { data, error } = await supabase.functions.invoke("resend", {
-        body: { netID, trackingId },
+        body: { netID, trackingId, redirectUrl },
       });
 
       if (error) throw error;
@@ -228,7 +225,7 @@ export default function Component() {
   };
 
   useEffect(() => {
-    checkAuthorization();
+    fetchCoord();
   }, []);
 
   useEffect(() => {
@@ -312,116 +309,110 @@ export default function Component() {
           exitModal={() => setShowExportModal(false)}
         />
       )}
-      {!isAuthorized ? (
-        <div className="flex flex-1 items-center justify-center bg-white h-screen">
-          <h1 className="text-2xl font-semibold text-black">
-            401 - Unauthorized
-          </h1>
-        </div>
-      ) : (
-        <div className="flex h-screen bg-white">
-          <div className="hidden w-64 bg-gray-100 lg:flex flex-col px-4">
-            <div className="flex items-center gap-4 pt-4">
-              <Image
-                src="/mailroom_logo.png"
-                width={64}
-                height={64}
-                alt=""
-                priority={true}
-              />
-              <span className="text-lg font-semibold text-[#00205B] leading-6">
-                Mailroom <br></br> Admin
-              </span>
-            </div>
-            <div className="mt-4 space-y-2 pl-[10px]">
-              <DropdownMenu.Root>
-                <DropdownMenu.Trigger asChild>
-                  <Button
-                    variant="ghost"
-                    className="flex items-center w-full text-[#00205B] justify-start hover:bg-gray-200 font-semibold"
-                  >
-                    <Pencil className="w-5 h-5 mr-2" />
-                    Manage Admin
-                  </Button>
-                </DropdownMenu.Trigger>
-                <DropdownMenu.Portal>
-                  <DropdownMenu.Content
-                    className="min-w-[220px] bg-white rounded-md p-1 shadow-md"
-                    align="start"
-                  >
-                    <DropdownMenu.Item
-                      className="flex items-center px-2 py-2 text-sm cursor-pointer hover:bg-gray-100 rounded"
-                      onClick={() => {
-                        setActionType("add");
-                        setIsDialogOpen(true);
-                      }}
-                    >
-                      <Plus className="w-4 h-4 mr-2" />
-                      Add Admin
-                    </DropdownMenu.Item>
-                    <DropdownMenu.Item
-                      className="flex items-center px-2 py-2 text-sm cursor-pointer hover:bg-gray-100 rounded"
-                      onClick={() => {
-                        setActionType("remove");
-                        setIsDialogOpen(true);
-                      }}
-                    >
-                      <X className="w-4 h-4 mr-2" />
-                      Remove Admin
-                    </DropdownMenu.Item>
-                  </DropdownMenu.Content>
-                </DropdownMenu.Portal>
-              </DropdownMenu.Root>
 
-              <Button
-                variant="ghost"
-                className="flex items-center w-full text-[#00205B] justify-start hover:bg-gray-200 font-semibold"
-                onClick={() => setShowAddModal(true)}
-              >
-                <Plus className="w-5 h-5 mr-2" />
-                Add Students
-              </Button>
-
-              <Button
-                variant="ghost"
-                className="flex items-center w-full text-[#00205B] justify-start hover:bg-gray-200 font-semibold"
-                onClick={() => setShowExportModal(true)}
-              >
-                <Upload className="w-5 h-5 mr-2" />
-                Export Claims
-              </Button>
-
-              <Button
-                variant="ghost"
-                className="flex items-center w-full text-[#00205B] justify-start hover:bg-gray-200 font-semibold"
-                onClick={() => {
-                  signOutAction();
-                }}
-              >
-                <LogOut className="w-5 h-5 mr-2" />
-                Sign Out
-              </Button>
-            </div>
+      <div className="flex h-screen bg-white">
+        <div className="hidden w-64 bg-gray-100 lg:flex flex-col px-4">
+          <div className="flex items-center gap-4 pt-4">
+            <Image
+              src="/mailroom_logo.png"
+              width={64}
+              height={64}
+              alt=""
+              priority={true}
+            />
+            <span className="text-lg font-semibold text-[#00205B] leading-6">
+              Mailroom <br></br> Admin
+            </span>
           </div>
-
-          <div className="flex flex-1 flex-col overflow-hidden">
-            <header className="flex items-center justify-between bg-white px-6 pt-6">
-              <div className="flex items-center gap-4">
-                <h1 className="text-2xl font-semibold">
-                  Hi {coord?.name}! Track all packages here
-                </h1>
-              </div>
-              <div className="flex items-center gap-4 bg-white">
-                <Button className="hover:bg-white" variant="ghost" size="icon">
-                  <User className="h-5 w-5 text-[#00205B]" />
+          <div className="mt-4 space-y-2 pl-[10px]">
+            <DropdownMenu.Root>
+              <DropdownMenu.Trigger asChild>
+                <Button
+                  variant="ghost"
+                  className="flex items-center w-full text-[#00205B] justify-start hover:bg-gray-200 font-semibold"
+                >
+                  <Pencil className="w-5 h-5 mr-2" />
+                  Manage Admin
                 </Button>
+              </DropdownMenu.Trigger>
+              <DropdownMenu.Portal>
+                <DropdownMenu.Content
+                  className="min-w-[220px] bg-white rounded-md p-1 shadow-md"
+                  align="start"
+                >
+                  <DropdownMenu.Item
+                    className="flex items-center px-2 py-2 text-sm cursor-pointer hover:bg-gray-100 rounded"
+                    onClick={() => {
+                      setActionType("add");
+                      setIsDialogOpen(true);
+                    }}
+                  >
+                    <Plus className="w-4 h-4 mr-2" />
+                    Add Admin
+                  </DropdownMenu.Item>
+                  <DropdownMenu.Item
+                    className="flex items-center px-2 py-2 text-sm cursor-pointer hover:bg-gray-100 rounded"
+                    onClick={() => {
+                      setActionType("remove");
+                      setIsDialogOpen(true);
+                    }}
+                  >
+                    <X className="w-4 h-4 mr-2" />
+                    Remove Admin
+                  </DropdownMenu.Item>
+                </DropdownMenu.Content>
+              </DropdownMenu.Portal>
+            </DropdownMenu.Root>
 
-                {/* Admin Dialog */}
-                <Dialog.Root open={isDialogOpen} onOpenChange={resetDialog()}>
-                  <Dialog.Portal>
-                    <Dialog.Overlay className="fixed inset-0 bg-black/40" />
-                    <Dialog.Content
-                      className="
+            <Button
+              variant="ghost"
+              className="flex items-center w-full text-[#00205B] justify-start hover:bg-gray-200 font-semibold"
+              onClick={() => setShowAddModal(true)}
+            >
+              <Plus className="w-5 h-5 mr-2" />
+              Add Students
+            </Button>
+
+            <Button
+              variant="ghost"
+              className="flex items-center w-full text-[#00205B] justify-start hover:bg-gray-200 font-semibold"
+              onClick={() => setShowExportModal(true)}
+            >
+              <Upload className="w-5 h-5 mr-2" />
+              Export Claims
+            </Button>
+
+            <Button
+              variant="ghost"
+              className="flex items-center w-full text-[#00205B] justify-start hover:bg-gray-200 font-semibold"
+              onClick={() => {
+                signOutAction();
+              }}
+            >
+              <LogOut className="w-5 h-5 mr-2" />
+              Sign Out
+            </Button>
+          </div>
+        </div>
+
+        <div className="flex flex-1 flex-col overflow-hidden">
+          <header className="flex items-center justify-between bg-white px-6 pt-6">
+            <div className="flex items-center gap-4">
+              <h1 className="text-2xl font-semibold">
+                Hi {coord?.name}! Track all packages here
+              </h1>
+            </div>
+            <div className="flex items-center gap-4 bg-white">
+              <Button className="hover:bg-white" variant="ghost" size="icon">
+                <User className="h-5 w-5 text-[#00205B]" />
+              </Button>
+
+              {/* Admin Dialog */}
+              <Dialog.Root open={isDialogOpen} onOpenChange={resetDialog()}>
+                <Dialog.Portal>
+                  <Dialog.Overlay className="fixed inset-0 bg-black/40" />
+                  <Dialog.Content
+                    className="
                         fixed
                         top-1/2 left-1/2
                         w-[90vw] max-w-sm
@@ -429,107 +420,107 @@ export default function Component() {
                         rounded-lg bg-white p-6
                         shadow-lg
                       "
-                    >
-                      <Dialog.Title className="text-lg font-semibold text-black">
-                        {actionType === "add" ? "Add Admin" : "Remove Admin"}
-                      </Dialog.Title>
-                      <Dialog.Description className="text-sm text-gray-500 mt-1">
-                        Please enter the netID of the admin to{" "}
-                        {actionType === "add" ? "add" : "remove"}.
-                      </Dialog.Description>
-
-                      <div className="mt-4">
-                        <Input
-                          placeholder="Enter netID"
-                          value={netID}
-                          onChange={(e) => setNetID(e.target.value)}
-                        />
-                      </div>
-
-                      <div className="mt-6 flex justify-end gap-2">
-                        <Button
-                          variant="outline"
-                          onClick={() => {
-                            setIsDialogOpen(false);
-                            setTimeout(
-                              () => (document.body.style.pointerEvents = ""),
-                              0,
-                            );
-                          }}
-                        >
-                          Cancel
-                        </Button>
-                        <Button onClick={handleAdminSubmit}>
-                          {actionType === "add" ? "Add" : "Remove"}
-                        </Button>
-                      </div>
-                    </Dialog.Content>
-                  </Dialog.Portal>
-                </Dialog.Root>
-              </div>
-            </header>
-
-            <main className="flex-1 overflow-auto p-6">
-              <div className="mb-6 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-                <div className="flex w-full flex-col gap-4 md:w-full md:flex-row text-[#656565]">
-                  <Button
-                    variant="ghost"
-                    className="border rounded-3xl font-medium"
-                    onClick={(e) => {
-                      filteredStudents?.forEach((student) => {
-                        if (student.numOfValidPackages > 0) {
-                          handleClick(
-                            student.email.split("@")[0],
-                            "Your package has arrived!",
-                            e,
-                          );
-                        }
-                      });
-                    }}
                   >
-                    <Bell className="w-5 h-5 mr-2" />
-                    Remind All Students
-                  </Button>
-                  <DateDeliveredDropdown
-                    dateRange={deliveryDateRange}
-                    setDateRange={setDeliveryDateRange}
+                    <Dialog.Title className="text-lg font-semibold text-black">
+                      {actionType === "add" ? "Add Admin" : "Remove Admin"}
+                    </Dialog.Title>
+                    <Dialog.Description className="text-sm text-gray-500 mt-1">
+                      Please enter the netID of the admin to{" "}
+                      {actionType === "add" ? "add" : "remove"}.
+                    </Dialog.Description>
+
+                    <div className="mt-4">
+                      <Input
+                        placeholder="Enter netID"
+                        value={netID}
+                        onChange={(e) => setNetID(e.target.value)}
+                      />
+                    </div>
+
+                    <div className="mt-6 flex justify-end gap-2">
+                      <Button
+                        variant="outline"
+                        onClick={() => {
+                          setIsDialogOpen(false);
+                          setTimeout(
+                            () => (document.body.style.pointerEvents = ""),
+                            0,
+                          );
+                        }}
+                      >
+                        Cancel
+                      </Button>
+                      <Button onClick={handleAdminSubmit}>
+                        {actionType === "add" ? "Add" : "Remove"}
+                      </Button>
+                    </div>
+                  </Dialog.Content>
+                </Dialog.Portal>
+              </Dialog.Root>
+            </div>
+          </header>
+
+          <main className="flex-1 overflow-auto p-6">
+            <div className="mb-6 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+              <div className="flex w-full flex-col gap-4 md:w-full md:flex-row text-[#656565]">
+                <Button
+                  variant="ghost"
+                  className="border rounded-3xl font-medium"
+                  onClick={(e) => {
+                    filteredStudents?.forEach((student) => {
+                      if (student.numOfValidPackages > 0) {
+                        handleClick(
+                          student.email.split("@")[0],
+                          "Your package has arrived!",
+                          window.origin + "/packages",
+                          e,
+                        );
+                      }
+                    });
+                  }}
+                >
+                  <Bell className="w-5 h-5 mr-2" />
+                  Remind All Students
+                </Button>
+                <DateDeliveredDropdown
+                  dateRange={deliveryDateRange}
+                  setDateRange={setDeliveryDateRange}
+                />
+                <PackagesDropdown
+                  minPackages={minPackages}
+                  setMinPackages={setMinPackages}
+                />
+                <Select value={filter} onValueChange={setFilter}>
+                  <SelectTrigger className="w-full md:w-[180px] bg-white rounded-3xl font-medium">
+                    <SelectValue placeholder="Filter by status" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-white">
+                    <SelectItem value="all">All Packages</SelectItem>
+                    <SelectItem value="unclaimed">Unclaimed</SelectItem>
+                    <SelectItem value="claimed">Claimed</SelectItem>
+                  </SelectContent>
+                </Select>
+                <div className="relative flex w-full md:w-auto">
+                  <Search className="absolute left-2 top-1/2 h-4 w-4 -translate-y-1/2 transform text-gray-400" />
+                  <Input
+                    placeholder="Search names..."
+                    className="pl-8 bg-white text-black rounded-3xl font-medium"
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
                   />
-                  <PackagesDropdown
-                    minPackages={minPackages}
-                    setMinPackages={setMinPackages}
-                  />
-                  <Select value={filter} onValueChange={setFilter}>
-                    <SelectTrigger className="w-full md:w-[180px] bg-white rounded-3xl font-medium">
-                      <SelectValue placeholder="Filter by status" />
-                    </SelectTrigger>
-                    <SelectContent className="bg-white">
-                      <SelectItem value="all">All Packages</SelectItem>
-                      <SelectItem value="unclaimed">Unclaimed</SelectItem>
-                      <SelectItem value="claimed">Claimed</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <div className="relative flex w-full md:w-auto">
-                    <Search className="absolute left-2 top-1/2 h-4 w-4 -translate-y-1/2 transform text-gray-400" />
-                    <Input
-                      placeholder="Search names..."
-                      className="pl-8 bg-white text-black rounded-3xl font-medium"
-                      value={searchTerm}
-                      onChange={(e) => setSearchTerm(e.target.value)}
-                    />
-                  </div>
                 </div>
               </div>
+            </div>
 
-              <PackageTable
-                loading={loading}
-                filteredStudents={filteredStudents}
-                toggle={toggle}
-                handleClick={handleClick}
-              />
-            </main>
-          </div>
+            <PackageTable
+              loading={loading}
+              filteredStudents={filteredStudents}
+              toggle={toggle}
+              handleClick={handleClick}
+            />
+          </main>
         </div>
-      )}
+      </div>
     </>
   );
 }
@@ -541,6 +532,7 @@ interface PackageTableProps {
   handleClick: (
     netID: string,
     trackingId: string,
+    redirectUrl: string,
     event: React.MouseEvent<HTMLButtonElement, MouseEvent>,
   ) => Promise<void>;
 }
@@ -642,6 +634,7 @@ function PackageTable({
                           handleClick(
                             student.email.split("@")[0],
                             "Your package has arrived!",
+                            window.origin + "/packages",
                             e,
                           )
                         }

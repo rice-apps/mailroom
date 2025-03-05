@@ -56,7 +56,10 @@ export async function claimPackage(id: string): Promise<boolean | undefined> {
   try {
     const { error } = await supabase
       .from("packages")
-      .update({ claimed: "true" })
+      .update({
+        claimed: "true",
+        date_claimed: new Date(Date.now()).toISOString(),
+      })
       .eq("id", id);
     if (error) {
       console.error(`error claiming package with id ${id}`);

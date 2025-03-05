@@ -17,12 +17,22 @@ Deno.serve(async (req) => {
 
   const url = new URL(req.url);
   const trackingID = url.searchParams.get("trackingID");
+  const redirectUrl = url.searchParams.get("redirectUrl");
+  if (!redirectUrl) {
+    return new Response(JSON.stringify({ error: `redirectUrl not found` }), {
+      status: 500,
+      headers: {
+        "Content-Type": "application/json",
+        "Access-Control-Allow-Origin": "*",
+      },
+    });
+  }
 
   // console.log(trackingID)
 
   const { data, error } = await supabaseClient
     .from("packages")
-    .update({ claimed: true })
+    .update({ claimed: true, date_claimed: new Date(Date.now()).toISOString() })
     .eq("package_identifier", trackingID)
     .select();
 
@@ -42,7 +52,7 @@ Deno.serve(async (req) => {
   return new Response(null, {
     status: 302, // Use 301 for permanent redirect
     headers: {
-      Location: "http://localhost:3000/packages", // Replace with your target URL
+      Location: redirectUrl, // Replace with your target URL
       "Access-Control-Allow-Origin": "*",
     },
   });
