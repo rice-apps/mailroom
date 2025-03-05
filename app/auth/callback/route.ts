@@ -8,20 +8,20 @@ export async function GET(request: Request) {
   const requestUrl = new URL(request.url);
   const code = requestUrl.searchParams.get("code");
 
-  const origin = request.headers.get("origin") || requestUrl.origin;
+  const host = request.headers.get("host") || requestUrl.host;
   if (
     !(JSON.parse(process.env.NEXT_PUBLIC_ALLOWED_HOSTS || "[]") ?? []).includes(
-      origin,
+      host,
     )
   ) {
     throw new Error(
-      `Invalid host ${origin} in ${process.env.NEXT_PUBLIC_ALLOWED_HOSTS}`,
+      `Invalid host ${host} in ${process.env.NEXT_PUBLIC_ALLOWED_HOSTS}`,
     );
   }
 
   const protocol = request.headers.get("x-forwarded-proto") || "http";
 
-  const baseUrl = `${protocol}://${origin}`;
+  const baseUrl = `${protocol}://${host}`;
 
   const redirectTo = requestUrl.searchParams.get("redirect_to")?.toString();
 
