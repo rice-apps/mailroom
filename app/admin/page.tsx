@@ -482,7 +482,7 @@ export default function Component() {
                           handleClick(
                             student.email.split("@")[0],
                             "Your package has arrived!",
-                            window.origin+"/packages",
+                            window.origin + "/packages",
                             e,
                           );
                         }
@@ -645,7 +645,7 @@ function PackageTable({
                           handleClick(
                             student.email.split("@")[0],
                             "Your package has arrived!",
-                            window.origin+"/packages",
+                            window.origin + "/packages",
                             e,
                           )
                         }

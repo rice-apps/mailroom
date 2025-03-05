@@ -25,14 +25,14 @@ Deno.serve(async (req) => {
         "Content-Type": "application/json",
         "Access-Control-Allow-Origin": "*",
       },
-    })
+    });
   }
 
   // console.log(trackingID)
 
   const { data, error } = await supabaseClient
     .from("packages")
-    .update({ claimed: true, date_claimed: new Date(Date.now()).toISOString()  })
+    .update({ claimed: true, date_claimed: new Date(Date.now()).toISOString() })
     .eq("package_identifier", trackingID)
     .select();
 
