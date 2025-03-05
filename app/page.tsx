@@ -9,10 +9,8 @@ export default async function Index() {
   const isAdmin = await isAnAdmin(user.data.user?.email?.split("@")[0] ?? "");
 
   if (isAdmin) {
-    console.log("admin");
-    redirect("/kiosk");
+    redirect("/home");
   } else {
-    console.log("student");
     redirect("/packages");
   }
 }
