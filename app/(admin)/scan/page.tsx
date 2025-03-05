@@ -7,6 +7,7 @@ import { ArrowLeft, Barcode, ChevronDown, Edit2 } from "lucide-react";
 import { createClient } from "@/utils/supabase/client";
 import ScanIcon from "@/components/scan-icon";
 import { TextArea } from "@/components/ui/textarea";
+import { useRouter } from "next/navigation";
 const supabase = createClient();
 
 declare global {
@@ -30,6 +31,7 @@ export default function ScanCheckin() {
   const [filteredRecipients, setFilteredRecipients] = useState<string[]>([]);
   const [userMap, setUserMap] = useState<Record<string, string>>();
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const router = useRouter();
 
   useEffect(() => {
     const fetchRecipients = async () => {
@@ -212,11 +214,15 @@ export default function ScanCheckin() {
     }
   };
 
+  const handleBackClick = () => {
+    router.back();
+  };
+
   return (
     <div className="min-h-screen bg-white p-8">
       <div className="mx-auto max-w-2xl">
         <div className="mb-8 flex items-center">
-          <button className="p-2">
+          <button className="p-2" onClick={handleBackClick}>
             <ArrowLeft className="h-6 w-6" />
           </button>
           <div className="flex-1"></div>
