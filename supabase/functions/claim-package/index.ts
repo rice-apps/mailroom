@@ -5,41 +5,11 @@
 // Setup type definitions for built-in Supabase Runtime APIs
 // import "jsr:@supabase/functions-js/edge-runtime.d.ts"
 
-import { createClient } from "jsr:@supabase/supabase-js@2";
-
 Deno.serve(async (req) => {
-  // const authHeader = req.headers.get('Authorization')!
-  const supabaseClient = createClient(
-    Deno.env.get("SUPABASE_URL") ?? "",
-    Deno.env.get("SUPABASE_ANON_KEY") ?? "",
-    // { global: { headers: { Authorization: authHeader } } }
-  );
-
   const url = new URL(req.url);
-  const trackingID = url.searchParams.get("trackingID");
   const redirectUrl = url.searchParams.get("redirectUrl");
   if (!redirectUrl) {
     return new Response(JSON.stringify({ error: `redirectUrl not found` }), {
-      status: 500,
-      headers: {
-        "Content-Type": "application/json",
-        "Access-Control-Allow-Origin": "*",
-      },
-    });
-  }
-
-  // console.log(trackingID)
-
-  const { data, error } = await supabaseClient
-    .from("packages")
-    .update({ claimed: true, date_claimed: new Date(Date.now()).toISOString() })
-    .eq("package_identifier", trackingID)
-    .select();
-
-  console.log(error);
-
-  if (error) {
-    return new Response(JSON.stringify({ error: error.message }), {
       status: 500,
       headers: {
         "Content-Type": "application/json",

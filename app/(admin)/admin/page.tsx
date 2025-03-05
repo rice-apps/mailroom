@@ -166,14 +166,13 @@ export default function Component() {
 
   const handleClick = async (
     netID: string,
-    trackingId: string,
     redirectUrl: string,
     event: React.MouseEvent<HTMLButtonElement, MouseEvent>,
   ) => {
     event.stopPropagation();
     try {
       const { data, error } = await supabase.functions.invoke("resend", {
-        body: { netID, trackingId, redirectUrl },
+        body: { netID, redirectUrl },
       });
 
       if (error) throw error;
@@ -475,7 +474,6 @@ export default function Component() {
                       if (student.numDeliveredPackages > 0) {
                         handleClick(
                           student.email.split("@")[0],
-                          "Your package has arrived!",
                           window.origin + "/packages",
                           e,
                         );
@@ -545,7 +543,6 @@ interface PackageTableProps {
   toggle: boolean;
   handleClick: (
     netID: string,
-    trackingId: string,
     redirectUrl: string,
     event: React.MouseEvent<HTMLButtonElement, MouseEvent>,
   ) => Promise<void>;
@@ -649,7 +646,6 @@ function PackageTable({
                         onClick={(e) =>
                           handleClick(
                             student.email.split("@")[0],
-                            "Your package has arrived!",
                             window.origin + "/packages",
                             e,
                           )
