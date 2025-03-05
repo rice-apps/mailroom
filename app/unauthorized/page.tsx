@@ -1,5 +1,5 @@
-import Link from 'next/link'
-import { Shield, Home } from 'lucide-react'
+import Link from "next/link";
+import { Shield, Home } from "lucide-react";
 
 export default function UnauthorizedPage() {
   return (
@@ -10,12 +10,12 @@ export default function UnauthorizedPage() {
         </div>
         <h1 className="text-3xl font-bold text-gray-800">Access Denied</h1>
         <p className="text-gray-600 mb-6">
-          You do not have permission to access this page. 
-          Please contact an administrator if you believe this is an error.
+          You do not have permission to access this page. Please contact an
+          administrator if you believe this is an error.
         </p>
         <div className="flex justify-center space-x-4">
-          <Link 
-            href="/" 
+          <Link
+            href="/"
             className="flex items-center px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition"
           >
             <Home className="mr-2 w-5 h-5" />
@@ -24,5 +24,5 @@ export default function UnauthorizedPage() {
         </div>
       </div>
     </div>
-  )
+  );
 }
