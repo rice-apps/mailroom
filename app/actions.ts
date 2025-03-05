@@ -14,7 +14,7 @@ export const signInAction = async (formData: FormData) => {
       host,
     )
   ) {
-    throw new Error("Invalid host");
+    throw new Error(`Invalid host ${host} in ${process.env.NEXT_PUBLIC_ALLOWED_HOSTS}`);
   }
 
   const protocol = headersList.get("x-forwarded-proto") || "http";
