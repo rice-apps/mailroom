@@ -675,7 +675,9 @@ function PackageTable({
                                 {(() => {
                                   const now = new Date().getTime();
                                   const addedDate = new Date(
-                                    !pkg.claimed ? pkg.date_added : pkg.date_claimed,
+                                    !pkg.claimed
+                                      ? pkg.date_added
+                                      : pkg.date_claimed,
                                   ).getTime();
                                   const diffMs = now - addedDate;
 
@@ -687,7 +689,9 @@ function PackageTable({
                                     diffMinutes / 60,
                                   );
                                   const diffDays = Math.floor(diffHours / 24);
-                                  const baseAction = pkg.claimed ? "Claimed" : "Added";
+                                  const baseAction = pkg.claimed
+                                    ? "Claimed"
+                                    : "Added";
                                   if (diffSeconds < 60) {
                                     return `${baseAction} just now`;
                                   } else if (diffMinutes < 60) {

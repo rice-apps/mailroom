@@ -40,7 +40,8 @@ export default function PackageOptions() {
           {`Hi ${name}!`}
         </h1>
         <h3 className="text-lg text-center text-muted-foreground mb-12">
-          Would you like to enter kiosk mode, track your college's packages, or view your own packages?
+          Would you like to enter kiosk mode, track your college's packages, or
+          view your own packages?
         </h3>
         <div className="flex flex-col md:flex-row gap-8 justify-center items-stretch w-full">
           <button

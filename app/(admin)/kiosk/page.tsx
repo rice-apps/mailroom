@@ -37,7 +37,7 @@ export default function PackageOptions() {
           {`Hi ${name}!`}
         </h1>
         <h3 className="text-lg text-center text-muted-foreground mb-12">
-            Would you like to scan in a package?
+          Would you like to scan in a package?
         </h3>
         <div className="flex flex-col md:flex-row gap-8 justify-center items-stretch w-full">
           <button
