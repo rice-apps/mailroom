@@ -6,6 +6,7 @@ import { Label } from "@/components/ui/label";
 import { ArrowLeft, Barcode, ChevronDown, Edit2 } from "lucide-react";
 import { createClient } from "@/utils/supabase/client";
 import ScanIcon from "@/components/scan-icon";
+import { TextArea } from "@/components/ui/textarea";
 const supabase = createClient();
 
 declare global {
@@ -22,7 +23,7 @@ declare global {
 export default function ScanCheckin() {
   const [trackingNumber, setTrackingNumber] = useState("");
   const [recipientName, setRecipientName] = useState("");
-  const [studentNetID, setStudentNetID] = useState("");
+  const [notes, setNotes] = useState("");
   const [isScanning, setIsScanning] = useState(true);
   const [isManualInput, setIsManualInput] = useState(false);
   const [showDropdown, setShowDropdown] = useState(false);
@@ -41,7 +42,7 @@ export default function ScanCheckin() {
             acc[user.name] = user.id;
             return acc;
           },
-          {}
+          {},
         );
         setUserMap(recipientMap);
         setFilteredRecipients(Object.keys(recipientMap));
@@ -51,7 +52,8 @@ export default function ScanCheckin() {
   }, []);
 
   const [port, setPort] = useState<SerialPort | null>(null);
-  const [reader, setReader] = useState<ReadableStreamDefaultReader<string> | null>(null);
+  const [reader, setReader] =
+    useState<ReadableStreamDefaultReader<string> | null>(null);
   const [buffer, setBuffer] = useState("");
 
   interface PackageInfo {
@@ -69,7 +71,9 @@ export default function ScanCheckin() {
     package_identifier: "",
   });
 
-  const [confirmationMessage, setConfirmationMessage] = useState<string | null>(null);
+  const [confirmationMessage, setConfirmationMessage] = useState<string | null>(
+    null,
+  );
 
   const handleTrackingNumberChange = (value: string) => {
     setTrackingNumber(value);
@@ -134,7 +138,10 @@ export default function ScanCheckin() {
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
         setShowDropdown(false);
       }
     };
@@ -148,13 +155,15 @@ export default function ScanCheckin() {
     setIsManualInput(!isManualInput);
   };
 
-  const handleRecipientInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleRecipientInputChange = (
+    e: React.ChangeEvent<HTMLInputElement>,
+  ) => {
     setRecipientName(e.target.value);
     setShowDropdown(true);
   };
 
-  const handleNetIDChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setStudentNetID(e.target.value);
+  const handleNoteChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setNotes(e.target.value);
   };
 
   const handleRecipientSelect = (recipient: string) => {
@@ -162,7 +171,9 @@ export default function ScanCheckin() {
     setShowDropdown(false);
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+  ) => {
     const { name, value } = e.target;
     setFormData((prevData) => ({
       ...prevData,
@@ -177,7 +188,7 @@ export default function ScanCheckin() {
         claimed: formData.claimed,
         date_claimed: formData.date_claimed,
         package_identifier: formData.package_identifier,
-        extra_information: formData.extra_information,
+        extra_information: notes,
         user_id: userMap ? userMap[recipientName] : "",
       },
     ]);
@@ -192,7 +203,7 @@ export default function ScanCheckin() {
       // Reset form after successful submission
       setTrackingNumber("");
       setRecipientName("");
-      setStudentNetID("");
+      setNotes("");
       setFormData({
         claimed: false,
         package_identifier: "",
@@ -212,9 +223,12 @@ export default function ScanCheckin() {
           <div className="h-10 w-10 rounded-full bg-gray-200"></div>
         </div>
 
-        <h1 className="mb-2 text-3xl font-bold text-center">Scan in a Package</h1>
+        <h1 className="mb-2 text-3xl font-bold text-center">
+          Scan in a Package
+        </h1>
         <p className="mb-8 text-center text-gray-500">
-          Scan the barcode or enter the tracking number, and enter the student's information
+          Scan the barcode or enter the tracking number, and enter the student's
+          information
         </p>
 
         <div className="mb-12">
@@ -223,7 +237,7 @@ export default function ScanCheckin() {
               <div className="mb-4 flex justify-center">
                 <ScanIcon className="h-[7.5rem] w-[7.5rem]" />
               </div>
-              <Button 
+              <Button
                 className="rounded-full bg-white text-navy-900 border border-gray-300 px-6 py-2 hover:bg-gray-100"
                 onClick={requestPort}
                 type="button"
@@ -267,11 +281,15 @@ export default function ScanCheckin() {
                   placeholder="Enter Student's Name"
                 />
                 <ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
-                
+
                 {showDropdown && filteredRecipients.length > 0 && (
-                  <ul className="absolute z-10 w-full mt-1 bg-white border border-gray-200 rounded-md shadow-lg max-h-60 overflow-auto">
+                  <ul className="absolute z-10 w-full mt-1 bg-white border border-gray-200 rounded-md shadow-lg max-h-[12rem] overflow-auto">
                     {filteredRecipients
-                      .filter(name => name.toLowerCase().includes(recipientName.toLowerCase()))
+                      .filter((name) =>
+                        name
+                          .toLowerCase()
+                          .includes(recipientName.toLowerCase()),
+                      )
                       .map((recipient, index) => (
                         <li
                           key={index}
@@ -288,30 +306,30 @@ export default function ScanCheckin() {
           </div>
 
           <div className="space-y-1">
-            <div className="flex items-center relative">
-              <Label htmlFor="student-netid" className="text-gray-600 w-40">
-                Student's NetID
+            <div className="flex items-center">
+              <Label
+                htmlFor="delivery-notes"
+                className="text-gray-600 w-40 justify-self-start"
+              >
+                Delivery Notes
               </Label>
-              <div className="flex-1 relative">
-                <Input
-                  id="student-netid"
-                  type="text"
-                  value={studentNetID}
-                  onChange={handleNetIDChange}
-                  className="w-full rounded-full border-gray-200 pr-10"
-                  placeholder="Enter Student's NetID"
-                />
-                <ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
-              </div>
+              <TextArea
+                id="delivery-notes"
+                value={notes}
+                onChange={handleNoteChange}
+                className="flex-1 rounded-3xl border-gray-200 min-h-10"
+                placeholder="Some special notes about the delivery..."
+                accessKey=""
+              />
             </div>
           </div>
 
           {confirmationMessage && (
             <div
               className={`text-center p-3 rounded-md font-medium ${
-              confirmationMessage.includes("Error")
-                ? "bg-red-200 text-red-800 border border-red-300"
-                : "bg-green-200 text-green-800 border border-green-300"
+                confirmationMessage.includes("Error")
+                  ? "bg-red-200 text-red-800 border border-red-300"
+                  : "bg-green-200 text-green-800 border border-green-300"
               }`}
             >
               {confirmationMessage}
@@ -322,8 +340,10 @@ export default function ScanCheckin() {
             <button
               type="submit"
               className="inline-flex items-center justify-center whitespace-nowrap text-sm font-medium w-full rounded-lg bg-[#00205B] text-white py-2 px-4 h-10"
-              disabled={!trackingNumber || !recipientName || !studentNetID}
-              style={{ opacity: (!trackingNumber || !recipientName || !studentNetID) ? '0.6' : '1' }}
+              disabled={!trackingNumber || !recipientName}
+              style={{
+                opacity: !trackingNumber || !recipientName ? "0.6" : "1",
+              }}
             >
               Add Package
             </button>
