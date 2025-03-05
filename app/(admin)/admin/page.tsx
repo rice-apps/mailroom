@@ -272,7 +272,7 @@ export default function Component() {
       filter === "all" ||
       (filter === "unclaimed" &&
         student.packages.some((pkg) => !pkg.claimed)) ||
-      (filter === "claimed" && student.packages.every((pkg) => pkg.claimed));
+      (filter === "claimed" && student.packages.some((pkg) => pkg.claimed));
     const matchesSearch =
       student.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       student.email.toLowerCase().includes(searchTerm.toLowerCase());
@@ -660,16 +660,22 @@ function PackageTable({
                               </TableCell>
                               <TableCell className="w-[25%]"></TableCell>
                               <TableCell className="w-[20%]">
-                                <Badge className="bg-gray-400 text-white px-3 py-1">
-                                  Delivered
-                                </Badge>
+                                {pkg.claimed ? (
+                                  <Badge className="bg-green-400 text-white px-3 py-1">
+                                    Claimed
+                                  </Badge>
+                                ) : (
+                                  <Badge className="bg-gray-400 text-white px-3 py-1">
+                                    Delivered
+                                  </Badge>
+                                )}
                               </TableCell>
                               <TableCell className="w-[15%]"></TableCell>
                               <TableCell className="text-gray-500 w-[10%]">
                                 {(() => {
                                   const now = new Date().getTime();
                                   const addedDate = new Date(
-                                    pkg.date_added,
+                                    !pkg.claimed ? pkg.date_added : pkg.date_claimed,
                                   ).getTime();
                                   const diffMs = now - addedDate;
 
@@ -681,15 +687,15 @@ function PackageTable({
                                     diffMinutes / 60,
                                   );
                                   const diffDays = Math.floor(diffHours / 24);
-
+                                  const baseAction = pkg.claimed ? "Claimed" : "Added";
                                   if (diffSeconds < 60) {
-                                    return "Scanned just now";
+                                    return `${baseAction} just now`;
                                   } else if (diffMinutes < 60) {
-                                    return `Scanned ${diffMinutes} ${diffMinutes === 1 ? "minute" : "minutes"} ago`;
+                                    return `${baseAction} ${diffMinutes} ${diffMinutes === 1 ? "minute" : "minutes"} ago`;
                                   } else if (diffHours < 24) {
-                                    return `Scanned ${diffHours} ${diffHours === 1 ? "hour" : "hours"} ago`;
+                                    return `${baseAction} ${diffHours} ${diffHours === 1 ? "hour" : "hours"} ago`;
                                   } else {
-                                    return `Scanned ${diffDays} ${diffDays === 1 ? "day" : "days"} ago`;
+                                    return `${baseAction} ${diffDays} ${diffDays === 1 ? "day" : "days"} ago`;
                                   }
                                 })()}
                               </TableCell>
