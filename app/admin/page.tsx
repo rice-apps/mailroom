@@ -167,7 +167,12 @@ export default function Component() {
     }
   };
 
-  const handleClick = async (netID: string, trackingId: string) => {
+  const handleClick = async (
+    netID: string,
+    trackingId: string,
+    event: React.MouseEvent<HTMLButtonElement, MouseEvent>,
+  ) => {
+    event.stopPropagation();
     try {
       const { data, error } = await supabase.functions.invoke("resend", {
         body: { netID, trackingId },
@@ -470,12 +475,13 @@ export default function Component() {
                   <Button
                     variant="ghost"
                     className="border rounded-3xl font-medium"
-                    onClick={() => {
+                    onClick={(e) => {
                       filteredStudents?.forEach((student) => {
                         if (student.numOfValidPackages > 0) {
                           handleClick(
                             student.email.split("@")[0],
                             "Your package has arrived!",
+                            e,
                           );
                         }
                       });
@@ -532,7 +538,11 @@ interface PackageTableProps {
   loading: boolean;
   filteredStudents?: Student[];
   toggle: boolean;
-  handleClick: (netID: string, trackingId: string) => Promise<void>;
+  handleClick: (
+    netID: string,
+    trackingId: string,
+    event: React.MouseEvent<HTMLButtonElement, MouseEvent>,
+  ) => Promise<void>;
 }
 
 function PackageTable({
@@ -628,10 +638,11 @@ function PackageTable({
                         size="sm"
                         disabled={student.numOfValidPackages === 0}
                         className="bg-white border-[#00205B] text-[#00205B] hover:bg-[#00205B] hover:text-white rounded-3xl px-5"
-                        onClick={() =>
+                        onClick={(e) =>
                           handleClick(
                             student.email.split("@")[0],
                             "Your package has arrived!",
+                            e,
                           )
                         }
                       >
