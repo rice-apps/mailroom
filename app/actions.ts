@@ -9,8 +9,9 @@ export const signInAction = async (formData: FormData) => {
   const supabase = createClient();
   const headersList = headers();
   const host = headersList.get("host") || "";
+  console.log(process.env.NEXT_PUBLIC_ALLOWED_HOSTS);
   if (
-    (JSON.parse(process.env.NEXT_PUBLIC_ALLOWED_HOSTS || "[]") ?? []).includes(
+    !(JSON.parse(process.env.NEXT_PUBLIC_ALLOWED_HOSTS || "[]") ?? []).includes(
       host,
     )
   ) {
