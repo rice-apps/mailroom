@@ -7,15 +7,14 @@ import { redirect } from "next/navigation";
 
 export const signInAction = async (formData: FormData) => {
   const supabase = createClient();
-  const origin = formData.get("origin");
-
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider: "google",
     options: {
       queryParams: {
         prompt: "consent",
       },
-      redirectTo: origin + "/auth/callback",
+      redirectTo: baseUrl + "/auth/callback",
     },
   });
   redirect(data.url ?? "");

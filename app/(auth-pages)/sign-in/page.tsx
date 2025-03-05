@@ -1,5 +1,3 @@
-"use client";
-
 import { signInAction } from "@/app/actions";
 import { FormMessage, Message } from "@/components/form-message";
 import { SubmitButton } from "@/components/submit-button";
@@ -33,11 +31,6 @@ export default function Login({ searchParams }: { searchParams: Message }) {
         <h2 className={`text-sm font-medium text-muted-foreground mb-5`}>
           Login to your account to view packages
         </h2>
-        <input
-          type="hidden"
-          name="origin"
-          value={typeof window !== "undefined" ? window.location.origin : ""}
-        />
         <SubmitButton pendingText="Signing In..." formAction={signInAction}>
           <Image
             src="/google-icon.webp"
