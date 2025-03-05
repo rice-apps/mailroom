@@ -109,7 +109,8 @@ interface Student {
   netid: string;
   email: string;
   packages: Package[];
-  numOfValidPackages: number;
+  numDeliveredPackages: number;
+  numClaimedPackages: number;
   can_add_and_delete_packages: boolean;
   isAdmin?: boolean;
 }
@@ -239,11 +240,14 @@ export default function Component() {
           const updated = await Promise.all(
             result.map(async (student: Student) => {
               // Update number of valid packages based on claim
-              student.numOfValidPackages = 0;
+              student.numDeliveredPackages = 0;
+              student.numClaimedPackages = 0;
               const { packages } = student;
               packages.map((pkg) => {
                 if (!pkg.claimed) {
-                  student.numOfValidPackages += 1;
+                  student.numDeliveredPackages += 1;
+                } else {
+                  student.numClaimedPackages += 1;
                 }
               });
 
@@ -276,7 +280,7 @@ export default function Component() {
     const matchesSearch =
       student.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       student.email.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesMinPackages = student.numOfValidPackages >= minPackages;
+    const matchesMinPackages = getPackageCount(filter, student) >= minPackages;
     const matchesDateRange =
       !deliveryDateRange ||
       !deliveryDateRange.startDate ||
@@ -468,7 +472,7 @@ export default function Component() {
                   className="border rounded-3xl font-medium"
                   onClick={(e) => {
                     filteredStudents?.forEach((student) => {
-                      if (student.numOfValidPackages > 0) {
+                      if (student.numDeliveredPackages > 0) {
                         handleClick(
                           student.email.split("@")[0],
                           "Your package has arrived!",
@@ -517,12 +521,17 @@ export default function Component() {
               filteredStudents={filteredStudents}
               toggle={toggle}
               handleClick={handleClick}
+              currentFilter={filter}
             />
           </main>
         </div>
       </div>
     </>
   );
+}
+
+function getPackageCount(filter: string, student: Student) {
+  return ((filter === "unclaimed" || filter === "all") ? student.numDeliveredPackages : 0) + ((filter === "claimed" || filter === "all") ? student.numClaimedPackages : 0);
 }
 
 interface PackageTableProps {
@@ -535,6 +544,7 @@ interface PackageTableProps {
     redirectUrl: string,
     event: React.MouseEvent<HTMLButtonElement, MouseEvent>,
   ) => Promise<void>;
+  currentFilter: string;
 }
 
 function PackageTable({
@@ -542,6 +552,7 @@ function PackageTable({
   filteredStudents,
   toggle,
   handleClick,
+  currentFilter
 }: PackageTableProps) {
   const [expandedRows, setExpandedRows] = useState<{ [key: number]: boolean }>(
     {},
@@ -579,7 +590,7 @@ function PackageTable({
             </TableRow>
           ) : (
             filteredStudents?.map((student) => {
-              if (!toggle && student.numOfValidPackages === 0) {
+              if (!toggle && getPackageCount(currentFilter, student) === 0) {
                 return null;
               }
 
@@ -590,7 +601,7 @@ function PackageTable({
                     onClick={() => toggleRow(student.id)}
                   >
                     <TableCell className="w-[5%]">
-                      {student.numOfValidPackages > 0 ? (
+                      {getPackageCount(currentFilter, student) > 0 ? (
                         expandedRows[student.id] ? (
                           <ChevronUp className="text-[#00205B]" />
                         ) : (
@@ -615,20 +626,20 @@ function PackageTable({
                     <TableCell className="w-[15%]">
                       <Badge
                         variant={
-                          student.numOfValidPackages > 0
+                          getPackageCount(currentFilter, student) > 0
                             ? "default"
                             : "secondary"
                         }
                         className="bg-[#00205B] text-white hover:bg-black px-4 py-1"
                       >
-                        {student.numOfValidPackages}
+                        {getPackageCount(currentFilter, student)}
                       </Badge>
                     </TableCell>
                     <TableCell className="w-[10%]">
                       <Button
                         variant="outline"
                         size="sm"
-                        disabled={student.numOfValidPackages === 0}
+                        disabled={student.numDeliveredPackages === 0}
                         className="bg-white border-[#00205B] text-[#00205B] hover:bg-[#00205B] hover:text-white rounded-3xl px-5"
                         onClick={(e) =>
                           handleClick(
@@ -645,10 +656,16 @@ function PackageTable({
                   </TableRow>
 
                   {expandedRows[student.id] &&
-                    student.numOfValidPackages > 0 && (
+                    getPackageCount(currentFilter, student) > 0 && (
                       <>
-                        {student.packages.map((pkg, index) => (
-                          <>
+                        {student.packages.map((pkg, index) => {
+                          if (currentFilter === "claimed" && !pkg.claimed) {
+                            return null;
+                          }
+                          if (currentFilter === "unclaimed" && pkg.claimed) {
+                            return null;
+                          }
+                          return (<>
                             <TableRow
                               key={`${student.id}-package-${index}`}
                               className="bg-gray-100"
@@ -700,8 +717,8 @@ function PackageTable({
                                 })()}
                               </TableCell>
                             </TableRow>
-                          </>
-                        ))}
+                          </>);
+                        })}
                       </>
                     )}
                 </React.Fragment>
