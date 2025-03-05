@@ -190,7 +190,7 @@ export default function ExportModalComponent({
         </div>
         <div className="flex justify-end">
           <Button
-            className="mr-2 bg-gray-300 text-white hover:bg-gray-400"
+            className="mr-2 text-black border border-input bg-background hover:bg-accent hover:text-accent-foreground"
             onClick={() => exitModal()}
           >
             Exit

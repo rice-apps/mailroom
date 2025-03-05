@@ -52,7 +52,7 @@ export default function PackageOptions() {
               <h2 className="text-lg font-semibold text-black mb-2 rounded-3xl border border-black px-4 py-2">
                 Enter Kiosk Mode
               </h2>
-              <ArrowRight className="absolute bottom-4 right-4 w-6 h-6 text-foreground transition-all duration-300 ease-in-out transform translate-x-4 opacity-0 group-hover:translate-x-0 group-hover:opacity-100" />
+              <ArrowRight className="absolute bottom-4 right-4 w-6 h-6 transition-all duration-300 ease-in-out transform translate-x-4 opacity-0 group-hover:translate-x-0 group-hover:opacity-100" />
             </div>
           </button>
           <button
@@ -64,7 +64,7 @@ export default function PackageOptions() {
               <h2 className="text-lg font-semibold text-black mb-2 rounded-3xl border border-black px-4 py-2">
                 Track Packages
               </h2>
-              <ArrowRight className="absolute bottom-4 right-4 w-6 h-6 text-gray-500 dark:text-gray-400 transition-all duration-300 ease-in-out transform translate-x-4 opacity-0 group-hover:translate-x-0 group-hover:opacity-100" />
+              <ArrowRight className="absolute bottom-4 right-4 w-6 h-6 transition-all duration-300 ease-in-out transform translate-x-4 opacity-0 group-hover:translate-x-0 group-hover:opacity-100" />
             </div>
           </button>
           <button
@@ -81,7 +81,7 @@ export default function PackageOptions() {
               <h2 className="text-lg font-semibold text-black mb-2 rounded-3xl border border-black px-4 py-2">
                 View Your Packages
               </h2>
-              <ArrowRight className="absolute bottom-4 right-4 w-6 h-6 text-gray-500 dark:text-gray-400 transition-all duration-300 ease-in-out transform translate-x-4 opacity-0 group-hover:translate-x-0 group-hover:opacity-100" />
+              <ArrowRight className="absolute bottom-4 right-4 w-6 h-6 transition-all duration-300 ease-in-out transform translate-x-4 opacity-0 group-hover:translate-x-0 group-hover:opacity-100" />
             </div>
           </button>
         </div>
