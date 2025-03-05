@@ -37,15 +37,15 @@ import { createClient } from "@/utils/supabase/client";
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import { ToastAction } from "@/components/ui/toast";
-import { useToast } from "../hooks/use-toast";
+import { useToast } from "../../hooks/use-toast";
 
 // Assuming these functions are defined in the specified path
 import {
   fetchStudentsGivenCollege,
   updateAdmin,
   userExists,
-} from "../../api/admin";
-import checkAuth from "../../api/checkAuth";
+} from "../../../api/admin";
+import checkAuth from "../../../api/checkAuth";
 import AddModalComponent from "./AddModalComponent";
 import ExportModalComponent from "./ExportModalComponent";
 import React from "react";
@@ -57,7 +57,7 @@ import {
 import DateRangePickerDropdown, {
   DateRange,
 } from "@/components/ui/date-range-picker";
-import { signOutAction } from "../actions";
+import { signOutAction } from "../../actions";
 
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 import * as Dialog from "@radix-ui/react-dialog";
@@ -118,7 +118,6 @@ interface Student {
 const currentCollegeCoordEmail = "jt87@rice.edu";
 
 export default function Component() {
-  const [isAuthorized, setIsAuthorized] = useState(false);
   const [coord, setCoord] = useState<CollegeContact | null>(null);
   const [students, setStudents] = useState<Student[] | null>(null);
   const [loading, setLoading] = useState(false);
@@ -150,20 +149,17 @@ export default function Component() {
     }
   }
 
-  const checkAuthorization = async () => {
-    console.log("Checking authorization...");
+  const fetchCoord = async () => {
+    console.log("Fetching coordinator...");
     try {
       const response = await checkAuth();
-
-      setIsAuthorized(response.can_add_and_delete_packages === true);
       setCoord({
         collegeName: response.college,
         name: response.name,
         email: response.email,
       });
     } catch (error) {
-      console.error("Authorization check failed:", error);
-      setIsAuthorized(false);
+      console.error("Coordinator fetching failed:", error);
     }
   };
 
@@ -228,7 +224,7 @@ export default function Component() {
   };
 
   useEffect(() => {
-    checkAuthorization();
+    fetchCoord();
   }, []);
 
   useEffect(() => {
@@ -312,13 +308,7 @@ export default function Component() {
           exitModal={() => setShowExportModal(false)}
         />
       )}
-      {!isAuthorized ? (
-        <div className="flex flex-1 items-center justify-center bg-white h-screen">
-          <h1 className="text-2xl font-semibold text-black">
-            401 - Unauthorized
-          </h1>
-        </div>
-      ) : (
+      
         <div className="flex h-screen bg-white">
           <div className="hidden w-64 bg-gray-100 lg:flex flex-col px-4">
             <div className="flex items-center gap-4 pt-4">
@@ -529,7 +519,6 @@ export default function Component() {
             </main>
           </div>
         </div>
-      )}
     </>
   );
 }
