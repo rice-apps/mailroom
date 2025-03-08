@@ -53,14 +53,13 @@ export default function UserDetails() {
 
   const handleDeleteAccount = () => {
     console.log("Account deleted");
-    supabase.functions.invoke('delete-user')
-      .then(({ data, error }) => {
-        if (error) {
-          console.error('Error deleting user:', error);
-          return;
-        }
-        router.push('/sign-in');
-      });
+    supabase.functions.invoke("delete-user").then(({ data, error }) => {
+      if (error) {
+        console.error("Error deleting user:", error);
+        return;
+      }
+      router.push("/sign-in");
+    });
   };
 
   useEffect(() => {
@@ -97,7 +96,6 @@ export default function UserDetails() {
   return (
     <div className="min-h-screen bg-accent text-foreground px-4 py-8 md:flex md:justify-center md:items-center">
       <div className="w-full max-w-xl mx-auto">
-        
         <Card className="p-4 md:p-6 space-y-5 border-none shadow-md rounded-3xl">
           {/* -------------- Your Details --------------- */}
           <h2 className="text-xl md:text-2xl font-medium">Your Details</h2>
@@ -110,7 +108,7 @@ export default function UserDetails() {
                 {user?.full_name}
               </span>
             </div>
-            
+
             <div className="flex flex-col md:grid md:grid-cols-2 w-full">
               <span className="mb-1 font-medium text-sm text-gray-500">
                 Rice Email
@@ -119,7 +117,7 @@ export default function UserDetails() {
                 {user?.email}
               </span>
             </div>
-            
+
             <div className="flex flex-col md:grid md:grid-cols-2 w-full">
               <span className="mb-1 font-medium text-sm text-gray-500">
                 Residential College
@@ -128,7 +126,7 @@ export default function UserDetails() {
                 {user?.college}
               </span>
             </div>
-            
+
             <div className="flex flex-col md:grid md:grid-cols-2 w-full">
               <span className="mb-2 font-medium text-sm text-gray-500">
                 Additional Email
@@ -145,12 +143,14 @@ export default function UserDetails() {
               />
             </div>
           </div>
-          
-          <h2 className="text-xl md:text-2xl font-medium pt-2">Notification Settings</h2>
+
+          <h2 className="text-xl md:text-2xl font-medium pt-2">
+            Notification Settings
+          </h2>
           <p className="text-sm text-gray-500">
             What notifications do you want to see?
           </p>
-          
+
           <div className="space-y-5">
             <div className="flex justify-between items-center mt-4">
               <div className="flex items-center space-x-3">
@@ -171,7 +171,7 @@ export default function UserDetails() {
             >
               Save Changes
             </Button>
-            
+
             <Button
               className="w-full md:w-auto md:mx-auto h-12 md:h-10 bg-red-900 text-white hover:bg-red-800 rounded-full"
               onClick={handleDeleteAccount}
