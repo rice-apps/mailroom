@@ -112,11 +112,11 @@ export default function StudentDashboard() {
     fetchNotificationSetting();
   }, [user]);
 
-  const handleClaim = async (id: string) => {
+  const handleClaim = async (package_identifier: string) => {
     try {
-      const success = await claimPackage(id);
+      const success = await claimPackage(package_identifier);
       if (success && packages) {
-        const newPackages = packages.filter((pack) => pack.id !== id);
+        const newPackages = packages.filter((pack) => pack.package_identifier !== package_identifier);
         setPackages(newPackages);
       }
     } catch (err) {
@@ -230,7 +230,7 @@ export default function StudentDashboard() {
               <CardContent className="p-6">
                 <p className="mb-4 text-gray-600">{item.extra_information}</p>
                 <Button
-                  onClick={() => handleClaim(item.id)}
+                  onClick={() => handleClaim(item.package_identifier)}
                   className="w-full bg-[#00205B] text-white hover:bg-[#001845] rounded-full"
                 >
                   Claim Package

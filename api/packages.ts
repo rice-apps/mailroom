@@ -50,7 +50,7 @@ export async function fetchPackagesbyUser(
   }
 }
 
-export async function claimPackage(id: string): Promise<boolean | undefined> {
+export async function claimPackage(package_identifier: string): Promise<boolean | undefined> {
   const supabase = createClient();
 
   try {
@@ -60,7 +60,7 @@ export async function claimPackage(id: string): Promise<boolean | undefined> {
         claimed: "true",
         date_claimed: new Date(Date.now()).toISOString(),
       })
-      .eq("id", id);
+      .eq("package_identifier", package_identifier);
     if (error) {
       console.error(`error claiming package with id ${id}`);
       return false;
