@@ -221,15 +221,7 @@ export default function ScanCheckin() {
   return (
     <div className="min-h-screen bg-white p-8">
       <div className="mx-auto max-w-2xl">
-        <div className="mb-8 flex items-center">
-          <button className="p-2" onClick={handleBackClick}>
-            <ArrowLeft className="h-6 w-6" />
-          </button>
-          <div className="flex-1"></div>
-          <div className="h-10 w-10 rounded-full bg-gray-200"></div>
-        </div>
-
-        <h1 className="mb-2 text-3xl font-bold text-center">
+        <h1 className="mb-2 text-3xl font-bold text-center mt-8">
           Scan in a Package
         </h1>
         <p className="mb-8 text-center text-gray-500">
