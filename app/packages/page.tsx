@@ -116,7 +116,9 @@ export default function StudentDashboard() {
     try {
       const success = await claimPackage(package_identifier);
       if (success && packages) {
-        const newPackages = packages.filter((pack) => pack.package_identifier !== package_identifier);
+        const newPackages = packages.filter(
+          (pack) => pack.package_identifier !== package_identifier,
+        );
         setPackages(newPackages);
       }
     } catch (err) {

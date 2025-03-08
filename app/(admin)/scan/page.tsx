@@ -9,7 +9,7 @@ import ScanIcon from "@/components/scan-icon";
 import { TextArea } from "@/components/ui/textarea";
 import Slider from "@/components/ui/slider";
 import { useRouter } from "next/navigation";
-import {claimPackage } from "@/api/packages";
+import { claimPackage } from "@/api/packages";
 const supabase = createClient();
 
 declare global {
@@ -34,7 +34,7 @@ export default function ScanCheckin() {
   const [userMap, setUserMap] = useState<Record<string, string>>();
   const dropdownRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
-  const [currentView, setCurrentView] = useState('scan');
+  const [currentView, setCurrentView] = useState("scan");
 
   useEffect(() => {
     const fetchRecipients = async () => {
@@ -242,31 +242,33 @@ export default function ScanCheckin() {
           <button className="p-2" onClick={handleBackClick}>
             <ArrowLeft className="h-6 w-6" />
           </button>
-          <h1 className="flex-1 text-3xl font-semibold text-center">{currentView==='scan'? ("Scan in a Package"):("Claim Package")}</h1>
+          <h1 className="flex-1 text-3xl font-semibold text-center">
+            {currentView === "scan" ? "Scan in a Package" : "Claim Package"}
+          </h1>
           <div className="h-10 w-10 rounded-full bg-gray-200"></div>
         </div>
 
         <div className="w-full flex justify-center mb-4">
           <div className="relative w-64 h-10 bg-gray-100 rounded-full p-1 cursor-pointer border border-black">
-            <Slider 
+            <Slider
               views={[
-                { id: 'scan', content: 'Scan' },
-                { id: 'claim', content: 'Claim' }
-              ]} 
+                { id: "scan", content: "Scan" },
+                { id: "claim", content: "Claim" },
+              ]}
               className="w-full h-full"
               onViewChange={(view) => {
                 setCurrentView(view);
-                setTrackingNumber('');
-                setFormData(prev => ({
+                setTrackingNumber("");
+                setFormData((prev) => ({
                   ...prev,
-                  package_identifier: ''
+                  package_identifier: "",
                 }));
-              }} 
+              }}
             />
           </div>
         </div>
 
-        {currentView === 'scan' && (
+        {currentView === "scan" && (
           <>
             <p className="mb-4 text-center text-gray-500">
               Connect scanner and scan the package barcode
@@ -295,7 +297,10 @@ export default function ScanCheckin() {
               <div className="h-[1px] bg-gray-300 w-40 ml-4"></div>
             </div>
 
-            <form onSubmit={handleSubmit} className="space-y-6 max-w-xl mx-auto">
+            <form
+              onSubmit={handleSubmit}
+              className="space-y-6 max-w-xl mx-auto"
+            >
               <div className="space-y-1">
                 <div className="flex items-center">
                   {/* <Label htmlFor="tracking-number" className="text-gray-600 w-40">
@@ -399,8 +404,7 @@ export default function ScanCheckin() {
           </>
         )}
 
-
-        {currentView === 'claim' && (
+        {currentView === "claim" && (
           <>
             <p className="mb-4 text-center text-gray-500">
               Connect scanner and scan the package barcode
@@ -429,7 +433,10 @@ export default function ScanCheckin() {
               <div className="h-[1px] bg-gray-300 w-40 ml-4"></div>
             </div>
 
-            <form onSubmit={handleSubmit} className="space-y-6 max-w-xl mx-auto">
+            <form
+              onSubmit={handleSubmit}
+              className="space-y-6 max-w-xl mx-auto"
+            >
               <div className="space-y-1">
                 <div className="flex items-center">
                   {/* <Label htmlFor="tracking-number" className="text-gray-600 w-40">
@@ -445,8 +452,6 @@ export default function ScanCheckin() {
                   />
                 </div>
               </div>
-
-             
 
               {confirmationMessage && (
                 <div

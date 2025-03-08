@@ -50,7 +50,9 @@ export async function fetchPackagesbyUser(
   }
 }
 
-export async function claimPackage(package_identifier: string): Promise<boolean | undefined> {
+export async function claimPackage(
+  package_identifier: string,
+): Promise<boolean | undefined> {
   const supabase = createClient();
 
   try {

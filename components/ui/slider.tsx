@@ -1,7 +1,7 @@
-'use client';
+"use client";
 
-import React, { useState, ReactNode } from 'react';
-import { motion, AnimatePresence, PanInfo } from 'framer-motion';
+import React, { useState, ReactNode } from "react";
+import { motion, AnimatePresence, PanInfo } from "framer-motion";
 
 interface SliderProps {
   views: {
@@ -13,11 +13,11 @@ interface SliderProps {
   onViewChange?: (viewId: string) => void;
 }
 
-const Slider: React.FC<SliderProps> = ({ 
-  views, 
+const Slider: React.FC<SliderProps> = ({
+  views,
   initialViewIndex = 0,
-  className = '',
-  onViewChange
+  className = "",
+  onViewChange,
 }) => {
   const [currentViewIndex, setCurrentViewIndex] = useState(initialViewIndex);
   const [direction, setDirection] = useState(0);
@@ -29,32 +29,31 @@ const Slider: React.FC<SliderProps> = ({
   };
 
   return (
-    <div 
+    <div
       className={`relative cursor-pointer ${className}`}
       onClick={handleViewChange}
     >
-
-      <motion.div 
+      <motion.div
         className="absolute w-1/2 h-full bg-[#00205B] rounded-full pointer-events-none"
         animate={{
-          x: currentViewIndex === 0 ? '0%' : '100%'
+          x: currentViewIndex === 0 ? "0%" : "100%",
         }}
         transition={{
           type: "spring",
           stiffness: 300,
-          damping: 30
+          damping: 30,
         }}
       />
       <div className="absolute inset-0 flex">
         <div className="flex-1 flex items-center justify-center">
           <motion.span
             animate={{
-              color: currentViewIndex === 0 ? '#FFFFFF' : '#00205B'
+              color: currentViewIndex === 0 ? "#FFFFFF" : "#00205B",
             }}
             transition={{
               type: "spring",
               stiffness: 300,
-              damping: 30
+              damping: 30,
             }}
           >
             Scan In
@@ -63,19 +62,18 @@ const Slider: React.FC<SliderProps> = ({
         <div className="flex-1 flex items-center justify-center">
           <motion.span
             animate={{
-              color: currentViewIndex === 1 ? '#FFFFFF' : '#00205B'
+              color: currentViewIndex === 1 ? "#FFFFFF" : "#00205B",
             }}
             transition={{
               type: "spring",
               stiffness: 300,
-              damping: 30
+              damping: 30,
             }}
           >
             Claim
           </motion.span>
         </div>
       </div>
-      
     </div>
   );
 };
