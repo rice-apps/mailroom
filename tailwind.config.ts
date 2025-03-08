@@ -19,6 +19,7 @@ const config = {
     },
     extend: {
       colors: {
+        "grey-login-text-rgba": "rgba(141, 141, 141, 1)",
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",

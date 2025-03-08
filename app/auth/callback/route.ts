@@ -7,7 +7,22 @@ export async function GET(request: Request) {
   // https://supabase.com/docs/guides/auth/server-side/nextjs
   const requestUrl = new URL(request.url);
   const code = requestUrl.searchParams.get("code");
-  const origin = requestUrl.origin;
+  console.log("headers", JSON.stringify(request.headers));
+  const host = request.headers.get("host") || requestUrl.host;
+  if (
+    !(JSON.parse(process.env.NEXT_PUBLIC_ALLOWED_HOSTS || "[]") ?? []).includes(
+      host,
+    )
+  ) {
+    throw new Error(
+      `Invalid host ${host} in ${process.env.NEXT_PUBLIC_ALLOWED_HOSTS}`,
+    );
+  }
+
+  const protocol = request.headers.get("x-forwarded-proto") || "http";
+
+  const baseUrl = `${protocol}://${host}`;
+
   const redirectTo = requestUrl.searchParams.get("redirect_to")?.toString();
 
   if (code) {
@@ -16,9 +31,9 @@ export async function GET(request: Request) {
   }
 
   if (redirectTo) {
-    return NextResponse.redirect(`${origin}${redirectTo}`);
+    return NextResponse.redirect(`${baseUrl}${redirectTo}`);
   }
 
   // URL to redirect to after sign up process completes
-  return NextResponse.redirect(`${origin}/kiosk`);
+  return NextResponse.redirect(`${baseUrl}`);
 }

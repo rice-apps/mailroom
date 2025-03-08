@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Package, User } from "lucide-react";
+import { Package, User, Bell } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -13,7 +13,13 @@ import {
 import { Skeleton } from "@/components/ui/skeleton";
 import { fetchUser, fetchPackagesbyUser, claimPackage } from "@/api/packages";
 import { createClient } from "@/utils/supabase/client";
-// import { fetchPackagesbyUser, fetchUser, claimPackage } from "@/api/packages"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 interface User {
   id: string;
@@ -47,7 +53,10 @@ export default function StudentDashboard() {
   const [currentStudentEmail, setCurrentStudentEmail] = useState<string | null>(
     null,
   );
+  const [notificationsEnabled, setNotificationsEnabled] =
+    useState<boolean>(false);
 
+  // Get the current user email from Supabase
   useEffect(() => {
     const getUserEmail = async () => {
       const {
@@ -61,19 +70,18 @@ export default function StudentDashboard() {
     getUserEmail();
   }, []);
 
+  // Fetch the user and package data using the email
   useEffect(() => {
     const fetchData = async () => {
-      console.log("hi");
       if (currentStudentEmail) {
         try {
-          const user = await fetchUser(currentStudentEmail);
-          setUser(user);
-          console.log(user);
+          const userData = await fetchUser(currentStudentEmail);
+          setUser(userData);
 
-          const fetchedPackages = await fetchPackagesbyUser(user.id);
+          const fetchedPackages = await fetchPackagesbyUser(userData.id);
           setPackages(fetchedPackages);
         } catch (err) {
-          setError("failed to load data. Please try again later.");
+          setError("Failed to load data. Please try again later.");
         } finally {
           setLoading(false);
         }
@@ -83,6 +91,27 @@ export default function StudentDashboard() {
     fetchData();
   }, [currentStudentEmail]);
 
+  // Once the user is available, fetch their current notifications setting.
+  useEffect(() => {
+    const fetchNotificationSetting = async () => {
+      if (user) {
+        const { data, error } = await supabase
+          .from("users")
+          .select("is_subscribed_email")
+          .eq("email", user.email)
+          .single();
+
+        if (error) {
+          console.error("Error fetching notification settings:", error);
+        } else if (data) {
+          setNotificationsEnabled(data.is_subscribed_email);
+        }
+      }
+    };
+
+    fetchNotificationSetting();
+  }, [user]);
+
   const handleClaim = async (id: string) => {
     try {
       const success = await claimPackage(id);
@@ -91,57 +120,119 @@ export default function StudentDashboard() {
         setPackages(newPackages);
       }
     } catch (err) {
-      setError("failed to claim package. please try again.");
+      setError("Failed to claim package. Please try again.");
+    }
+  };
+
+  const handleNotificationChange = async (value: string) => {
+    const enableNotifications = value === "enable";
+    setNotificationsEnabled(enableNotifications);
+
+    // Get the netID of the logged in user using supabase.auth.getUser()
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    if (!user) {
+      console.error("No logged in user found");
+      return;
+    }
+    const email = user.email;
+
+    // Update the notifications setting in the Supabase table
+    const { error } = await supabase
+      .from("users")
+      .update({ is_subscribed_email: enableNotifications })
+      .eq("email", email)
+      .select();
+
+    if (error) {
+      console.error("Error updating notifications setting:", error);
     }
   };
 
   if (loading) {
     return (
-      <div className="flex flex-col gap-4 p-4">
-        <Skeleton className="h-12 w-[250px]" />
-        <Skeleton className="h-[200px] w-full" />
+      <div className="flex flex-col gap-4 p-8">
+        <Skeleton className="h-12 w-[250px] rounded-full" />
+        <Skeleton className="h-[200px] w-full rounded-3xl" />
       </div>
     );
   }
 
   if (error) {
-    return <div className="p-4 text-red-500">{error}</div>;
+    return <div className="p-8 text-red-500 font-medium">{error}</div>;
   }
 
   return (
-    <div className="container mx-auto p-4">
-      <Card className="mb-8">
-        <CardHeader>
-          <CardTitle className="text-2xl">Welcome, {user?.name}</CardTitle>
-          <CardDescription>Here's an overview of your packages</CardDescription>
+    <div className="container mx-auto p-6 max-w-6xl">
+      <Card className="mb-8 rounded-3xl shadow-md border-0">
+        <CardHeader className="pb-2">
+          <CardTitle className="text-2xl font-semibold">
+            Welcome, {user?.name}
+          </CardTitle>
+          <CardDescription className="text-gray-600">
+            Here's an overview of your packages
+          </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="flex items-center justify-between">
-            <div className="flex items-center">
-              <Package className="mr-2 h-4 w-4" />
-              <span>Total Packages: {packages?.length || 0}</span>
+          <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+            <div className="flex items-center bg-gray-50 px-4 py-2 rounded-full">
+              <Package className="mr-2 h-5 w-5 text-[#00205B]" />
+              <span className="font-medium">
+                Total Packages: {packages?.length || 0}
+              </span>
             </div>
-            <div className="flex items-center">
-              <User className="mr-2 h-4 w-4" />
+            <div className="flex items-center bg-gray-50 px-4 py-2 rounded-full">
+              <User className="mr-2 h-5 w-5 text-[#00205B]" />
               <span>{user?.email}</span>
             </div>
           </div>
         </CardContent>
       </Card>
 
+      {/* Notification Setting */}
+      <div className="mb-8 bg-white p-6 rounded-3xl shadow-sm border border-gray-100">
+        <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+          <div className="flex items-center">
+            <Bell className="h-5 w-5 mr-3 text-[#00205B]" />
+            <h3 className="font-medium text-gray-700">Email Notifications</h3>
+          </div>
+          <Select
+            value={notificationsEnabled ? "enable" : "disable"}
+            onValueChange={handleNotificationChange}
+          >
+            <SelectTrigger className="w-[180px] rounded-full border-gray-200">
+              <SelectValue placeholder="Notification Status" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="enable">Enabled</SelectItem>
+              <SelectItem value="disable">Disabled</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+      </div>
+
       {packages && packages.length > 0 ? (
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           {packages.map((item) => (
-            <Card key={item.id}>
-              <CardHeader>
-                <CardTitle>{item.package_identifier}</CardTitle>
+            <Card
+              key={item.id}
+              className="rounded-3xl overflow-hidden border-0 shadow-md"
+            >
+              <CardHeader className="bg-gray-50 pb-3">
+                <CardTitle className="text-lg font-medium">
+                  {item.package_identifier}
+                </CardTitle>
                 <CardDescription>
                   Added on: {new Date(item.date_added).toLocaleDateString()}
                 </CardDescription>
               </CardHeader>
-              <CardContent>
-                <p className="mb-2">{item.extra_information}</p>
-                <Button onClick={() => handleClaim(item.id)} className="w-full">
+              <CardContent className="p-6">
+                <p className="mb-4 text-gray-600">{item.extra_information}</p>
+                <Button
+                  onClick={() => handleClaim(item.id)}
+                  className="w-full bg-[#00205B] text-white hover:bg-[#001845] rounded-full"
+                >
                   Claim Package
                 </Button>
               </CardContent>
@@ -149,10 +240,13 @@ export default function StudentDashboard() {
           ))}
         </div>
       ) : (
-        <Card>
-          <CardContent className="p-8 text-center">
-            <p className="text-lg font-semibold">No packages available</p>
-            <p className="text-muted-foreground">
+        <Card className="rounded-3xl overflow-hidden border-0 shadow-md">
+          <CardContent className="p-12 text-center">
+            <Package className="mx-auto h-12 w-12 text-gray-300 mb-4" />
+            <p className="text-lg font-semibold text-gray-700">
+              No packages available
+            </p>
+            <p className="text-gray-500 mt-2">
               You don't have any packages to claim at the moment.
             </p>
           </CardContent>

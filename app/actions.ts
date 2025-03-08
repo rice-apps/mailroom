@@ -7,15 +7,32 @@ import { redirect } from "next/navigation";
 
 export const signInAction = async (formData: FormData) => {
   const supabase = createClient();
+  const headersList = headers();
+  const host = headersList.get("host") || "";
+  if (
+    !(JSON.parse(process.env.NEXT_PUBLIC_ALLOWED_HOSTS || "[]") ?? []).includes(
+      host,
+    )
+  ) {
+    throw new Error(
+      `Invalid host ${host} in ${process.env.NEXT_PUBLIC_ALLOWED_HOSTS}`,
+    );
+  }
+
+  const protocol = headersList.get("x-forwarded-proto") || "http";
+
+  const baseUrl = `${protocol}://${host}`;
+
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider: "google",
     options: {
       queryParams: {
         prompt: "consent",
       },
-      redirectTo: "http://localhost:3000/auth/callback", // TODO: dynamically choose between dev and prod base URL
+      redirectTo: baseUrl + "/auth/callback",
     },
   });
+
   redirect(data.url ?? "");
 };
 

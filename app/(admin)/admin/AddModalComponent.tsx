@@ -111,7 +111,7 @@ export default function AddModalComponent({
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
       <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-2xl">
-        <h2 className="text-xl font-semibold mb-4 text-gray-600">
+        <h2 className="text-xl font-semibold mb-4">
           Add Students to {college}
         </h2>
         <div className="mb-4 flex space-x-2 items-center">
@@ -195,15 +195,15 @@ export default function AddModalComponent({
         )}
         <div className="flex justify-end">
           <Button
-            className="mr-2 bg-gray-300 text-black hover:bg-gray-400"
+            className="mr-2 bg-white text-black border border-input bg-background hover:bg-accent hover:text-accent-foreground"
             onClick={exitModal}
           >
-            Cancel
+            Exit
           </Button>
           <Button
             className="bg-[#00205B] text-white hover:bg-black"
             onClick={() => {
-              insertUsersGivenCollege("Wiess", students).then((data) => {
+              insertUsersGivenCollege(college, students).then((data) => {
                 exitModal();
               });
             }}

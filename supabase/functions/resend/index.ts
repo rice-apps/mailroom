@@ -26,10 +26,10 @@ const handler = async (request: Request): Promise<Response> => {
     });
   }
 
-  const { netID, trackingId } = requestData;
-  if (!netID || !trackingId) {
+  const { netID, redirectUrl } = requestData;
+  if (!netID || !redirectUrl) {
     return new Response(
-      JSON.stringify({ error: "Missing netID or trackingId" }),
+      JSON.stringify({ error: "Missing netID or redirectUrl" }),
       {
         status: 400,
         headers: {
@@ -289,15 +289,15 @@ const handler = async (request: Request): Promise<Response> => {
                             </div>
                             <div> 
                             
-                            <a href="https://qiekvvwcicienqtinxmo.supabase.co/functions/v1/claim-package?trackingID=${trackingId}" 
+                            <a href="https://qiekvvwcicienqtinxmo.supabase.co/functions/v1/claim-package?redirectUrl=${redirectUrl}" 
                               style="display: inline-block; padding: 10px 20px; background-color: #a27a52; color: #ffffff; text-decoration: none; border-radius: 4px; font-weight: bold; margin: 10px 0;">
                                 Claim Package
                             </a>
 
                             </div>
-                            <div><span>Tracking ID: ${trackingId}</span>
+                            <div><span>Your package has arrived!</span>
                             </div>
-                            <div><p>If you no longer want to receive these notifications, you can <a href="https://qiekvvwcicienqtinxmo.supabase.co/functions/v1/unsubscribe-handler?trackingID=${trackingId}&netID=${netID}">unsubscribe here</a>.</p></div>
+                            <div><p>If you no longer want to receive these notifications, you can <a href="https://qiekvvwcicienqtinxmo.supabase.co/functions/v1/unsubscribe-handler?netID=${netID}">unsubscribe here</a>.</p></div>
                             </div>
                           </td>
                           </tr>
