@@ -7,7 +7,6 @@ import { Switch } from "@/components/ui/switch";
 import { Card } from "@/components/ui/card";
 import { Mail, MessageCircle } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { ArrowLeft } from "lucide-react";
 import { createClient } from "@/utils/supabase/client";
 import { User } from "@supabase/supabase-js";
 
@@ -23,11 +22,9 @@ interface Student {
 export default function UserDetails() {
   const [additionalEmail, setAdditionalEmail] = useState<string | null>(null);
   const [emailNotifications, setEmailNotifications] = useState(true);
-
   const [user, setUser] = useState<Student | null>(null);
   const router = useRouter();
   const supabase = createClient();
-
 
   const handleSaveChanges = () => {
     console.log("Changes saved");
@@ -98,45 +95,48 @@ export default function UserDetails() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-accent text-foreground flex justify-center items-center">
-      <div className="w-full max-w-xl">
-        {/* -------------- Your Details --------------- */}
-        <div className="p-6 space-y-5 border-none shadow-none max-w-3xl">
-          <h2 className="text-2xl font-medium">Your Details</h2>
+    <div className="min-h-screen bg-accent text-foreground px-4 py-8 md:flex md:justify-center md:items-center">
+      <div className="w-full max-w-xl mx-auto">
+        
+        <Card className="p-4 md:p-6 space-y-5 border-none shadow-md rounded-3xl">
+          {/* -------------- Your Details --------------- */}
+          <h2 className="text-xl md:text-2xl font-medium">Your Details</h2>
           <div className="space-y-5">
-            <div className="grid grid-cols-2 w-full">
+            <div className="flex flex-col md:grid md:grid-cols-2 w-full">
               <span className="mb-1 font-medium text-sm text-gray-500">
                 Name
               </span>
-              <span className="mb-1 font-medium text-sm text-black">
-                {" "}
+              <span className="mb-3 md:mb-1 font-medium text-sm text-black">
                 {user?.full_name}
               </span>
             </div>
-            <div className="grid grid-cols-2 w-full">
+            
+            <div className="flex flex-col md:grid md:grid-cols-2 w-full">
               <span className="mb-1 font-medium text-sm text-gray-500">
                 Rice Email
               </span>
-              <span className="mb-1 font-medium text-sm text-black">
+              <span className="mb-3 md:mb-1 font-medium text-sm text-black break-words">
                 {user?.email}
               </span>
             </div>
-            <div className="grid grid-cols-2 w-full">
+            
+            <div className="flex flex-col md:grid md:grid-cols-2 w-full">
               <span className="mb-1 font-medium text-sm text-gray-500">
                 Residential College
               </span>
-              <span className="mb-1 font-medium text-sm text-black">
+              <span className="mb-3 md:mb-1 font-medium text-sm text-black">
                 {user?.college}
               </span>
             </div>
-            <div className="grid grid-cols-2 w-full">
-              <span className="mb-1 font-medium text-sm text-gray-500">
+            
+            <div className="flex flex-col md:grid md:grid-cols-2 w-full">
+              <span className="mb-2 font-medium text-sm text-gray-500">
                 Additional Email
               </span>
               <Input
                 type="email"
                 placeholder="example@domain.com"
-                className="placeholder:text-gray-350 border-black rounded-full h-9 w-80"
+                className="placeholder:text-gray-350 border-gray-300 rounded-full h-10 w-full"
                 value={additionalEmail ?? ""}
                 onChange={(e) => {
                   setAdditionalEmail(e.target.value);
@@ -145,13 +145,15 @@ export default function UserDetails() {
               />
             </div>
           </div>
-          <h2 className="text-2xl font-medium">Notification Settings</h2>
+          
+          <h2 className="text-xl md:text-2xl font-medium pt-2">Notification Settings</h2>
           <p className="text-sm text-gray-500">
             What notifications do you want to see?
           </p>
+          
           <div className="space-y-5">
-            <div className="flex justify-between items-center mt-7">
-              <div className="flex items-center space-x-5">
+            <div className="flex justify-between items-center mt-4">
+              <div className="flex items-center space-x-3">
                 <Mail className="w-5 h-5" />
                 <span className="text-sm font-medium text-gray-700">Email</span>
               </div>
@@ -162,23 +164,22 @@ export default function UserDetails() {
             </div>
           </div>
 
-          <div className="flex justify-center">
+          <div className="flex flex-col space-y-3 pt-4">
             <Button
-              className="mt-2 w-50 h-8 bg-blue-900 hover:bg-blue-800 rounded-full mx-auto"
+              className="w-full md:w-auto md:mx-auto h-12 md:h-10 bg-blue-900 hover:bg-blue-800 rounded-full"
               onClick={handleSaveChanges}
             >
               Save Changes
             </Button>
-          </div>
-          <div className="flex justify-center">
+            
             <Button
-              className="mt-2 w-50 h-8 bg-red-900 text-white hover:bg-red-800 rounded-full"
+              className="w-full md:w-auto md:mx-auto h-12 md:h-10 bg-red-900 text-white hover:bg-red-800 rounded-full"
               onClick={handleDeleteAccount}
             >
               Delete Account
             </Button>
           </div>
-        </div>
+        </Card>
       </div>
     </div>
   );
