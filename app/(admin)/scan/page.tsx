@@ -195,22 +195,25 @@ export default function ScanCheckin() {
       },
     ]);
     const { data, error: fetchIDError } = await supabase
-    .from('users')
-    .select('email')
-    .eq('id', userMap ? userMap[recipientName] : "")
-    .single();
+      .from("users")
+      .select("email")
+      .eq("id", userMap ? userMap[recipientName] : "")
+      .single();
 
     if (fetchIDError) {
-      console.error('Error fetching user:', error);
+      console.error("Error fetching user:", error);
       setConfirmationMessage("Error fetching user data. Please try again.");
     }
 
     if (data) {
       const { error: resendError } = await supabase.functions.invoke("resend", {
-        body: { netID: data.email.split("@")[0], redirectUrl: window.origin + '/packages'},
+        body: {
+          netID: data.email.split("@")[0],
+          redirectUrl: window.origin + "/packages",
+        },
       });
       if (resendError) {
-          setConfirmationMessage("Error submitting data. Please try again.");
+        setConfirmationMessage("Error submitting data. Please try again.");
       }
     }
 
