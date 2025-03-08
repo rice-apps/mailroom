@@ -9,6 +9,7 @@ import { Mail, MessageCircle } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/utils/supabase/client";
 import { User } from "@supabase/supabase-js";
+import { useToast } from "../hooks/use-toast";
 
 interface Student {
   netId: string;
@@ -25,6 +26,7 @@ export default function UserDetails() {
   const [user, setUser] = useState<Student | null>(null);
   const router = useRouter();
   const supabase = createClient();
+  const { toast } = useToast();
 
   const handleSaveChanges = () => {
     console.log("Changes saved");
@@ -45,8 +47,10 @@ export default function UserDetails() {
       .then(({ error }) => {
         if (error) {
           console.error("Error updating user:", error);
+          toast({ title: `Failed to save.` });
         } else {
           console.log("User updated successfully");
+          toast({ title: `Changes saved!` });
         }
       });
   };
@@ -56,8 +60,11 @@ export default function UserDetails() {
     supabase.functions.invoke("delete-user").then(({ data, error }) => {
       if (error) {
         console.error("Error deleting user:", error);
+        toast({ title: `Failed to delete.` });
         return;
       }
+      toast({ title: `Account deleted!` });
+      supabase.auth.signOut();
       router.push("/sign-in");
     });
   };
