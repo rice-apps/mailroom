@@ -23,6 +23,7 @@
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
     "cors": "^2.8.5",
+    "framer-motion": "^12.4.10",
     "geist": "^1.2.1",
     "lucide-react": "^0.436.0",
     "next": "latest",
