@@ -1,15 +1,13 @@
 import { GeistSans } from "geist/font/sans";
 import { ThemeProvider } from "next-themes";
-
-import Link from "next/link";
 import "./globals.css";
 import { Toaster } from "@/components/ui/toaster";
-
 import { Figtree } from "next/font/google";
+import NavigationBar from "@/components/navigation-bar";
 
 export const metadata = {
-  title: "Next.js and Supabase Starter Kit",
-  description: "The fastest way to build apps with Next.js and Supabase",
+  title: "Rice Mailroom",
+  description: "Package management system for Rice University",
 };
 
 const figtree = Figtree({
@@ -25,14 +23,15 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className={figtreeClass} suppressHydrationWarning>
-      <body className="bg-accent text-foreground">
+      <body className="bg-white text-foreground">
         <ThemeProvider
           attribute="class"
           defaultTheme="system"
           enableSystem
           disableTransitionOnChange
         >
-          {children}
+          <NavigationBar />
+          <main>{children}</main>
           <Toaster />
         </ThemeProvider>
       </body>
