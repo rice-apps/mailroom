@@ -226,7 +226,6 @@ export default function ScanCheckin() {
             <ArrowLeft className="h-6 w-6" />
           </button>
           <div className="flex-1"></div>
-          <div className="h-10 w-10 rounded-full bg-gray-200"></div>
         </div>
 
         <h1 className="mb-2 text-3xl font-bold text-center">
