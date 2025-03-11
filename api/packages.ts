@@ -64,12 +64,12 @@ export async function claimPackage(
       })
       .eq("package_identifier", package_identifier);
     if (error) {
-      console.error(`error claiming package with id ${id}`);
+      console.error(`error claiming package with tracking id ${package_identifier}`);
       return false;
     }
     return true;
   } catch (error) {
-    console.error(`error claiming package with id ${id}`);
+    console.error(`error claiming package with tracking id ${package_identifier}`);
     return false;
   }
 }
