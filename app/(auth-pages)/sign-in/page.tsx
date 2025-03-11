@@ -23,7 +23,7 @@ export default function Login({ searchParams }: { searchParams: Message }) {
         priority={true}
         className="mb-6"
       />
-      <form className="flex flex-col justify-center items-center align-middle gap-1 items-center justify-center">
+      <form className="flex flex-col justify-center items-center align-middle gap-1">
         <h1 className={`text-2xl font-medium text-primary pb-px`}>
           {" "}
           Welcome back to Mailroom!
