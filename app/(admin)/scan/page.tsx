@@ -23,7 +23,7 @@ declare global {
   }
 }
 
-type ScanMode = "checkin" | "claim"
+type ScanMode = "checkin" | "claim";
 
 export default function ScanCheckin() {
   const [trackingNumber, setTrackingNumber] = useState("");
@@ -39,12 +39,12 @@ export default function ScanCheckin() {
   const [currentView, setCurrentView] = useState<ScanMode>("checkin");
   useEffect(() => {
     const searchParams = new URLSearchParams(window.location.search);
-    const mode = searchParams.get('mode') as ScanMode;
+    const mode = searchParams.get("mode") as ScanMode;
     if (mode) {
       setCurrentView(mode);
     }
   }, []);
- 
+
   useEffect(() => {
     const fetchRecipients = async () => {
       const { data, error } = await supabase.from("users").select("id, name");
@@ -275,7 +275,9 @@ export default function ScanCheckin() {
             <ArrowLeft className="h-6 w-6" />
           </button>
           <h1 className="flex-1 text-3xl font-semibold text-center pr-10">
-            {currentView === "checkin" ? "Check in a Package" : "Claim a Package"}
+            {currentView === "checkin"
+              ? "Check in a Package"
+              : "Claim a Package"}
           </h1>
         </div>
 
