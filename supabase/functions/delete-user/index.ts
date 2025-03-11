@@ -7,41 +7,52 @@
 import { createClient } from "npm:@supabase/supabase-js";
 
 const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-}
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Headers":
+    "authorization, x-client-info, apikey, content-type",
+  "Content-Type": "application/json",
+};
 
 Deno.serve(async (req) => {
-  if (req.method === 'OPTIONS') {
-    return new Response('ok', { headers: corsHeaders })
+  if (req.method === "OPTIONS") {
+    return new Response("ok", { headers: corsHeaders });
   }
-  
+
   const SUPABASE_URL = Deno.env.get("SUPABASE_URL");
   const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
   const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY ?? "");
 
-  const authHeader = req.headers.get('Authorization')!;
+  const authHeader = req.headers.get("Authorization")!;
   if (!authHeader) {
-    return new Response("Unauthorized", { status: 401 }, ...corsHeaders);
+    return new Response("Unauthorized", { status: 401, headers: corsHeaders });
   }
-  const token = authHeader.replace('Bearer ', '');
+  const token = authHeader.replace("Bearer ", "");
   if (!token) {
-    return new Response("Unauthorized", { status: 401 }, ...corsHeaders);
+    return new Response("Unauthorized", { status: 401, headers: corsHeaders });
   }
 
-  const { data } = await supabase.auth.getUser(token)
-  const user = data.user
+  const { data } = await supabase.auth.getUser(token);
+  const user = data.user;
   const { id } = user;
-  let { error } = await req.supabase.from("users").delete().eq("id", id);
+  let { error } = await supabase.from("users").delete().eq("id", id);
   if (error) {
-    return new Response(JSON.stringify(error), { status: 500 }, ...corsHeaders);
+    return new Response(JSON.stringify(error), {
+      status: 500,
+      headers: corsHeaders,
+    });
   }
 
   error = await supabase.auth.admin.deleteUser(id).error;
   if (error) {
-    return new Response(JSON.stringify(error), { status: 500 }, ...corsHeaders);
+    return new Response(JSON.stringify(error), {
+      status: 500,
+      headers: corsHeaders,
+    });
   }
-  return new Response(JSON.stringify({ success: true }), { status: 200 }, ...corsHeaders);
+  return new Response(JSON.stringify({ success: true }), {
+    status: 200,
+    headers: corsHeaders,
+  });
 });
 
 /* To invoke locally:

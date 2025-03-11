@@ -64,7 +64,6 @@ export default function UserDetails() {
         return;
       }
       toast({ title: `Account deleted!` });
-      supabase.auth.signOut();
       router.push("/sign-in");
     });
   };
