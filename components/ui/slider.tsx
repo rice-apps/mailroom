@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, ReactNode } from "react";
+import React, { useState, ReactNode, useEffect } from "react";
 import { motion, AnimatePresence, PanInfo } from "framer-motion";
 
 interface SliderProps {
@@ -21,6 +21,10 @@ const Slider: React.FC<SliderProps> = ({
 }) => {
   const [currentViewIndex, setCurrentViewIndex] = useState(initialViewIndex);
   const [direction, setDirection] = useState(0);
+
+  useEffect(() => {
+    setCurrentViewIndex(initialViewIndex);
+  }, [initialViewIndex]);
 
   const handleViewChange = () => {
     const newIndex = currentViewIndex === 0 ? 1 : 0;
@@ -56,7 +60,7 @@ const Slider: React.FC<SliderProps> = ({
               damping: 30,
             }}
           >
-            Scan In
+            Check In
           </motion.span>
         </div>
         <div className="flex-1 flex items-center justify-center">

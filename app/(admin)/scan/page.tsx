@@ -23,6 +23,8 @@ declare global {
   }
 }
 
+type ScanMode = "checkin" | "claim"
+
 export default function ScanCheckin() {
   const [trackingNumber, setTrackingNumber] = useState("");
   const [recipientName, setRecipientName] = useState("");
@@ -34,8 +36,15 @@ export default function ScanCheckin() {
   const [userMap, setUserMap] = useState<Record<string, string>>();
   const dropdownRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
-  const [currentView, setCurrentView] = useState("scan");
-
+  const [currentView, setCurrentView] = useState<ScanMode>("checkin");
+  useEffect(() => {
+    const searchParams = new URLSearchParams(window.location.search);
+    const mode = searchParams.get('mode') as ScanMode;
+    if (mode) {
+      setCurrentView(mode);
+    }
+  }, []);
+ 
   useEffect(() => {
     const fetchRecipients = async () => {
       const { data, error } = await supabase.from("users").select("id, name");
@@ -265,33 +274,33 @@ export default function ScanCheckin() {
           <button className="p-2" onClick={handleBackClick}>
             <ArrowLeft className="h-6 w-6" />
           </button>
-          <h1 className="flex-1 text-3xl font-semibold text-center">
-            {currentView === "scan" ? "Scan in a Package" : "Claim Package"}
+          <h1 className="flex-1 text-3xl font-semibold text-center pr-10">
+            {currentView === "checkin" ? "Check in a Package" : "Claim a Package"}
           </h1>
-          <div className="h-10 w-10 rounded-full bg-gray-200"></div>
         </div>
 
         <div className="w-full flex justify-center mb-4">
           <div className="relative w-64 h-10 bg-gray-100 rounded-full p-1 cursor-pointer border border-black">
             <Slider
               views={[
-                { id: "scan", content: "Scan" },
+                { id: "checkin", content: "Scan" },
                 { id: "claim", content: "Claim" },
               ]}
               className="w-full h-full"
               onViewChange={(view) => {
-                setCurrentView(view);
+                setCurrentView(view as ScanMode);
                 setTrackingNumber("");
                 setFormData((prev) => ({
                   ...prev,
                   package_identifier: "",
                 }));
               }}
+              initialViewIndex={currentView == "checkin" ? 0 : 1}
             />
           </div>
         </div>
 
-        {currentView === "scan" && (
+        {currentView === "checkin" && (
           <>
             <p className="mb-4 text-center text-gray-500">
               Connect scanner and scan the package barcode
