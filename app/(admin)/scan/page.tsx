@@ -268,7 +268,7 @@ export default function ScanCheckin() {
   };
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen">
       <div className="w-full pt-8">
         <div className="mb-4 flex items-center px-8">
           <button className="p-2" onClick={handleBackClick}>

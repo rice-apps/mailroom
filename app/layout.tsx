@@ -23,7 +23,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className={figtreeClass} suppressHydrationWarning>
-      <body className="bg-white text-foreground">
+      <body className="bg-accent text-foreground">
         <ThemeProvider
           attribute="class"
           defaultTheme="system"
