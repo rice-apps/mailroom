@@ -317,9 +317,12 @@ export default function Component() {
 
       <div className="flex h-screen bg-white">
         <div className="hidden w-64 bg-gray-100 lg:flex flex-col px-4">
-          <div className="flex items-center gap-4 pt-4 cursor-pointer" onClick={()=>{
-            router.push("/");
-          }}>
+          <div
+            className="flex items-center gap-4 pt-4 cursor-pointer"
+            onClick={() => {
+              router.push("/");
+            }}
+          >
             <Image
               src="/mailroom_logo.png"
               width={64}

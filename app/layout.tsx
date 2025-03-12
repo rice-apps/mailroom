@@ -4,6 +4,7 @@ import "./globals.css";
 import { Toaster } from "@/components/ui/toaster";
 import { Figtree } from "next/font/google";
 import NavigationBar from "@/components/navigation-bar";
+import Transition from "@/components/transition";
 
 export const metadata = {
   title: "Rice Mailroom",
@@ -31,7 +32,7 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           <NavigationBar />
-          <main>{children}</main>
+          <Transition>{children}</Transition>
           <Toaster />
         </ThemeProvider>
       </body>
