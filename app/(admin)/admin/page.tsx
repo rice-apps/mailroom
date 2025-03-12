@@ -61,6 +61,7 @@ import { signOutAction } from "../../actions";
 
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 import * as Dialog from "@radix-ui/react-dialog";
+import { useRouter } from "next/navigation";
 
 // Assuming these functions are defined in the specified path
 
@@ -131,6 +132,7 @@ export default function Component() {
     null,
   );
   const [minPackages, setMinPackages] = useState(0);
+  const router = useRouter();
 
   // States for the Admin Dialog
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -315,7 +317,9 @@ export default function Component() {
 
       <div className="flex h-screen bg-white">
         <div className="hidden w-64 bg-gray-100 lg:flex flex-col px-4">
-          <div className="flex items-center gap-4 pt-4">
+          <div className="flex items-center gap-4 pt-4 cursor-pointer" onClick={()=>{
+            router.push("/");
+          }}>
             <Image
               src="/mailroom_logo.png"
               width={64}
