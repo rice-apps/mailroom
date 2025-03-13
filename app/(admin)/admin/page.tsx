@@ -273,14 +273,21 @@ export default function Component() {
   }, [coord]);
 
   const filteredStudents = students?.filter((student) => {
+    const hasMatchingPackage = student.packages.some((pkg) =>
+      pkg.package_identifier.toLowerCase().includes(searchTerm.toLowerCase()),
+    );
+
     const matchesFilter =
       filter === "all" ||
       (filter === "unclaimed" &&
         student.packages.some((pkg) => !pkg.claimed)) ||
       (filter === "claimed" && student.packages.some((pkg) => pkg.claimed));
+
     const matchesSearch =
       student.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      student.email.toLowerCase().includes(searchTerm.toLowerCase());
+      student.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      hasMatchingPackage; 
+
     const matchesMinPackages = getPackageCount(filter, student) >= minPackages;
     const matchesDateRange =
       !deliveryDateRange ||
@@ -512,7 +519,7 @@ export default function Component() {
                 <div className="relative flex w-full md:w-auto">
                   <Search className="absolute left-2 top-1/2 h-4 w-4 -translate-y-1/2 transform text-gray-400" />
                   <Input
-                    placeholder="Search names..."
+                    placeholder="Search names, netID or packages..."
                     className="pl-8 bg-white text-black rounded-3xl font-medium"
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
@@ -521,12 +528,80 @@ export default function Component() {
               </div>
             </div>
 
+            <div className="flex flex-wrap gap-2 mb-4">
+              {searchTerm && (
+                <Badge
+                  variant="outline"
+                  className="bg-blue-50 flex items-center gap-1"
+                >
+                  Search: {searchTerm}
+                  <X
+                    className="h-3 w-3 ml-1 cursor-pointer"
+                    onClick={() => setSearchTerm("")}
+                  />
+                </Badge>
+              )}
+
+              {filter !== "all" && (
+                <Badge
+                  variant="outline"
+                  className="bg-blue-50 flex items-center gap-1"
+                >
+                  Status: {filter}
+                  <X
+                    className="h-3 w-3 ml-1 cursor-pointer"
+                    onClick={() => setFilter("all")}
+                  />
+                </Badge>
+              )}
+
+              {minPackages > 0 && (
+                <Badge
+                  variant="outline"
+                  className="bg-blue-50 flex items-center gap-1"
+                >
+                  Min packages: {minPackages}
+                  <X
+                    className="h-3 w-3 ml-1 cursor-pointer"
+                    onClick={() => setMinPackages(0)}
+                  />
+                </Badge>
+              )}
+
+              {deliveryDateRange?.startDate && deliveryDateRange?.endDate && (
+                <Badge
+                  variant="outline"
+                  className="bg-blue-50 flex items-center gap-1"
+                >
+                  Date range: {deliveryDateRange.startDate.toLocaleDateString()}{" "}
+                  - {deliveryDateRange.endDate.toLocaleDateString()}
+                  <X
+                    className="h-3 w-3 ml-1 cursor-pointer"
+                    onClick={() => setDeliveryDateRange(null)}
+                  />
+                </Badge>
+              )}
+            </div>
+
+            {students && filteredStudents && (
+              <div className="text-sm text-gray-500 mb-4">
+                Showing {filteredStudents.length} of {students.length} students
+                {searchTerm && ` matching "${searchTerm}"`}
+                {filter !== "all" && ` with ${filter} packages`}
+                {minPackages > 0 && ` having ${minPackages}+ packages`}
+                {deliveryDateRange?.startDate &&
+                  deliveryDateRange?.endDate &&
+                  ` delivered between ${deliveryDateRange.startDate.toLocaleDateString()} and ${deliveryDateRange.endDate.toLocaleDateString()}`}
+              </div>
+            )}
+
             <PackageTable
               loading={loading}
               filteredStudents={filteredStudents}
               toggle={toggle}
               handleClick={handleClick}
               currentFilter={filter}
+              searchTerm={searchTerm}
             />
           </main>
         </div>
@@ -554,6 +629,7 @@ interface PackageTableProps {
     event: React.MouseEvent<HTMLButtonElement, MouseEvent>,
   ) => Promise<void>;
   currentFilter: string;
+  searchTerm: string;
 }
 
 function PackageTable({
@@ -562,6 +638,7 @@ function PackageTable({
   toggle,
   handleClick,
   currentFilter,
+  searchTerm,
 }: PackageTableProps) {
   const [expandedRows, setExpandedRows] = useState<{ [key: number]: boolean }>(
     {},
@@ -574,6 +651,20 @@ function PackageTable({
     }));
   };
 
+  const formatDateTime = (dateString: string) => {
+    if (!dateString) return "";
+    const date = new Date(dateString);
+    return date.toLocaleString("en-US", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+      hour: "numeric",
+      minute: "2-digit",
+      second: "2-digit",
+      hour12: true,
+    });
+  };
+
   return (
     <Card>
       <Table>
@@ -581,9 +672,15 @@ function PackageTable({
         <TableHeader className="text-base bg-[#00205B] text-white rounded-t-lg">
           <TableRow>
             <TableHead className="text-white w-[5%] first:rounded-tl-lg"></TableHead>
-            <TableHead className="text-white w-[25%]">Student</TableHead>
-            <TableHead className="text-white w-[25%]">Rice Email</TableHead>
-            <TableHead className="text-white w-[20%]">Rice NetID</TableHead>
+            <TableHead className="text-white w-[25%]">
+              Student / Details
+            </TableHead>
+            <TableHead className="text-white w-[25%]">
+              Rice Email / Package ID
+            </TableHead>
+            <TableHead className="text-white w-[20%]">
+              Rice NetID / Status
+            </TableHead>
             <TableHead className="text-white w-[15%]"># of Packages</TableHead>
             <TableHead className="text-white w-[10%] last:rounded-tr-lg">
               Remind
@@ -603,6 +700,27 @@ function PackageTable({
                 return null;
               }
 
+              const filteredPackages = student.packages.filter((pkg) => {
+                const matchesSearch =
+                  !searchTerm ||
+                  pkg.package_identifier
+                    .toLowerCase()
+                    .includes(searchTerm.toLowerCase()) ||
+                  (pkg.extra_information &&
+                    pkg.extra_information
+                      .toLowerCase()
+                      .includes(searchTerm.toLowerCase()));
+
+                const matchesFilter =
+                  currentFilter === "all" ||
+                  (currentFilter === "claimed" && pkg.claimed) ||
+                  (currentFilter === "unclaimed" && !pkg.claimed);
+
+                return matchesSearch && matchesFilter;
+              });
+
+              const hasFilteredPackages = filteredPackages.length > 0;
+
               return (
                 <React.Fragment key={student.id}>
                   <TableRow
@@ -610,7 +728,7 @@ function PackageTable({
                     onClick={() => toggleRow(student.id)}
                   >
                     <TableCell className="w-[5%]">
-                      {getPackageCount(currentFilter, student) > 0 ? (
+                      {hasFilteredPackages ? (
                         expandedRows[student.id] ? (
                           <ChevronUp className="text-[#00205B]" />
                         ) : (
@@ -641,7 +759,9 @@ function PackageTable({
                         }
                         className="bg-[#00205B] text-white hover:bg-black px-4 py-1"
                       >
-                        {getPackageCount(currentFilter, student)}
+                        {!searchTerm && currentFilter == "all"
+                          ? `${getPackageCount(currentFilter, student)}`
+                          : `${filteredPackages.length} of ${getPackageCount(currentFilter, student)}`}
                       </Badge>
                     </TableCell>
                     <TableCell className="w-[10%]">
@@ -663,80 +783,71 @@ function PackageTable({
                     </TableCell>
                   </TableRow>
 
-                  {expandedRows[student.id] &&
-                    getPackageCount(currentFilter, student) > 0 && (
-                      <>
-                        {student.packages.map((pkg, index) => {
-                          if (currentFilter === "claimed" && !pkg.claimed) {
-                            return null;
-                          }
-                          if (currentFilter === "unclaimed" && pkg.claimed) {
-                            return null;
-                          }
-                          return (
-                            <>
-                              <TableRow
-                                key={`${student.id}-package-${index}`}
-                                className="bg-gray-100"
+                  {expandedRows[student.id] && hasFilteredPackages && (
+                    <>
+                      {filteredPackages.map((pkg, index) => (
+                        <TableRow
+                          key={`${student.id}-package-${index}`}
+                          className="bg-gray-100"
+                        >
+                          <TableCell className="w-[5%]"></TableCell>
+                          <TableCell className="w-[25%]">
+                            {pkg.extra_information ||
+                              "Package details unavailable"}
+                          </TableCell>
+                          <TableCell className="w-[25%] font-medium text-blue-700">
+                            {pkg.package_identifier}
+                          </TableCell>
+                          <TableCell className="w-[20%]">
+                            {pkg.claimed ? (
+                              <Badge
+                                className="bg-green-400 text-white px-3 py-1 cursor-help"
+                                title={`Claimed on: ${formatDateTime(pkg.date_claimed)}`}
                               >
-                                <TableCell className="w-[5%]"></TableCell>
-                                <TableCell className="w-[25%]">
-                                  {pkg.extra_information ||
-                                    "Package details unavailable"}
-                                </TableCell>
-                                <TableCell className="w-[25%]"></TableCell>
-                                <TableCell className="w-[20%]">
-                                  {pkg.claimed ? (
-                                    <Badge className="bg-green-400 text-white px-3 py-1">
-                                      Claimed
-                                    </Badge>
-                                  ) : (
-                                    <Badge className="bg-gray-400 text-white px-3 py-1">
-                                      Delivered
-                                    </Badge>
-                                  )}
-                                </TableCell>
-                                <TableCell className="w-[15%]"></TableCell>
-                                <TableCell className="text-gray-500 w-[10%]">
-                                  {(() => {
-                                    const now = new Date().getTime();
-                                    const addedDate = new Date(
-                                      !pkg.claimed
-                                        ? pkg.date_added
-                                        : pkg.date_claimed,
-                                    ).getTime();
-                                    const diffMs = now - addedDate;
+                                Claimed
+                              </Badge>
+                            ) : (
+                              <Badge
+                                className="bg-gray-400 text-white px-3 py-1 cursor-help"
+                                title={`Delivered on: ${formatDateTime(pkg.date_added)}`}
+                              >
+                                Delivered
+                              </Badge>
+                            )}
+                          </TableCell>
+                          <TableCell className="w-[15%]"></TableCell>
+                          <TableCell className="text-gray-500 w-[10%]">
+                            {(() => {
+                              const now = new Date().getTime();
+                              const addedDate = new Date(
+                                !pkg.claimed
+                                  ? pkg.date_added
+                                  : pkg.date_claimed,
+                              ).getTime();
+                              const diffMs = now - addedDate;
 
-                                    const diffSeconds = Math.floor(
-                                      diffMs / 1000,
-                                    );
-                                    const diffMinutes = Math.floor(
-                                      diffSeconds / 60,
-                                    );
-                                    const diffHours = Math.floor(
-                                      diffMinutes / 60,
-                                    );
-                                    const diffDays = Math.floor(diffHours / 24);
-                                    const baseAction = pkg.claimed
-                                      ? "Claimed"
-                                      : "Added";
-                                    if (diffSeconds < 60) {
-                                      return `${baseAction} just now`;
-                                    } else if (diffMinutes < 60) {
-                                      return `${baseAction} ${diffMinutes} ${diffMinutes === 1 ? "minute" : "minutes"} ago`;
-                                    } else if (diffHours < 24) {
-                                      return `${baseAction} ${diffHours} ${diffHours === 1 ? "hour" : "hours"} ago`;
-                                    } else {
-                                      return `${baseAction} ${diffDays} ${diffDays === 1 ? "day" : "days"} ago`;
-                                    }
-                                  })()}
-                                </TableCell>
-                              </TableRow>
-                            </>
-                          );
-                        })}
-                      </>
-                    )}
+                              const diffSeconds = Math.floor(diffMs / 1000);
+                              const diffMinutes = Math.floor(diffSeconds / 60);
+                              const diffHours = Math.floor(diffMinutes / 60);
+                              const diffDays = Math.floor(diffHours / 24);
+                              const baseAction = pkg.claimed
+                                ? "Claimed"
+                                : "Added";
+                              if (diffSeconds < 60) {
+                                return `${baseAction} just now`;
+                              } else if (diffMinutes < 60) {
+                                return `${baseAction} ${diffMinutes} ${diffMinutes === 1 ? "minute" : "minutes"} ago`;
+                              } else if (diffHours < 24) {
+                                return `${baseAction} ${diffHours} ${diffHours === 1 ? "hour" : "hours"} ago`;
+                              } else {
+                                return `${baseAction} ${diffDays} ${diffDays === 1 ? "day" : "days"} ago`;
+                              }
+                            })()}
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </>
+                  )}
                 </React.Fragment>
               );
             })
