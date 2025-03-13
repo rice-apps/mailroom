@@ -286,7 +286,7 @@ export default function Component() {
     const matchesSearch =
       student.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       student.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      hasMatchingPackage; 
+      hasMatchingPackage;
 
     const matchesMinPackages = getPackageCount(filter, student) >= minPackages;
     const matchesDateRange =
