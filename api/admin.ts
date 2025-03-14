@@ -118,7 +118,7 @@ export async function insertUsersGivenCollege(
   const supabase = createClient();
 
   try {
-    const { data, error } = await supabase.from("users").insert(
+    const { data, error } = await supabase.from("users").upsert(
       students.map((student) => ({
         college,
         user_type: "student",
@@ -128,6 +128,10 @@ export async function insertUsersGivenCollege(
         can_claim_packages: true,
         can_administrate_users: false,
       })),
+      {
+        onConflict: 'email',
+        ignoreDuplicates: true
+      }
     );
 
     if (error) {
