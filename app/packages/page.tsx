@@ -141,11 +141,9 @@ export default function StudentDashboard() {
     const email = user.email;
 
     // Update the notifications setting in the Supabase table
-    const { error } = await supabase
-      .from("users")
-      .update({ is_subscribed_email: enableNotifications })
-      .eq("email", email)
-      .select();
+    const { error } = await supabase.functions.invoke("update-notifs", {
+      body: { enabled: enableNotifications },
+    });
 
     if (error) {
       console.error("Error updating notifications setting:", error);

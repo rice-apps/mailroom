@@ -37,21 +37,25 @@ export default function UserDetails() {
       additional_email: additionalEmail,
     };
 
-    supabase.functions
-      .invoke("update-email", {
-        body: {
-          email: updatedUser.additional_email,
-        },
-      })
-      .then(({ error }) => {
-        if (error) {
-          console.error("Error updating user:", error);
-          toast({ title: `Failed to save.` });
-        } else {
-          console.log("User updated successfully");
-          toast({ title: `Changes saved!` });
-        }
-      });
+    Promise.all([
+      supabase.functions.invoke("update-notifs", {
+        body: { enabled: emailNotifications },
+      }),
+      supabase.functions.invoke("update-email", {
+        body: { email: updatedUser.additional_email },
+      }),
+    ]).then(([notifsResult, emailResult]) => {
+      if (notifsResult.error || emailResult.error) {
+        console.error(
+          "Error updating user:",
+          notifsResult.error || emailResult.error,
+        );
+        toast({ title: `Failed to save.` });
+      } else {
+        console.log("User updated successfully");
+        toast({ title: `Changes saved!` });
+      }
+    });
   };
 
   const handleDeleteAccount = () => {
@@ -82,7 +86,7 @@ export default function UserDetails() {
         }
         if (data && data.length > 0) {
           const userData = data[0];
-          setEmailNotifications(userData.is_subscribed_email || true);
+          setEmailNotifications(userData.is_subscribed_email ?? true);
           setAdditionalEmail(userData.additional_email ?? "");
 
           setUser({
