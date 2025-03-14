@@ -118,7 +118,7 @@ export async function insertUsersGivenCollege(
   const supabase = createClient();
 
   try {
-    const { data, error } = await supabase.from("users").insert(
+    const { data, error } = await supabase.from("users").upsert(
       students.map((student) => ({
         college,
         user_type: "student",
@@ -128,6 +128,10 @@ export async function insertUsersGivenCollege(
         can_claim_packages: true,
         can_administrate_users: false,
       })),
+      {
+        onConflict: 'email',
+        ignoreDuplicates: true
+      }
     );
 
     if (error) {
@@ -139,5 +143,24 @@ export async function insertUsersGivenCollege(
   } catch (error) {
     console.error("Unexpected error:", error);
     return null;
+  }
+}
+
+export async function deleteInactiveUsers(emails: Array<string>) {
+  console.log("HEY GUYS",emails)
+  const supabase = createClient();
+  try {
+    const {data,error} = await supabase
+    .from("users")
+    .delete()
+    .filter("email","not.in",`(${emails.map((email) => `'${email}'`).join(",")})`)
+    .neq("can_add_and_delete_packages",true)
+    console.log(data,"HAHHAHAHAHAH")
+    console.log(error,"what?")
+  } catch (e: unknown) {
+    if (e instanceof Error) {
+      console.error("unexpected error",e.message)
+      
+    }
   }
 }
