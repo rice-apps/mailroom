@@ -37,13 +37,12 @@ export default function UserDetails() {
       additional_email: additionalEmail,
     };
 
-    supabase
-      .from("users")
-      .update({
-        is_subscribed_email: updatedUser.is_subscribed_email,
-        additional_email: updatedUser.additional_email,
+    supabase.functions
+      .invoke("update-email", {
+        body: {
+          email: updatedUser.additional_email,
+        },
       })
-      .eq("email", updatedUser.email)
       .then(({ error }) => {
         if (error) {
           console.error("Error updating user:", error);
