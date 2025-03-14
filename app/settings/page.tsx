@@ -83,6 +83,7 @@ export default function UserDetails() {
         if (data && data.length > 0) {
           const userData = data[0];
           setEmailNotifications(userData.is_subscribed_email || true);
+          setAdditionalEmail(userData.additional_email ?? "")
 
           setUser({
             netId: userData.net_id,
