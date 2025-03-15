@@ -1,14 +1,13 @@
 "use client";
 
 import { ArrowLeft, Settings } from "lucide-react";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { useEffect, useRef, useState } from "react";
 
 export default function NavigationBar() {
   const router = useRouter();
   const pathname = usePathname();
-  const searchParams = useSearchParams();
   const navRef = useRef<HTMLDivElement>(null);
   const [shouldRender, setShouldRender] = useState(true);
 
@@ -31,11 +30,6 @@ export default function NavigationBar() {
 
   // Check for overlaps with other elements
   useEffect(() => {
-    // Check if we should hide the navigation bar
-    if (hiddenPaths.some((path) => pathname.startsWith(path))) {
-      return false;
-    }
-
     const checkForOverlaps = () => {
       // Get elements that might overlap with our nav
       const elementsNearTop = Array.from(
@@ -46,7 +40,12 @@ export default function NavigationBar() {
         return rect.top < 60;
       });
 
-      setShouldRender(elementsNearTop.length === 0);
+      // Check if we should hide the navigation bar
+      if (hiddenPaths.some((path) => pathname.startsWith(path))) {
+        setShouldRender(false);
+      } else {
+        setShouldRender(elementsNearTop.length === 0);
+      }
     };
 
     // Run initial check
@@ -58,7 +57,7 @@ export default function NavigationBar() {
 
     // Clean up
     return () => observer.disconnect();
-  }, [pathname, searchParams, hiddenPaths]);
+  }, [pathname, hiddenPaths]);
 
   // Don't render if we detected overlapping elements
   if (!shouldRender) return null;
