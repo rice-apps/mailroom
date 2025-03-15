@@ -11,6 +11,7 @@ interface SliderProps {
   initialViewIndex?: number;
   className?: string;
   onViewChange?: (viewId: string) => void;
+  resetTimeout?: number;
 }
 
 const Slider: React.FC<SliderProps> = ({
@@ -18,9 +19,11 @@ const Slider: React.FC<SliderProps> = ({
   initialViewIndex = 0,
   className = "",
   onViewChange,
+  resetTimeout,
 }) => {
   const [currentViewIndex, setCurrentViewIndex] = useState(initialViewIndex);
   const [direction, setDirection] = useState(0);
+  var clearTimeout: () => void | null = null;
 
   useEffect(() => {
     setCurrentViewIndex(initialViewIndex);
@@ -28,6 +31,16 @@ const Slider: React.FC<SliderProps> = ({
 
   const handleViewChange = () => {
     const newIndex = currentViewIndex === 0 ? 1 : 0;
+    if (resetTimeout) {
+      if (newIndex != initialViewIndex) {
+        clearTimeout = setTimeout(() => {
+          setCurrentViewIndex(initialViewIndex);
+          onViewChange?.(views[initialViewIndex].id);
+        }, resetTimeout);
+      } else {
+        clearTimeout();
+      }
+    }
     setCurrentViewIndex(newIndex);
     onViewChange?.(views[newIndex].id);
   };

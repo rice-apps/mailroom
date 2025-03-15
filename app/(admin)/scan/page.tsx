@@ -298,6 +298,7 @@ export default function ScanCheckin() {
                 }));
               }}
               initialViewIndex={currentView == "checkin" ? 0 : 1}
+              resetTimeout={60_000} // 10 seconds
             />
           </div>
         </div>
