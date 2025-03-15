@@ -22,11 +22,6 @@ export default function NavigationBar() {
     "/auth/callback",
   ];
 
-  // Check if we should hide the navigation bar
-  if (hiddenPaths.some((path) => pathname.startsWith(path))) {
-    return null;
-  }
-
   // Determine if settings icon should be shown (hide on settings page)
   const showSettingsIcon = !pathname.includes("/settings");
   const showBackButton =
@@ -36,6 +31,11 @@ export default function NavigationBar() {
 
   // Check for overlaps with other elements
   useEffect(() => {
+    // Check if we should hide the navigation bar
+    if (hiddenPaths.some((path) => pathname.startsWith(path))) {
+      return false;
+    }
+
     const checkForOverlaps = () => {
       // Get elements that might overlap with our nav
       const elementsNearTop = Array.from(
@@ -58,7 +58,7 @@ export default function NavigationBar() {
 
     // Clean up
     return () => observer.disconnect();
-  }, [pathname, searchParams]);
+  }, [pathname, searchParams, hiddenPaths]);
 
   // Don't render if we detected overlapping elements
   if (!shouldRender) return null;

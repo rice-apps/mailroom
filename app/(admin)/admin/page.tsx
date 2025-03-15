@@ -327,7 +327,7 @@ export default function Component() {
           <div
             className="flex items-center gap-4 pt-4 cursor-pointer"
             onClick={() => {
-              router.push("/");
+              router.push("/home");
             }}
           >
             <Image

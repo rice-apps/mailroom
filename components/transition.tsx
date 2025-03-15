@@ -8,18 +8,18 @@ export default function Transition({
 }: {
   children: React.ReactNode;
 }) {
-  // Get current pathname to use as a key
   const pathname = usePathname();
 
   return (
-    <AnimatePresence mode="wait">
+    <AnimatePresence mode="wait" initial={false}>
       <motion.main
-        key={pathname} // Key is crucial for AnimatePresence to track
+        key={pathname}
         initial={{ opacity: 0, x: 20 }}
         animate={{ opacity: 1, x: 0 }}
+        exit={{ opacity: 0, x: -20 }}
         transition={{
           ease: "easeInOut",
-          duration: 0.3, // Slightly faster for better UX
+          duration: 0.3,
         }}
       >
         {children}
