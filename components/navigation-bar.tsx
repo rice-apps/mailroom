@@ -19,12 +19,12 @@ export default function NavigationBar() {
     "/register",
     "/auth",
     "/auth/callback",
+    "/kiosk"
   ];
 
   // Determine if settings icon should be shown (hide on settings page)
   const showSettingsIcon = !pathname.includes("/settings");
   const showBackButton =
-    !pathname.includes("/kiosk") &&
     !pathname.includes("/admin") &&
     !pathname.includes("/home");
 
