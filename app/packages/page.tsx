@@ -112,11 +112,13 @@ export default function StudentDashboard() {
     fetchNotificationSetting();
   }, [user]);
 
-  const handleClaim = async (id: string) => {
+  const handleClaim = async (package_identifier: string) => {
     try {
-      const success = await claimPackage(id);
+      const success = await claimPackage(package_identifier);
       if (success && packages) {
-        const newPackages = packages.filter((pack) => pack.id !== id);
+        const newPackages = packages.filter(
+          (pack) => pack.package_identifier !== package_identifier,
+        );
         setPackages(newPackages);
       }
     } catch (err) {
@@ -139,11 +141,9 @@ export default function StudentDashboard() {
     const email = user.email;
 
     // Update the notifications setting in the Supabase table
-    const { error } = await supabase
-      .from("users")
-      .update({ is_subscribed_email: enableNotifications })
-      .eq("email", email)
-      .select();
+    const { error } = await supabase.functions.invoke("update-notifs", {
+      body: { enabled: enableNotifications },
+    });
 
     if (error) {
       console.error("Error updating notifications setting:", error);
@@ -152,9 +152,60 @@ export default function StudentDashboard() {
 
   if (loading) {
     return (
-      <div className="flex flex-col gap-4 p-8">
-        <Skeleton className="h-12 w-[250px] rounded-full" />
-        <Skeleton className="h-[200px] w-full rounded-3xl" />
+      <div className="container mx-auto p-6 max-w-6xl">
+        {/* Skeleton for welcome card */}
+        <div className="mb-8 rounded-3xl shadow-md border-0 bg-white p-6">
+          <div className="pb-2">
+            <Skeleton className="h-8 w-64 mb-2" /> {/* Title */}
+            <Skeleton className="h-4 w-48 mb-5" /> {/* Description */}
+          </div>
+          <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+            <div className="flex items-center bg-gray-50 px-4 py-2 rounded-full w-full md:w-40">
+              <Skeleton className="h-5 w-5 mr-2 rounded-full" />{" "}
+              {/* Package icon */}
+              <Skeleton className="h-4 w-36" /> {/* Total packages text */}
+            </div>
+            <div className="flex items-center bg-gray-50 px-4 py-2 rounded-full w-full md:w-56">
+              <Skeleton className="h-5 w-5 mr-2 rounded-full" />{" "}
+              {/* User icon */}
+              <Skeleton className="h-4 w-48" /> {/* Email text */}
+            </div>
+          </div>
+        </div>
+
+        {/* Skeleton for notifications section */}
+        <div className="mb-8 bg-white p-6 rounded-3xl shadow-sm border border-gray-100">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+            <div className="flex items-center">
+              <Skeleton className="h-5 w-5 mr-3 rounded-full" />{" "}
+              {/* Bell icon */}
+              <Skeleton className="h-5 w-36" /> {/* Email Notifications text */}
+            </div>
+            <Skeleton className="h-10 w-[180px] rounded-full" />{" "}
+            {/* Select dropdown */}
+          </div>
+        </div>
+
+        {/* Skeleton for packages grid - show 3 package cards */}
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+          {[1, 2, 3].map((item) => (
+            <div
+              key={item}
+              className="rounded-3xl overflow-hidden border-0 shadow-md bg-white"
+            >
+              <div className="bg-gray-50 p-4 pb-3">
+                <Skeleton className="h-6 w-40 mb-2" />{" "}
+                {/* Package identifier */}
+                <Skeleton className="h-4 w-32" /> {/* Added on date */}
+              </div>
+              <div className="p-6">
+                <Skeleton className="h-4 w-full mb-2" /> {/* Info line 1 */}
+                <Skeleton className="h-4 w-3/4 mb-4" /> {/* Info line 2 */}
+                <Skeleton className="h-10 w-full rounded-full" /> {/* Button */}
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
     );
   }
@@ -230,7 +281,7 @@ export default function StudentDashboard() {
               <CardContent className="p-6">
                 <p className="mb-4 text-gray-600">{item.extra_information}</p>
                 <Button
-                  onClick={() => handleClaim(item.id)}
+                  onClick={() => handleClaim(item.package_identifier)}
                   className="w-full bg-[#00205B] text-white hover:bg-[#001845] rounded-full"
                 >
                   Claim Package

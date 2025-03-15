@@ -60,7 +60,7 @@ export default function ExportModalComponent({
             date_claimed,
             extra_information,
             claimed,
-            users (
+            users!inner (
                 id,
                 name,
                 email,
