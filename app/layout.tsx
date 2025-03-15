@@ -9,6 +9,9 @@ import Transition from "@/components/transition";
 export const metadata = {
   title: "Rice Mailroom",
   description: "Package management system for Rice University",
+  icons: {
+    icon: '/favicon.ico',
+  },
 };
 
 const figtree = Figtree({
