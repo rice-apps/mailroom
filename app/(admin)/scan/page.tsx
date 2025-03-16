@@ -47,13 +47,18 @@ export default function ScanCheckin() {
 
   useEffect(() => {
     const fetchRecipients = async () => {
-      const { data, error } = await supabase.from("users").select("id, name");
+      const { data, error } = await supabase
+        .from("users")
+        .select("id, name, preferred_name");
       if (error) {
         console.error("Error fetching recipients:", error.message);
       } else {
         const recipientMap = data.reduce(
-          (acc: Record<string, string>, user: { id: string; name: string }) => {
-            acc[user.name] = user.id;
+          (
+            acc: Record<string, string>,
+            user: { id: string; name: string; preferred_name: string },
+          ) => {
+            acc[user?.preferred_name ?? user?.name] = user.id;
             return acc;
           },
           {},

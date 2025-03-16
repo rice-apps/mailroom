@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Package, User, Bell } from "lucide-react";
+import { Package, User, Bell, Info, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -9,6 +9,7 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
+  CardFooter,
 } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { fetchUser, fetchPackagesbyUser, claimPackage } from "@/api/packages";
@@ -20,6 +21,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Input } from "@/components/ui/input";
+import { useToast } from "@/app/hooks/use-toast";
 
 interface User {
   id: string;
@@ -31,6 +34,7 @@ interface User {
   can_administrate_users: boolean;
   user_type: string;
   user_id: string;
+  preferred_name: string | null;
 }
 
 interface Package {
@@ -49,12 +53,18 @@ export default function StudentDashboard() {
   const [packages, setPackages] = useState<Package[] | null>(null);
   const [error, setError] = useState<string | null>(null);
   const supabase = createClient();
+  const { toast } = useToast();
 
   const [currentStudentEmail, setCurrentStudentEmail] = useState<string | null>(
     null,
   );
   const [notificationsEnabled, setNotificationsEnabled] =
     useState<boolean>(false);
+
+  // Add these states for the preferred name onboarding
+  const [showOnboarding, setShowOnboarding] = useState(false);
+  const [preferredName, setPreferredName] = useState("");
+  const [saving, setSaving] = useState(false);
 
   // Get the current user email from Supabase
   useEffect(() => {
@@ -77,6 +87,12 @@ export default function StudentDashboard() {
         try {
           const userData = await fetchUser(currentStudentEmail);
           setUser(userData);
+
+          // Check if we need to show the onboarding dialog
+          if (userData && userData.preferred_name === null) {
+            setPreferredName(userData.name || ""); // Default to their full name
+            setShowOnboarding(true);
+          }
 
           const fetchedPackages = await fetchPackagesbyUser(userData.id);
           setPackages(fetchedPackages);
@@ -141,12 +157,48 @@ export default function StudentDashboard() {
     const email = user.email;
 
     // Update the notifications setting in the Supabase table
-    const { error } = await supabase.functions.invoke("update-notifs", {
-      body: { enabled: enableNotifications },
+    const { error } = await supabase.functions.invoke("update-user", {
+      body: { is_subscribed_email: enableNotifications },
     });
 
     if (error) {
       console.error("Error updating notifications setting:", error);
+    }
+  };
+
+  const handleSavePreferredName = async () => {
+    if (!user) return;
+
+    setSaving(true);
+    try {
+      const { error } = await supabase
+        .from("users")
+        .update({
+          preferred_name: preferredName,
+        })
+        .eq("id", user.id);
+
+      if (error) throw error;
+
+      setUser({
+        ...user,
+        preferred_name: preferredName,
+      });
+
+      setShowOnboarding(false);
+
+      toast({
+        title: "Preferred name saved",
+        description: "Your preferred name has been set successfully.",
+      });
+    } catch (err) {
+      console.error("Failed to save preferred name:", err);
+      toast({
+        title: "Failed to save name",
+        description: "Please try again or check settings later.",
+      });
+    } finally {
+      setSaving(false);
     }
   };
 
@@ -216,10 +268,93 @@ export default function StudentDashboard() {
 
   return (
     <div className="container mx-auto p-6 max-w-6xl">
+      {/* Preferred Name Onboarding Dialog */}
+      {showOnboarding && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <Card className="w-full max-w-lg rounded-3xl border-[2px] border-[#BEBFBF] shadow-md overflow-hidden">
+            <CardHeader className="bg-white pb-3">
+              <CardTitle className="text-2xl font-semibold text-[#00205B]">
+                Set Your Preferred Name
+              </CardTitle>
+              <CardDescription className="text-muted-foreground">
+                Please provide the name you'd like to use for package pickups
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="p-8 bg-white">
+              <div className="flex flex-col items-center justify-center">
+                <div className="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center mb-6">
+                  <User className="h-10 w-10 text-[#00205B]" />
+                </div>
+
+                <div className="w-full mb-8">
+                  <h3 className="text-lg font-medium text-gray-800 mb-2 text-center">
+                    Make sure your name matches your packages
+                  </h3>
+
+                  <p className="text-gray-600 mb-6 text-center">
+                    This name should match what's on your packages. This helps
+                    identify you quickly when checking in packages.
+                  </p>
+
+                  <div className="bg-gray-50 p-4 rounded-xl w-full mb-6">
+                    <div className="flex items-start gap-3">
+                      <Info size="18" className="text-blue-500 mt-0.5" />
+                      <div className="text-sm text-gray-700">
+                        <p className="font-medium mb-1">Important:</p>
+                        <ul className="list-disc pl-4 space-y-1">
+                          <li>
+                            Your preferred name should match your package labels
+                          </li>
+                          <li>If unsure, use your name on your student ID</li>
+                          <li>You can change this later in settings</li>
+                        </ul>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="mb-4">
+                    <label
+                      htmlFor="preferredName"
+                      className="block text-sm font-medium text-gray-700 mb-1"
+                    >
+                      Preferred Name
+                    </label>
+                    <Input
+                      id="preferredName"
+                      value={preferredName}
+                      onChange={(e) => setPreferredName(e.target.value)}
+                      placeholder="Enter your preferred name"
+                      className="rounded-full"
+                    />
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+            <CardFooter className="bg-white border-t p-4 flex justify-end gap-3">
+              <Button
+                variant="outline"
+                onClick={() => setShowOnboarding(false)}
+                className="rounded-full border-[#00205B] text-[#00205B]"
+              >
+                Later
+              </Button>
+              <Button
+                onClick={handleSavePreferredName}
+                disabled={!preferredName || saving}
+                className="rounded-full bg-[#00205B] text-white hover:bg-[#001845]"
+              >
+                {saving ? "Saving..." : "Save Name"}
+                {!saving && <Check className="ml-2 h-4 w-4" />}
+              </Button>
+            </CardFooter>
+          </Card>
+        </div>
+      )}
+
       <Card className="mb-8 rounded-3xl shadow-md border-0">
         <CardHeader className="pb-2">
           <CardTitle className="text-2xl font-semibold">
-            Welcome, {user?.name}
+            Welcome, {user?.preferred_name ?? user?.name}
           </CardTitle>
           <CardDescription className="text-gray-600">
             Here's an overview of your packages

@@ -13,6 +13,7 @@ import {
   ChevronDown,
   Calendar,
   X,
+  AlertTriangle,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -90,6 +91,7 @@ const collegeContacts = [
 
 interface CollegeContact {
   name: string;
+  preferred_name?: string;
   email: string;
   collegeName: string;
 }
@@ -107,6 +109,7 @@ interface Package {
 interface Student {
   id: number;
   name: string;
+  preferred_name: string | null;
   netid: string;
   email: string;
   packages: Package[];
@@ -160,6 +163,7 @@ export default function Component() {
         collegeName: response.college,
         name: response.name,
         email: response.email,
+        preferred_name: response.preferred_name,
       });
     } catch (error) {
       console.error("Coordinator fetching failed:", error);
@@ -285,6 +289,9 @@ export default function Component() {
 
     const matchesSearch =
       student.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      student.preferred_name
+        ?.toLowerCase()
+        .includes(searchTerm.toLowerCase()) ||
       student.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
       hasMatchingPackage;
 
@@ -306,6 +313,8 @@ export default function Component() {
       matchesFilter && matchesSearch && matchesMinPackages && matchesDateRange
     );
   });
+
+  const nameConflicts = detectNameConflicts(students);
 
   return (
     <>
@@ -416,7 +425,8 @@ export default function Component() {
           <header className="flex items-center justify-between bg-white px-6 pt-6">
             <div className="flex items-center gap-4">
               <h1 className="text-2xl font-semibold">
-                Hi {coord?.name}! Track all packages here
+                Hi {coord?.preferred_name ?? coord?.name}! Track all packages
+                here
               </h1>
             </div>
             <div className="flex items-center gap-4 bg-white">
@@ -527,6 +537,8 @@ export default function Component() {
                 </div>
               </div>
             </div>
+
+            <NameConflictWarning conflicts={nameConflicts} />
 
             <div className="flex flex-wrap gap-2 mb-4">
               {searchTerm && (
@@ -739,12 +751,22 @@ function PackageTable({
                       )}
                     </TableCell>
                     <TableCell className="font-medium w-[25%]">
-                      {student.name}
-                      {student.isAdmin && (
-                        <Badge className="ml-2 bg-blue-100 text-blue-800 border border-blue-200 hover:bg-blue-200">
-                          Admin
-                        </Badge>
-                      )}
+                      <div className="flex items-center">
+                        <div className="flex flex-col">
+                          <span>{student.name}</span>
+                          {student.preferred_name &&
+                            student.preferred_name !== student.name && (
+                              <span className="text-xs text-gray-500">
+                                {student.preferred_name}
+                              </span>
+                            )}
+                        </div>
+                        {student.isAdmin && (
+                          <Badge className="ml-2 bg-blue-100 text-blue-800 border border-blue-200 hover:bg-blue-200">
+                            Admin
+                          </Badge>
+                        )}
+                      </div>
                     </TableCell>
                     <TableCell className="w-[25%]">{student.email}</TableCell>
                     <TableCell className="w-[20%]">
@@ -971,5 +993,67 @@ function PackagesDropdown({
         </div>
       </PopoverContent>
     </Popover>
+  );
+}
+
+const detectNameConflicts = (students: Student[] | null) => {
+  if (!students || students.length === 0) return [];
+
+  const packageNameMap = new Map<string, Student[]>();
+
+  students.forEach((student) => {
+    const displayName = student.preferred_name || student.name;
+    const normalizedName = displayName.trim().toLowerCase();
+
+    if (!packageNameMap.has(normalizedName)) {
+      packageNameMap.set(normalizedName, [student]);
+    } else {
+      packageNameMap.get(normalizedName)!.push(student);
+    }
+  });
+
+  const conflicts = [];
+
+  for (const [normalizedName, studentsWithName] of packageNameMap.entries()) {
+    if (studentsWithName.length > 1) {
+      conflicts.push({
+        name: studentsWithName[0].preferred_name || studentsWithName[0].name,
+        students: studentsWithName,
+      });
+    }
+  }
+
+  return conflicts;
+};
+
+function NameConflictWarning({ conflicts }: { conflicts: any[] }) {
+  if (conflicts.length === 0) return null;
+
+  return (
+    <div className="mb-4 p-4 bg-amber-50 border border-amber-200 rounded-lg">
+      <div className="flex items-start">
+        <AlertTriangle className="h-5 w-5 text-amber-500 mt-0.5 mr-2" />
+        <div>
+          <h3 className="font-medium text-amber-800">Name Conflict Warning</h3>
+          <p className="text-amber-700 text-sm mb-2">
+            Multiple students share the same name for package identification.
+            This could cause confusion when scanning packages.
+          </p>
+          <ul className="list-disc pl-5 space-y-1 text-sm text-amber-700">
+            {conflicts.map((conflict, index) => (
+              <li key={index}>
+                "{conflict.name}" is used by {conflict.students.length}{" "}
+                students:{" "}
+                <span className="italic">
+                  {conflict.students
+                    .map((s: { email: string }) => s.email.split("@")[0])
+                    .join(", ")}
+                </span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </div>
+    </div>
   );
 }

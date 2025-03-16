@@ -19,7 +19,7 @@ export default function PackageOptions() {
     console.log("Checking authorization...");
     try {
       const response = await checkAuth();
-      setName(response.name);
+      setName(response?.preferred_name ?? response?.name);
     } catch (error) {
       console.error("Authorization check failed:", error);
     }
