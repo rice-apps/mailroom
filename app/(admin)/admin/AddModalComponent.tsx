@@ -11,7 +11,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { PlusCircle, X } from "lucide-react";
+import { Info, PlusCircle, X } from "lucide-react";
 import Papa from "papaparse";
 import { insertUsersGivenCollege } from "@/api/admin";
 import { parse } from "path";
@@ -100,9 +100,24 @@ export default function AddModalComponent({
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
       <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-2xl">
-        <h2 className="text-xl font-semibold mb-4">
-          Add Students to {college}
-        </h2>
+        <div className="mb-6">
+          <h2 className="text-xl font-semibold mb-2">
+            Update Student List for {college}
+          </h2>
+            <div className="bg-blue-50 border border-blue-200 rounded-md p-4 mb-4">
+            <div className="flex items-start">
+              <Info size="18" className="text-blue-500 mt-0.5" />
+              <div className="ml-3">
+              <h3 className="text-sm font-semibold text-blue-800 mb-2">Important Information</h3>
+              <ul className="list-disc pl-4 text-sm text-blue-900 space-y-1">
+                <li>Upload a CSV file with columns: "Full Name" and "netID"</li>
+                <li>This will replace the entire student list for {college}</li>
+                <li>Any students not included in this upload will be removed</li>
+              </ul>
+              </div>
+            </div>
+            </div>
+        </div>
         <div className="mb-4 flex space-x-2 items-center">
           <Button
             onClick={handleReplaceCSV}

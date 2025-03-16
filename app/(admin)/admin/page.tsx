@@ -396,7 +396,7 @@ export default function Component() {
               onClick={() => setShowAddModal(true)}
             >
               <Plus className="w-5 h-5 mr-2" />
-              Add Students
+              Update Students
             </Button>
 
             <Button
