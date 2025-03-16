@@ -23,7 +23,7 @@ const Slider: React.FC<SliderProps> = ({
 }) => {
   const [currentViewIndex, setCurrentViewIndex] = useState(initialViewIndex);
   const [direction, setDirection] = useState(0);
-  var clearTimeout: () => void | null = null;
+  let timeoutId: ReturnType<typeof setTimeout> | null = null;
 
   useEffect(() => {
     setCurrentViewIndex(initialViewIndex);
@@ -33,12 +33,13 @@ const Slider: React.FC<SliderProps> = ({
     const newIndex = currentViewIndex === 0 ? 1 : 0;
     if (resetTimeout) {
       if (newIndex != initialViewIndex) {
-        clearTimeout = setTimeout(() => {
+        if (timeoutId) clearTimeout(timeoutId);
+        timeoutId = setTimeout(() => {
           setCurrentViewIndex(initialViewIndex);
           onViewChange?.(views[initialViewIndex].id);
         }, resetTimeout);
       } else {
-        clearTimeout();
+        if (timeoutId) clearTimeout(timeoutId);
       }
     }
     setCurrentViewIndex(newIndex);
