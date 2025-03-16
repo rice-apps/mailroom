@@ -18,44 +18,36 @@ interface Student {
   college: string;
   is_subscribed_email: boolean;
   additional_email: string | null;
+  preferred_name: string | null;
 }
 
 export default function UserDetails() {
   const [additionalEmail, setAdditionalEmail] = useState<string | null>(null);
   const [emailNotifications, setEmailNotifications] = useState(true);
+  const [preferredName, setPreferredName] = useState<string | null>(null);
   const [user, setUser] = useState<Student | null>(null);
   const router = useRouter();
   const supabase = createClient();
   const { toast } = useToast();
 
   const handleSaveChanges = () => {
-    console.log("Changes saved");
-
-    const updatedUser = {
-      ...user,
-      is_subscribed_email: emailNotifications,
-      additional_email: additionalEmail,
-    };
-
-    Promise.all([
-      supabase.functions.invoke("update-notifs", {
-        body: { enabled: emailNotifications },
-      }),
-      supabase.functions.invoke("update-email", {
-        body: { email: updatedUser.additional_email },
-      }),
-    ]).then(([notifsResult, emailResult]) => {
-      if (notifsResult.error || emailResult.error) {
-        console.error(
-          "Error updating user:",
-          notifsResult.error || emailResult.error,
-        );
-        toast({ title: `Failed to save.` });
-      } else {
-        console.log("User updated successfully");
-        toast({ title: `Changes saved!` });
-      }
-    });
+    supabase.functions
+      .invoke("update-user", {
+        body: {
+          is_subscribed_email: emailNotifications,
+          preferred_name: preferredName,
+          additional_email: additionalEmail,
+        },
+      })
+      .then(({ error }) => {
+        if (error) {
+          console.error("Error updating user:", error);
+          toast({ title: `Failed to save.` });
+        } else {
+          console.log("User updated successfully");
+          toast({ title: `Changes saved!` });
+        }
+      });
   };
 
   const handleDeleteAccount = () => {
@@ -88,6 +80,7 @@ export default function UserDetails() {
           const userData = data[0];
           setEmailNotifications(userData.is_subscribed_email ?? true);
           setAdditionalEmail(userData.additional_email ?? "");
+          setPreferredName(userData.preferred_name ?? "");
 
           setUser({
             netId: userData.net_id,
@@ -96,6 +89,7 @@ export default function UserDetails() {
             college: userData.college,
             is_subscribed_email: userData.is_subscribed_email || true,
             additional_email: userData.additional_email,
+            preferred_name: userData.preferred_name,
           });
         }
       }
@@ -135,6 +129,26 @@ export default function UserDetails() {
               <span className="mb-3 md:mb-1 font-medium text-sm text-black">
                 {user?.college}
               </span>
+            </div>
+
+            <div className="flex flex-col md:grid md:grid-cols-2 w-full">
+              <div className="mb-1">
+                <span className="font-medium text-sm text-gray-500">
+                  Preferred Name
+                </span>
+                <p className="text-xs text-gray-400 mt-1">
+                  Use the same name as your packages
+                </p>
+              </div>
+              <Input
+                type="text"
+                placeholder="Mark Scout"
+                className="placeholder:text-gray-350 border-gray-300 rounded-full h-10 w-full"
+                value={preferredName ?? ""}
+                onChange={(e) => {
+                  setPreferredName(e.target.value);
+                }}
+              />
             </div>
 
             <div className="flex flex-col md:grid md:grid-cols-2 w-full">

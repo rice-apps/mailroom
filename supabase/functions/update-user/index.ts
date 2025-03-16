@@ -34,9 +34,18 @@ Deno.serve(async (req) => {
   const { data } = await supabase.auth.getUser(token);
   const user = data.user;
   const { id } = user;
+  const { is_subscribed_email, preferred_name, additional_email } =
+    await req.json();
+  const updateData = {};
+
+  if (is_subscribed_email !== undefined)
+    updateData["is_subscribed_email"] = is_subscribed_email;
+  if (preferred_name) updateData["preferred_name"] = preferred_name;
+  if (additional_email) updateData["additional_email"] = additional_email;
+
   const { error } = await supabase
     .from("users")
-    .update({ additional_email: (await req.json()).email })
+    .update(updateData)
     .eq("id", id);
   if (error) {
     return new Response(JSON.stringify(error), {
