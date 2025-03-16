@@ -7,7 +7,7 @@ import { redirect } from "next/navigation";
 
 export const signInAction = async (formData: FormData) => {
   const supabase = createClient();
-  const headersList = headers();
+  const headersList = await headers();
   const host = headersList.get("host") || "";
   if (
     !(JSON.parse(process.env.NEXT_PUBLIC_ALLOWED_HOSTS || "[]") ?? []).includes(
