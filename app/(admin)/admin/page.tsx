@@ -1040,10 +1040,10 @@ function NameConflictWarning({ conflicts }: { conflicts: any[] }) {
             {conflicts.map((conflict, index) => (
               <li key={index}>
                 "{conflict.name}" is used by {conflict.students.length}{" "}
-                students: {" "}
+                students:{" "}
                 <span className="italic">
                   {conflict.students
-                    .map((s: {email: string}) => s.email.split("@")[0])
+                    .map((s: { email: string }) => s.email.split("@")[0])
                     .join(", ")}
                 </span>
               </li>

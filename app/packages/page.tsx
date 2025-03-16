@@ -157,8 +157,8 @@ export default function StudentDashboard() {
     const email = user.email;
 
     // Update the notifications setting in the Supabase table
-    const { error } = await supabase.functions.invoke("update-notifs", {
-      body: { enabled: enableNotifications },
+    const { error } = await supabase.functions.invoke("update-user", {
+      body: { is_subscribed_email: enableNotifications },
     });
 
     if (error) {
@@ -195,7 +195,7 @@ export default function StudentDashboard() {
       console.error("Failed to save preferred name:", err);
       toast({
         title: "Failed to save name",
-        description: "Please try again or check settings later."
+        description: "Please try again or check settings later.",
       });
     } finally {
       setSaving(false);
@@ -292,7 +292,8 @@ export default function StudentDashboard() {
                   </h3>
 
                   <p className="text-gray-600 mb-6 text-center">
-                    This name should match what's on your packages. This helps identify you quickly when checking in packages.
+                    This name should match what's on your packages. This helps
+                    identify you quickly when checking in packages.
                   </p>
 
                   <div className="bg-gray-50 p-4 rounded-xl w-full mb-6">

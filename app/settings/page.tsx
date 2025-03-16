@@ -31,45 +31,23 @@ export default function UserDetails() {
   const { toast } = useToast();
 
   const handleSaveChanges = () => {
-    console.log("Changes saved");
-
-    const updatedUser = {
-      ...user,
-      is_subscribed_email: emailNotifications,
-      additional_email: additionalEmail,
-      preferred_name: preferredName,
-    };
-
-    supabase.from("users")
-      .update({ preferred_name: preferredName })
-      .eq("email", user?.email)
+    supabase.functions
+      .invoke("update-user", {
+        body: {
+          is_subscribed_email: emailNotifications,
+          preferred_name: preferredName,
+          additional_email: additionalEmail,
+        },
+      })
       .then(({ error }) => {
-      if (error) {
-        console.error("Error updating preferred name:", error);
-      } else {
-        console.log("Preferred name updated successfully");
-      }
+        if (error) {
+          console.error("Error updating user:", error);
+          toast({ title: `Failed to save.` });
+        } else {
+          console.log("User updated successfully");
+          toast({ title: `Changes saved!` });
+        }
       });
-
-    Promise.all([
-      supabase.functions.invoke("update-notifs", {
-        body: { enabled: emailNotifications },
-      }),
-      supabase.functions.invoke("update-email", {
-        body: { email: updatedUser.additional_email },
-      }),
-    ]).then(([notifsResult, emailResult]) => {
-      if (notifsResult.error || emailResult.error) {
-        console.error(
-          "Error updating user:",
-          notifsResult.error || emailResult.error,
-        );
-        toast({ title: `Failed to save.` });
-      } else {
-        console.log("User updated successfully");
-        toast({ title: `Changes saved!` });
-      }
-    });
   };
 
   const handleDeleteAccount = () => {
@@ -155,21 +133,21 @@ export default function UserDetails() {
 
             <div className="flex flex-col md:grid md:grid-cols-2 w-full">
               <div className="mb-1">
-              <span className="font-medium text-sm text-gray-500">
-                Preferred Name
-              </span>
-              <p className="text-xs text-gray-400 mt-1">
-                Use the same name as your packages
-              </p>
+                <span className="font-medium text-sm text-gray-500">
+                  Preferred Name
+                </span>
+                <p className="text-xs text-gray-400 mt-1">
+                  Use the same name as your packages
+                </p>
               </div>
               <Input
-              type="text"
-              placeholder="Mark Scout"
-              className="placeholder:text-gray-350 border-gray-300 rounded-full h-10 w-full"
-              value={preferredName ?? ""}
-              onChange={(e) => {
-                setPreferredName(e.target.value);
-              }}
+                type="text"
+                placeholder="Mark Scout"
+                className="placeholder:text-gray-350 border-gray-300 rounded-full h-10 w-full"
+                value={preferredName ?? ""}
+                onChange={(e) => {
+                  setPreferredName(e.target.value);
+                }}
               />
             </div>
 

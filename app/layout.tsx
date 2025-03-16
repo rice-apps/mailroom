@@ -10,7 +10,7 @@ export const metadata = {
   title: "Rice Mailroom",
   description: "Package management system for Rice University",
   icons: {
-    icon: '/favicon.ico',
+    icon: "/favicon.ico",
   },
 };
 
