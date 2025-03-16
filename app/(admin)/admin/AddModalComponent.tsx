@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/table";
 import { PlusCircle, X } from "lucide-react";
 import Papa from "papaparse";
-import { insertUsersGivenCollege,deleteInactiveUsers } from "@/api/admin";
+import { insertUsersGivenCollege } from "@/api/admin";
 import { parse } from "path";
 
 type StudentData = {
@@ -55,9 +55,8 @@ export default function AddModalComponent({
             } else {
               const parsedData = results.data as StudentData[];
               if (parsedData.length > 0) {
-                console.log("HEEEEEEEEEHEEE")
+                console.log("HEEEEEEEEEHEEE");
                 setStudents(parsedData);
-                removeOldUsers(parsedData);
               } else {
                 setError('CSV file must have "Full Name" and "netID" columns');
               }
@@ -81,16 +80,6 @@ export default function AddModalComponent({
       setError("Please fill in both Full Name and netID");
     }
   };
-  const removeOldUsers = async (data: StudentData[]) => {
-    let emails: Array<string> = new Array<string>();
-    data.forEach(element => {
-      emails.push(element.netID+ "@rice.edu");
-    });
-    await deleteInactiveUsers(emails)
-    console.log(data,"HERE IS DATA")
-
-    
-  }
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;

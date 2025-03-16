@@ -129,9 +129,9 @@ export async function insertUsersGivenCollege(
         can_administrate_users: false,
       })),
       {
-        onConflict: 'email',
-        ignoreDuplicates: true
-      }
+        onConflict: "email",
+        ignoreDuplicates: true,
+      },
     );
 
     if (error) {
@@ -139,28 +139,33 @@ export async function insertUsersGivenCollege(
       return null;
     }
 
+    const deletedUsers = await supabase
+      .from("users")
+      .delete()
+      .eq("college", college)
+      .filter(
+        "email",
+        "not.in",
+        `(${students.map((s) => `${s.netID}@rice.edu`).join(",")})`,
+      )
+      .neq("can_add_and_delete_packages", true)
+      .select("id");
+
+    if (deletedUsers.error) {
+      console.error("Error inserting user:", deletedUsers.error);
+      return null;
+    }
+
+    const deletedIds = deletedUsers.data.map((u) => u.id);
+    if (deletedIds.length > 0) {
+      await supabase.functions.invoke("delete-auth", {
+        body: { ids: deletedIds },
+      });
+    }
+
     return data;
   } catch (error) {
     console.error("Unexpected error:", error);
     return null;
-  }
-}
-
-export async function deleteInactiveUsers(emails: Array<string>) {
-  console.log("HEY GUYS",emails)
-  const supabase = createClient();
-  try {
-    const {data,error} = await supabase
-    .from("users")
-    .delete()
-    .filter("email","not.in",`(${emails.map((email) => `'${email}'`).join(",")})`)
-    .neq("can_add_and_delete_packages",true)
-    console.log(data,"HAHHAHAHAHAH")
-    console.log(error,"what?")
-  } catch (e: unknown) {
-    if (e instanceof Error) {
-      console.error("unexpected error",e.message)
-      
-    }
   }
 }
