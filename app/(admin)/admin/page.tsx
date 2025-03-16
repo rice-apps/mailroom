@@ -13,6 +13,7 @@ import {
   ChevronDown,
   Calendar,
   X,
+  AlertTriangle,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -310,6 +311,8 @@ export default function Component() {
     );
   });
 
+  const nameConflicts = detectNameConflicts(students);
+
   return (
     <>
       {showAddModal && coord && (
@@ -531,6 +534,8 @@ export default function Component() {
                 </div>
               </div>
             </div>
+
+            <NameConflictWarning conflicts={nameConflicts} />
 
             <div className="flex flex-wrap gap-2 mb-4">
               {searchTerm && (
@@ -985,5 +990,67 @@ function PackagesDropdown({
         </div>
       </PopoverContent>
     </Popover>
+  );
+}
+
+const detectNameConflicts = (students: Student[] | null) => {
+  if (!students || students.length === 0) return [];
+
+  const packageNameMap = new Map<string, Student[]>();
+
+  students.forEach((student) => {
+    const displayName = student.preferred_name || student.name;
+    const normalizedName = displayName.trim().toLowerCase();
+
+    if (!packageNameMap.has(normalizedName)) {
+      packageNameMap.set(normalizedName, [student]);
+    } else {
+      packageNameMap.get(normalizedName)!.push(student);
+    }
+  });
+
+  const conflicts = [];
+
+  for (const [normalizedName, studentsWithName] of packageNameMap.entries()) {
+    if (studentsWithName.length > 1) {
+      conflicts.push({
+        name: studentsWithName[0].preferred_name || studentsWithName[0].name,
+        students: studentsWithName,
+      });
+    }
+  }
+
+  return conflicts;
+};
+
+function NameConflictWarning({ conflicts }: { conflicts: any[] }) {
+  if (conflicts.length === 0) return null;
+
+  return (
+    <div className="mb-4 p-4 bg-amber-50 border border-amber-200 rounded-lg">
+      <div className="flex items-start">
+        <AlertTriangle className="h-5 w-5 text-amber-500 mt-0.5 mr-2" />
+        <div>
+          <h3 className="font-medium text-amber-800">Name Conflict Warning</h3>
+          <p className="text-amber-700 text-sm mb-2">
+            Multiple students share the same name for package identification.
+            This could cause confusion when scanning packages.
+          </p>
+          <ul className="list-disc pl-5 space-y-1 text-sm text-amber-700">
+            {conflicts.map((conflict, index) => (
+              <li key={index}>
+                "{conflict.name}" is used by {conflict.students.length}{" "}
+                students: {" "}
+                <span className="italic">
+                  {conflict.students
+                    .map((s: {email: string}) => s.email.split("@")[0])
+                    .join(", ")}
+                </span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </div>
+    </div>
   );
 }
