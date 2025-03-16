@@ -5,12 +5,13 @@ import { Toaster } from "@/components/ui/toaster";
 import { Figtree } from "next/font/google";
 import NavigationBar from "@/components/navigation-bar";
 import Transition from "@/components/transition";
+import Favicon from "../public/favicon.ico";
 
 export const metadata = {
   title: "Rice Mailroom",
   description: "Package management system for Rice University",
   icons: {
-    icon: '/favicon.ico',
+    icon: Favicon.src,
   },
 };
 
