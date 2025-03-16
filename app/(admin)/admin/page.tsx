@@ -289,6 +289,9 @@ export default function Component() {
 
     const matchesSearch =
       student.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      student.preferred_name
+        ?.toLowerCase()
+        .includes(searchTerm.toLowerCase()) ||
       student.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
       hasMatchingPackage;
 
