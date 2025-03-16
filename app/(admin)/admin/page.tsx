@@ -90,6 +90,7 @@ const collegeContacts = [
 
 interface CollegeContact {
   name: string;
+  preferred_name?: string;
   email: string;
   collegeName: string;
 }
@@ -107,6 +108,7 @@ interface Package {
 interface Student {
   id: number;
   name: string;
+  preferred_name: string | null;
   netid: string;
   email: string;
   packages: Package[];
@@ -160,6 +162,7 @@ export default function Component() {
         collegeName: response.college,
         name: response.name,
         email: response.email,
+        preferred_name: response.preferred_name,
       });
     } catch (error) {
       console.error("Coordinator fetching failed:", error);
@@ -416,7 +419,8 @@ export default function Component() {
           <header className="flex items-center justify-between bg-white px-6 pt-6">
             <div className="flex items-center gap-4">
               <h1 className="text-2xl font-semibold">
-                Hi {coord?.name}! Track all packages here
+                Hi {coord?.preferred_name ?? coord?.name}! Track all packages
+                here
               </h1>
             </div>
             <div className="flex items-center gap-4 bg-white">
@@ -739,12 +743,22 @@ function PackageTable({
                       )}
                     </TableCell>
                     <TableCell className="font-medium w-[25%]">
-                      {student.name}
-                      {student.isAdmin && (
-                        <Badge className="ml-2 bg-blue-100 text-blue-800 border border-blue-200 hover:bg-blue-200">
-                          Admin
-                        </Badge>
-                      )}
+                      <div className="flex items-center">
+                        <div className="flex flex-col">
+                          <span>{student.name}</span>
+                          {student.preferred_name &&
+                            student.preferred_name !== student.name && (
+                              <span className="text-xs text-gray-500">
+                                {student.preferred_name}
+                              </span>
+                            )}
+                        </div>
+                        {student.isAdmin && (
+                          <Badge className="ml-2 bg-blue-100 text-blue-800 border border-blue-200 hover:bg-blue-200">
+                            Admin
+                          </Badge>
+                        )}
+                      </div>
                     </TableCell>
                     <TableCell className="w-[25%]">{student.email}</TableCell>
                     <TableCell className="w-[20%]">
