@@ -172,12 +172,11 @@ export default function StudentDashboard() {
 
     setSaving(true);
     try {
-      const { error } = await supabase
-        .from("users")
-        .update({
+      const { error } = await supabase.functions.invoke("update-user", {
+        body: {
           preferred_name: preferredName,
-        })
-        .eq("id", user.id);
+        },
+      });
 
       if (error) throw error;
 
