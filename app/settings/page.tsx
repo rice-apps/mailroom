@@ -103,7 +103,7 @@ export default function UserDetails() {
 
   return (
     <div className="min-h-screen bg-accent text-foreground px-4 py-8 md:flex md:justify-center md:items-center">
-      <div className="w-full max-w-xl mx-auto">
+      <div className="w-full max-w-xl mx-auto my-4">
         <Card className="p-4 md:p-6 space-y-5 border-none shadow-md rounded-3xl">
           {/* -------------- Your Details --------------- */}
           <h2 className="text-xl md:text-2xl font-medium">Your Details</h2>
