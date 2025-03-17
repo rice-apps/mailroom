@@ -8,6 +8,7 @@ import { Card } from "@/components/ui/card";
 import { Mail, MessageCircle } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/utils/supabase/client";
+import { Skeleton } from "@/components/ui/skeleton";
 import { User } from "@supabase/supabase-js";
 import { useToast } from "../hooks/use-toast";
 
@@ -26,6 +27,7 @@ export default function UserDetails() {
   const [emailNotifications, setEmailNotifications] = useState(true);
   const [preferredName, setPreferredName] = useState<string | null>(null);
   const [user, setUser] = useState<Student | null>(null);
+  const [loading, setLoading] = useState(true);
   const router = useRouter();
   const supabase = createClient();
   const { toast } = useToast();
@@ -65,6 +67,7 @@ export default function UserDetails() {
 
   useEffect(() => {
     const getUser = async () => {
+      setLoading(true);
       const {
         data: { user },
       } = await supabase.auth.getUser();
@@ -93,6 +96,7 @@ export default function UserDetails() {
           });
         }
       }
+      setLoading(false);
     };
     getUser();
   }, []);
@@ -108,27 +112,39 @@ export default function UserDetails() {
               <span className="mb-1 font-medium text-sm text-gray-500">
                 Name
               </span>
-              <span className="mb-3 md:mb-1 font-medium text-sm text-black">
-                {user?.full_name}
-              </span>
+              {loading ? (
+                <Skeleton className="h-5 w-40 mb-3 md:mb-1" />
+              ) : (
+                <span className="mb-3 md:mb-1 font-medium text-sm text-black">
+                  {user?.full_name}
+                </span>
+              )}
             </div>
 
             <div className="flex flex-col md:grid md:grid-cols-2 w-full">
               <span className="mb-1 font-medium text-sm text-gray-500">
                 Rice Email
               </span>
-              <span className="mb-3 md:mb-1 font-medium text-sm text-black break-words">
-                {user?.email}
-              </span>
+              {loading ? (
+                <Skeleton className="h-5 w-64 mb-3 md:mb-1" />
+              ) : (
+                <span className="mb-3 md:mb-1 font-medium text-sm text-black break-words">
+                  {user?.email}
+                </span>
+              )}
             </div>
 
             <div className="flex flex-col md:grid md:grid-cols-2 w-full">
               <span className="mb-1 font-medium text-sm text-gray-500">
                 Residential College
               </span>
-              <span className="mb-3 md:mb-1 font-medium text-sm text-black">
-                {user?.college}
-              </span>
+              {loading ? (
+                <Skeleton className="h-5 w-32 mb-3 md:mb-1" />
+              ) : (
+                <span className="mb-3 md:mb-1 font-medium text-sm text-black">
+                  {user?.college}
+                </span>
+              )}
             </div>
 
             <div className="flex flex-col md:grid md:grid-cols-2 w-full">
@@ -140,31 +156,39 @@ export default function UserDetails() {
                   Use the same name as your packages
                 </p>
               </div>
-              <Input
-                type="text"
-                placeholder="Mark Scout"
-                className="placeholder:text-gray-350 border-gray-300 rounded-full h-10 w-full"
-                value={preferredName ?? ""}
-                onChange={(e) => {
-                  setPreferredName(e.target.value);
-                }}
-              />
+              {loading ? (
+                <Skeleton className="h-10 w-full rounded-full" />
+              ) : (
+                <Input
+                  type="text"
+                  placeholder="Mark Scout"
+                  className="placeholder:text-gray-350 border-gray-300 rounded-full h-10 w-full"
+                  value={preferredName ?? ""}
+                  onChange={(e) => {
+                    setPreferredName(e.target.value);
+                  }}
+                />
+              )}
             </div>
 
             <div className="flex flex-col md:grid md:grid-cols-2 w-full">
               <span className="mb-2 font-medium text-sm text-gray-500">
                 Additional Email
               </span>
-              <Input
-                type="email"
-                placeholder="example@domain.com"
-                className="placeholder:text-gray-350 border-gray-300 rounded-full h-10 w-full"
-                value={additionalEmail ?? ""}
-                onChange={(e) => {
-                  setAdditionalEmail(e.target.value);
-                }}
-                pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$"
-              />
+              {loading ? (
+                <Skeleton className="h-10 w-full rounded-full" />
+              ) : (
+                <Input
+                  type="email"
+                  placeholder="example@domain.com"
+                  className="placeholder:text-gray-350 border-gray-300 rounded-full h-10 w-full"
+                  value={additionalEmail ?? ""}
+                  onChange={(e) => {
+                    setAdditionalEmail(e.target.value);
+                  }}
+                  pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$"
+                />
+              )}
             </div>
           </div>
 
@@ -181,27 +205,40 @@ export default function UserDetails() {
                 <Mail className="w-5 h-5" />
                 <span className="text-sm font-medium text-gray-700">Email</span>
               </div>
-              <Switch
-                checked={emailNotifications}
-                onCheckedChange={setEmailNotifications}
-              />
+              {loading ? (
+                <Skeleton className="h-6 w-12" />
+              ) : (
+                <Switch
+                  checked={emailNotifications}
+                  onCheckedChange={setEmailNotifications}
+                />
+              )}
             </div>
           </div>
 
           <div className="flex flex-col space-y-3 pt-4">
-            <Button
-              className="w-full md:w-auto md:mx-auto h-12 md:h-10 bg-blue-900 hover:bg-blue-800 rounded-full"
-              onClick={handleSaveChanges}
-            >
-              Save Changes
-            </Button>
+            {loading ? (
+              <>
+                <Skeleton className="h-12 md:h-10 w-full md:w-40 md:mx-auto rounded-full" />
+                <Skeleton className="h-12 md:h-10 w-full md:w-40 md:mx-auto rounded-full" />
+              </>
+            ) : (
+              <>
+                <Button
+                  className="w-full md:w-auto md:mx-auto h-12 md:h-10 bg-blue-900 hover:bg-blue-800 rounded-full"
+                  onClick={handleSaveChanges}
+                >
+                  Save Changes
+                </Button>
 
-            <Button
-              className="w-full md:w-auto md:mx-auto h-12 md:h-10 bg-red-900 text-white hover:bg-red-800 rounded-full"
-              onClick={handleDeleteAccount}
-            >
-              Delete Account
-            </Button>
+                <Button
+                  className="w-full md:w-auto md:mx-auto h-12 md:h-10 bg-red-900 text-white hover:bg-red-800 rounded-full"
+                  onClick={handleDeleteAccount}
+                >
+                  Delete Account
+                </Button>
+              </>
+            )}
           </div>
         </Card>
       </div>
