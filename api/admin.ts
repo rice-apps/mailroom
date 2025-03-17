@@ -118,7 +118,7 @@ export async function insertUsersGivenCollege(
   const supabase = createClient();
 
   try {
-    const { data, error } = await supabase.from("users").insert(
+    const { data, error } = await supabase.from("users").upsert(
       students.map((student) => ({
         college,
         user_type: "student",
@@ -128,11 +128,39 @@ export async function insertUsersGivenCollege(
         can_claim_packages: true,
         can_administrate_users: false,
       })),
+      {
+        onConflict: "email",
+        ignoreDuplicates: true,
+      },
     );
 
     if (error) {
       console.error("Error inserting user:", error);
       return null;
+    }
+
+    const deletedUsers = await supabase
+      .from("users")
+      .delete()
+      .eq("college", college)
+      .filter(
+        "email",
+        "not.in",
+        `(${students.map((s) => `${s.netID}@rice.edu`).join(",")})`,
+      )
+      .neq("can_add_and_delete_packages", true)
+      .select("id");
+
+    if (deletedUsers.error) {
+      console.error("Error inserting user:", deletedUsers.error);
+      return null;
+    }
+
+    const deletedIds = deletedUsers.data.map((u) => u.id);
+    if (deletedIds.length > 0) {
+      await supabase.functions.invoke("delete-auth", {
+        body: { ids: deletedIds },
+      });
     }
 
     return data;
