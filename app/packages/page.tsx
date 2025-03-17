@@ -23,6 +23,7 @@ import {
 } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/app/hooks/use-toast";
+import * as Dialog from "@radix-ui/react-dialog";
 
 interface User {
   id: string;
@@ -269,24 +270,36 @@ export default function StudentDashboard() {
   return (
     <div className="container mx-auto p-6 max-w-6xl">
       {/* Preferred Name Onboarding Dialog */}
-      {showOnboarding && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <Card className="w-full max-w-lg rounded-3xl border-[2px] border-[#BEBFBF] shadow-md overflow-hidden">
-            <CardHeader className="bg-white pb-3">
-              <CardTitle className="text-2xl font-semibold text-[#00205B]">
+      <Dialog.Root open={showOnboarding} onOpenChange={setShowOnboarding}>
+        <Dialog.Portal>
+          <Dialog.Overlay className="fixed inset-0 bg-black/40" />
+          <Dialog.Content
+            className="
+              fixed
+              top-1/2 left-1/2
+              w-[90vw] max-w-lg
+              -translate-x-1/2 -translate-y-1/2
+              rounded-3xl bg-white
+              shadow-lg
+              border-[2px] border-[#BEBFBF]
+              overflow-auto
+              max-h-[85vh]
+            "
+          >
+            <div className="p-6">
+              <Dialog.Title className="text-2xl font-semibold text-[#00205B]">
                 Set Your Preferred Name
-              </CardTitle>
-              <CardDescription className="text-muted-foreground">
+              </Dialog.Title>
+              <Dialog.Description className="text-muted-foreground mt-1">
                 Please provide the name you'd like to use for package pickups
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="p-8 bg-white">
-              <div className="flex flex-col items-center justify-center">
+              </Dialog.Description>
+
+              <div className="flex flex-col items-center justify-center py-4">
                 <div className="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center mb-6">
                   <User className="h-10 w-10 text-[#00205B]" />
                 </div>
 
-                <div className="w-full mb-8">
+                <div className="w-full mb-6">
                   <h3 className="text-lg font-medium text-gray-800 mb-2 text-center">
                     Make sure your name matches your packages
                   </h3>
@@ -329,27 +342,28 @@ export default function StudentDashboard() {
                   </div>
                 </div>
               </div>
-            </CardContent>
-            <CardFooter className="bg-white border-t p-4 flex justify-end gap-3">
-              <Button
-                variant="outline"
-                onClick={() => setShowOnboarding(false)}
-                className="rounded-full border-[#00205B] text-[#00205B]"
-              >
-                Later
-              </Button>
-              <Button
-                onClick={handleSavePreferredName}
-                disabled={!preferredName || saving}
-                className="rounded-full bg-[#00205B] text-white hover:bg-[#001845]"
-              >
-                {saving ? "Saving..." : "Save Name"}
-                {!saving && <Check className="ml-2 h-4 w-4" />}
-              </Button>
-            </CardFooter>
-          </Card>
-        </div>
-      )}
+
+              <div className="flex justify-end gap-3">
+                <Button
+                  variant="outline"
+                  onClick={() => setShowOnboarding(false)}
+                  className="rounded-full border-[#00205B] text-[#00205B]"
+                >
+                  Later
+                </Button>
+                <Button
+                  onClick={handleSavePreferredName}
+                  disabled={!preferredName || saving}
+                  className="rounded-full bg-[#00205B] text-white hover:bg-[#001845]"
+                >
+                  {saving ? "Saving..." : "Save Name"}
+                  {!saving && <Check className="ml-2 h-4 w-4" />}
+                </Button>
+              </div>
+            </div>
+          </Dialog.Content>
+        </Dialog.Portal>
+      </Dialog.Root>
 
       <Card className="mb-8 rounded-3xl shadow-md border-0">
         <CardHeader className="pb-2">

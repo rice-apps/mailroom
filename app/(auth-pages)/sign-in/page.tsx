@@ -10,7 +10,8 @@ const figtree = Figtree({
 
 const figtreeClass = figtree.className;
 
-export default function Login({ searchParams }: { searchParams: Message }) {
+export default async function Login(props: { searchParams: Promise<Message> }) {
+  const searchParams = await props.searchParams;
   return (
     <div
       className={`${figtreeClass} flex flex-col w-screen min-h-screen justify-center items-center bg-background overflow-hidden font-[figtree]`}
