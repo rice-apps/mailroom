@@ -15,7 +15,7 @@ export default function UnauthorizedPage() {
         </p>
         <div className="flex justify-center space-x-4">
           <Link
-            href="/"
+            href="/packages"
             className="flex items-center px-4 py-2 bg-blue-900 text-white rounded-md hover:bg-blue-800 transition"
           >
             <Home className="mr-2 w-5 h-5" />

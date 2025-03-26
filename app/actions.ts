@@ -6,7 +6,7 @@ import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 
 export const signInAction = async (formData: FormData) => {
-  const supabase = createClient();
+  const supabase = await createClient();
   const headersList = await headers();
   const host = headersList.get("host") || "";
   if (
@@ -37,7 +37,7 @@ export const signInAction = async (formData: FormData) => {
 };
 
 export const signOutAction = async () => {
-  const supabase = createClient();
+  const supabase = await createClient();
   await supabase.auth.signOut();
   return redirect("/sign-in");
 };

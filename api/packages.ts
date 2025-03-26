@@ -4,7 +4,7 @@ import { createClient } from "@/utils/supabase/server";
 import { create } from "domain";
 
 export async function fetchUser(email: string): Promise<any | null> {
-  const supabase = createClient();
+  const supabase = await createClient();
 
   try {
     const { data, error } = await supabase
@@ -28,7 +28,7 @@ export async function fetchUser(email: string): Promise<any | null> {
 export async function fetchPackagesbyUser(
   user_id: string,
 ): Promise<any | null> {
-  const supabase = createClient();
+  const supabase = await createClient();
 
   console.log(34, user_id);
 
@@ -53,7 +53,7 @@ export async function fetchPackagesbyUser(
 export async function claimPackage(
   package_identifier: string,
 ): Promise<boolean | undefined> {
-  const supabase = createClient();
+  const supabase = await createClient();
 
   try {
     const { error } = await supabase

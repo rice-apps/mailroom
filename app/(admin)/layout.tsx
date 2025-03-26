@@ -7,7 +7,7 @@ export default async function Layout({
 }: {
   children: React.ReactNode;
 }) {
-  const supabase = createClient();
+  const supabase = await createClient();
   const user = await supabase.auth.getUser();
   const authorized = await isAnAdmin(
     user.data.user?.email?.split("@")[0] ?? "",

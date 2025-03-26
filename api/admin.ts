@@ -5,7 +5,7 @@ import { createClient } from "@/utils/supabase/server";
 export async function fetchStudentsGivenCollege(
   college: string,
 ): Promise<any | null> {
-  const supabase = createClient();
+  const supabase = await createClient();
 
   try {
     const { data, error } = await supabase
@@ -42,7 +42,7 @@ export async function fetchStudentsGivenCollege(
 }
 
 export async function updateAdmin(netid: string, is_admin: boolean) {
-  const supabase = createClient();
+  const supabase = await createClient();
   console.log("hello", is_admin);
   try {
     const { data, error } = await supabase
@@ -63,7 +63,7 @@ export async function updateAdmin(netid: string, is_admin: boolean) {
 }
 
 export async function isAnAdmin(netid: string) {
-  const supabase = createClient();
+  const supabase = await createClient();
 
   const { data, error } = await supabase
     .from("users")
@@ -90,7 +90,7 @@ export async function isAnAdmin(netid: string) {
 }
 
 export async function userExists(netid: string) {
-  const supabase = createClient();
+  const supabase = await createClient();
 
   const { count, error } = await supabase
     .from("users")
@@ -115,7 +115,7 @@ export async function insertUsersGivenCollege(
   college: string,
   students: StudentData[],
 ): Promise<any | null> {
-  const supabase = createClient();
+  const supabase = await createClient();
 
   try {
     const { data, error } = await supabase.from("users").upsert(
