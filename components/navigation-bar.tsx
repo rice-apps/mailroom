@@ -25,7 +25,7 @@ export default function NavigationBar() {
   // Determine if settings icon should be shown (hide on settings page)
   const showSettingsIcon = !pathname.includes("/settings");
   const showBackButton =
-    !pathname.includes("/admin") && !pathname.includes("/home");
+    !pathname.includes("/admin") && !pathname.includes("/home") && !pathname.includes("/packages");
 
   // Check for overlaps with other elements
   useEffect(() => {
