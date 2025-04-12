@@ -5,7 +5,11 @@ import { usePathname, useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { useEffect, useRef, useState } from "react";
 
-export default function NavigationBar() {
+interface Props {
+  admin: boolean;
+}
+
+export default function NavigationBar({ admin }: Props) {
   const router = useRouter();
   const pathname = usePathname();
   const navRef = useRef<HTMLDivElement>(null);
@@ -25,7 +29,10 @@ export default function NavigationBar() {
   // Determine if settings icon should be shown (hide on settings page)
   const showSettingsIcon = !pathname.includes("/settings");
   const showBackButton =
-    !pathname.includes("/admin") && !pathname.includes("/home") && !pathname.includes("/packages");
+    (admin && pathname.includes("/packages")) ||
+    (!pathname.includes("/admin") &&
+      !pathname.includes("/home") &&
+      !pathname.includes("/packages"));
 
   // Check for overlaps with other elements
   useEffect(() => {
