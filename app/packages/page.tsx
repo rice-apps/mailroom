@@ -388,9 +388,13 @@ export default function StudentDashboard() {
             </div>
           </div>
         </CardContent>
-        <button className="absolute top-6 right-6 flex flex-row gap-2 items-center justify-center" onClick={signOutAction} title="Log out">
+        <button
+          className="absolute top-6 right-6 flex flex-row gap-2 items-center justify-center"
+          onClick={signOutAction}
+          title="Log out"
+        >
           <p>Log Out</p>
-        <LogOut className="mr-2 h-5 w-5 text-[#00205B]" />
+          <LogOut className="mr-2 h-5 w-5 text-[#00205B]" />
         </button>
       </Card>
 
