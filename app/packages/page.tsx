@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Package, User, Bell, Info, Check } from "lucide-react";
+import { Package, User, Bell, Info, Check, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -24,6 +24,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/app/hooks/use-toast";
 import * as Dialog from "@radix-ui/react-dialog";
+import { signOutAction } from "../actions";
 
 interface User {
   id: string;
@@ -364,7 +365,7 @@ export default function StudentDashboard() {
         </Dialog.Portal>
       </Dialog.Root>
 
-      <Card className="mb-8 rounded-3xl shadow-md border-0">
+      <Card className="mb-8 rounded-3xl shadow-md border-0 relative">
         <CardHeader className="pb-2">
           <CardTitle className="text-2xl font-semibold">
             Welcome, {user?.preferred_name ?? user?.name}
@@ -387,6 +388,14 @@ export default function StudentDashboard() {
             </div>
           </div>
         </CardContent>
+        <button
+          className="absolute top-6 right-6 flex flex-row gap-2 items-center justify-center"
+          onClick={signOutAction}
+          title="Log out"
+        >
+          <p>Log Out</p>
+          <LogOut className="mr-2 h-5 w-5 text-[#00205B]" />
+        </button>
       </Card>
 
       {/* Notification Setting */}

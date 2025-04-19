@@ -6,6 +6,8 @@ import { Figtree } from "next/font/google";
 import NavigationBar from "@/components/navigation-bar";
 import Transition from "@/components/transition";
 import Favicon from "../public/favicon.ico";
+import { createClient } from "@/utils/supabase/server";
+import { isAnAdmin } from "@/api/admin";
 
 export const metadata = {
   title: "Rice Mailroom",
@@ -21,11 +23,19 @@ const figtree = Figtree({
 
 const figtreeClass = figtree.className;
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const supabase = await createClient();
+  const isAdmin =
+    (await isAnAdmin(
+      (await supabase.auth.getSession()).data.session?.user.email?.split(
+        "@",
+      )[0] ?? "",
+    )) ?? false;
+
   return (
     <html lang="en" className={figtreeClass} suppressHydrationWarning>
       <body className="bg-accent text-foreground">
@@ -35,7 +45,7 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <NavigationBar />
+          <NavigationBar admin={isAdmin} />
           <Transition>{children}</Transition>
           <Toaster />
         </ThemeProvider>

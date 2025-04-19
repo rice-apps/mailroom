@@ -62,7 +62,7 @@ export async function updateAdmin(netid: string, is_admin: boolean) {
   }
 }
 
-export async function isAnAdmin(netid: string) {
+export async function isAnAdmin(netid: string): Promise<boolean | null> {
   const supabase = await createClient();
 
   const { data, error } = await supabase
