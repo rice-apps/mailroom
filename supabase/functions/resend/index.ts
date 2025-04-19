@@ -285,7 +285,7 @@ const handler = async (request: Request): Promise<Response> => {
             <![endif]-->
         </head>
   
-        <body class="body pc-font-alt" style="width: 100% !important; min-height: 100% !important; margin: 0 !important; padding: 0 !important; line-height: 1.5; color: #2D3A41; mso-line-height-rule: exactly; -webkit-font-smoothing: antialiased; -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; font-variant-ligatures: normal; text-rendering: optimizeLegibility; -moz-osx-font-smoothing: grayscale; background-color: #f4f4f4;" bgcolor="#f4f4f4">
+        <body class="body pc-font-alt" style="width: 100% !important; min-height: 100% !important; margin: 0 !important; padding: 0 !important; line-height: 1.5; color: #ffffff; mso-line-height-rule: exactly; -webkit-font-smoothing: antialiased; -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; font-variant-ligatures: normal; text-rendering: optimizeLegibility; -moz-osx-font-smoothing: grayscale; background-color: #ffffff;" bgcolor="#ffffff">
         <table class="pc-project-body" style="table-layout: fixed; min-width: 600px; background-color: #f4f4f4;" bgcolor="#f4f4f4" width="100%" border="0" cellspacing="0" cellpadding="0" role="presentation">
           <tr>
           <td align="center" valign="top">
@@ -301,13 +301,8 @@ const handler = async (request: Request): Promise<Response> => {
                     <td style="padding: 0px 0px 0px 0px;">
                     <table width="100%" border="0" cellspacing="0" cellpadding="0" role="presentation">
                       <tr>
-                      <td valign="top" class="pc-w520-padding-30-30-30-30 pc-w620-padding-35-35-35-35" style="padding: 40px 40px 40px 40px; border-radius: 0px; background-color: #1B1B1B;" bgcolor="#1B1B1B">
+                      <td valign="top" class="pc-w520-padding-30-30-30-30 pc-w620-padding-35-35-35-35" style="padding: 40px 40px 40px 40px; border-radius: 0px; background-color: #ffffff;" bgcolor="#ffffff">
                         <table width="100%" border="0" cellpadding="0" cellspacing="0" role="presentation">
-                        <tr>
-                          <td class="pc-w620-spacing-0-0-40-0" align="center" valign="top" style="padding: 0px 0px 60px 0px;">
-                          <img src="https://cloudfilesdm.com/postcards/logo-white.png" width="125" height="25" alt="" style="display: block; outline: 0; line-height: 100%; -ms-interpolation-mode: bicubic; width: 125px; height: auto; max-width: 100%; border: 0;" />
-                          </td>
-                        </tr>
                         </table>
                         <table width="100%" border="0" cellpadding="0" cellspacing="0" role="presentation">
                         <tr>
@@ -315,7 +310,7 @@ const handler = async (request: Request): Promise<Response> => {
                           <table border="0" cellpadding="0" cellspacing="0" role="presentation" width="100%" style="border-collapse: separate; border-spacing: 0; margin-right: auto; margin-left: auto;">
                             <tr>
                             <td valign="top" align="center">
-                              <div class="pc-font-alt pc-w620-fontSize-30 pc-w620-lineHeight-133pc" style="line-height: 100%; letter-spacing: -0.6px; font-family: 'Fira Sans', Arial, Helvetica, sans-serif; font-size: 48px; font-weight: 800; font-variant-ligatures: normal; color: #ffffff; text-align: center; text-align-last: center;">
+                              <div class="pc-font-alt pc-w620-fontSize-30 pc-w620-lineHeight-133pc" style="line-height: 100%; letter-spacing: -0.6px; font-family: 'Fira Sans', Arial, Helvetica, sans-serif; font-size: 48px; font-weight: 800; font-variant-ligatures: normal; color: #000000; text-align: center; text-align-last: center;">
                               <div><span>Package Delivered</span>
                               </div>
                               </div>
@@ -329,7 +324,7 @@ const handler = async (request: Request): Promise<Response> => {
                         <tr>
                           <td align="center" valign="top" style="padding: 0px 0px 20px 0px;">
                             <a href="#" title="" target="_blank">
-                          <img src="https://cloudfilesdm.com/postcards/image-1729971413221.png" width="285" height="285" alt="" style="display: block; outline: 0; line-height: 100%; -ms-interpolation-mode: bicubic; width: 285px; height: auto; max-width: 100%; border: 0;" />
+                          <img src="https://mailroom.riceapps.org/_next/image?url=%2Fmailroom_logo.png&w=640&q=75" width="285" height="285" alt="" style="display: block; outline: 0; line-height: 100%; -ms-interpolation-mode: bicubic; width: 285px; height: auto; max-width: 100%; border: 0;" />
                            </a>
                           </td>
                         </tr>
@@ -340,20 +335,20 @@ const handler = async (request: Request): Promise<Response> => {
                           <table border="0" cellpadding="0" cellspacing="0" role="presentation" width="100%" style="border-collapse: separate; border-spacing: 0; margin-right: auto; margin-left: auto;">
                             <tr>
                             <td valign="top" align="center">
-                              <div class="pc-font-alt pc-w620-fontSize-16 pc-w620-lineHeight-163pc" style="line-height: 156%; letter-spacing: -0.2px; font-family: 'Fira Sans', Arial, Helvetica, sans-serif; font-size: 18px; font-weight: 300; font-variant-ligatures: normal; color: #ffffff; text-align: center; text-align-last: center;">
+                              <div class="pc-font-alt pc-w620-fontSize-16 pc-w620-lineHeight-163pc" style="line-height: 156%; letter-spacing: -0.2px; font-family: 'Fira Sans', Arial, Helvetica, sans-serif; font-size: 18px; font-weight: 300; font-variant-ligatures: normal; color: #000000; text-align: center; text-align-last: center;">
                               <div><span>Pickup your package in the mailroom!</span>
                               </div>
                               <div> 
                               
                               <a href="https://qiekvvwcicienqtinxmo.supabase.co/functions/v1/claim-package?redirectUrl=${redirectUrl}" 
-                                style="display: inline-block; padding: 10px 20px; background-color: #a27a52; color: #ffffff; text-decoration: none; border-radius: 4px; font-weight: bold; margin: 10px 0;">
+                                style="display: inline-block; padding: 10px 20px; background-color: #00205c; color: #ffffff; text-decoration: none; border-radius: 4px; font-weight: bold; margin: 10px 0;">
                                   Claim Package
                               </a>
   
                               </div>
-                              <div><span>Your package has arrived!</span>
+                              <div><span style="color: #000000">Your package has arrived!</span>
                               </div>
-                              <div><p>If you no longer want to receive these notifications, you can <a href="https://qiekvvwcicienqtinxmo.supabase.co/functions/v1/unsubscribe-handler?netID=${netID}">unsubscribe here</a>.</p></div>
+                              <div><p style="color: #000000">If you no longer want to receive these notifications, you can <a href="https://qiekvvwcicienqtinxmo.supabase.co/functions/v1/unsubscribe-handler?netID=${netID}">unsubscribe here</a>.</p></div>
                               </div>
                             </td>
                             </tr>
